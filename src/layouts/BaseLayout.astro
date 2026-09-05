@@ -1,0 +1,99 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = '직접 테스트한 업무 생산성 소프트웨어 활용 가이드',
+  canonical,
+  ogType = 'website',
+  ogImage,
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localhost:4321';
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
+const siteName = '업무도구 실험실';
+
+const navItems = [
+  { href: '/', label: '글 목록' },
+  { href: '/about', label: '소개' },
+  { href: '/editorial-policy', label: '편집 원칙' },
+];
+const footerItems = [
+  { href: '/about', label: '소개' },
+  { href: '/author', label: '작성자' },
+  { href: '/contact', label: '문의' },
+  { href: '/privacy', label: '개인정보처리방침' },
+  { href: '/editorial-policy', label: '편집 원칙' },
+];
+const isCurrent = (href: string) =>
+  href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname.startsWith(href);
+
+const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="ko_KR" />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    {jsonLdBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">업무도구 실험실</a>
+        <nav class="site-nav" aria-label="주요 메뉴">
+          <ul>
+            {navItems.map((item) => (
+              <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main" class="container">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <nav class="container footer-nav" aria-label="푸터 링크">
+        <ul>
+          {footerItems.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <div class="container"><small>직접 확인과 사람 검토를 거친 콘텐츠만 공개합니다.</small></div>
+    </footer>
+  </body>
+</html>

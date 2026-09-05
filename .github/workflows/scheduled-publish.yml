@@ -1,0 +1,43 @@
+name: Scheduled Publish
+
+# 사람이 status: scheduled + publishAt를 승인한 글을 호스팅에 재빌드하도록 한다.
+# 정적 호스팅은 저장소 변경이 없으면 스스로 다시 빌드하지 않으므로,
+# 호스팅의 Deploy Hook URL을 DEPLOY_HOOK_URL secret으로 등록해야 실제 공개가 진행된다.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-publish
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check:content
+      - run: npm run build
+      - run: npm run check:build
+
+      - name: 호스팅 재빌드 요청
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::notice::DEPLOY_HOOK_URL이 없어 빌드 검증만 수행했습니다. 호스팅 연결 후 secret을 등록하세요."
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK_URL"

@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublicPosts } from '../lib/posts';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../lib/format';
+
+const posts = await getPublicPosts();
+const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localhost:4321';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '업무도구 실험실',
+  description: '직접 테스트한 업무 생산성 소프트웨어 활용 가이드',
+  url: new URL('/', siteUrl).toString(),
+  inLanguage: 'ko',
+};
+const cardId = (slug: string) => `post-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+---
+<BaseLayout
+  title="업무도구 실험실 — 직접 테스트한 업무 생산성 가이드"
+  description="직접 테스트한 업무 생산성 소프트웨어 활용 가이드. Excel·Google Sheets·Notion·Google Workspace와 검증된 AI 업무 활용법을 다룹니다."
+  jsonLd={jsonLd}
+>
+  <section class="hero">
+    <p class="eyebrow">실험하고 기록하는 업무 도구 가이드</p>
+    <h1>따라 해보고, 안 될 때까지 기록합니다.</h1>
+    <p class="lede">Excel·Google Sheets·Notion·Google Workspace와 검증한 AI 업무 활용법을 한 가지 문제씩 다룹니다.</p>
+  </section>
+
+  <section class="home-section" aria-labelledby="topics-heading">
+    <h2 id="topics-heading">다루는 주제</h2>
+    <div class="topic-grid">
+      <div class="topic-card">
+        <p class="post-meta"><span class="badge badge--prod">업무 생산성</span></p>
+        <h3>스프레드시트·문서·캘린더 실무</h3>
+        <p>Excel, Google Sheets, Notion, Google Workspace에서 문제 하나를 해결하는 단계별 가이드입니다. 수식·설정 경로·템플릿·오류 해결을 포함합니다.</p>
+      </div>
+      <div class="topic-card">
+        <p class="post-meta"><span class="badge badge--ai">AI 업무 활용</span></p>
+        <h3>직접 테스트한 AI 업무 활용법</h3>
+        <p>회의록에서 실행 항목 추출, 긴 문서를 표로 변환 같은 작업을 모델·버전과 실제 입력·결과, 실패하고 고친 과정과 함께 기록합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-section" aria-labelledby="latest-heading">
+    <h2 id="latest-heading">최근 글</h2>
+    {posts.length ? (
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li class="post-card" aria-labelledby={cardId(post.id)}>
+            <p class="post-meta">
+              <span class={topicBadgeClass(post.data.topic)}>{topicLabel(post.data.topic)}</span>
+              {post.data.testedAt && <span class="badge badge--verified">직접 테스트</span>}
+              <time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)} 작성</time>
+              {post.data.testedAt && (
+                <time datetime={toIsoDate(post.data.testedAt)}>{formatKoDate(post.data.testedAt)} 테스트</time>
+              )}
+            </p>
+            <h3 id={cardId(post.id)}><a href={`/posts/${post.id}`}>{post.data.title}</a></h3>
+            <p>{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="empty">
+        <p><strong>첫 번째 검증 글을 준비하고 있습니다.</strong></p>
+        <p>직접 테스트와 사람 검토를 마친 글부터 공개합니다.</p>
+      </div>
+    )}
+  </section>
+
+  <section class="home-section" aria-labelledby="trust-heading">
+    <h2 id="trust-heading">이 블로그를 읽어도 되는 이유</h2>
+    <ul class="trust-list">
+      <li>직접 실행하지 않은 과정은 직접 테스트했다고 쓰지 않습니다.</li>
+      <li>수치·가격·날짜·버전에는 출처와 확인 날짜를 기록합니다.</li>
+      <li>AI로 초안을 작성해도 사람의 사실·문체·정책 검토를 통과해야만 공개합니다.</li>
+    </ul>
+    <p>자세한 기준은 <a href="/editorial-policy">편집 원칙</a>에서 확인하세요.</p>
+  </section>
+</BaseLayout>

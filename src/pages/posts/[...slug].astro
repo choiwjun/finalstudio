@@ -1,0 +1,120 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isPublicPost, type Post } from '../../lib/posts';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.filter((post) => isPublicPost(post)).map((post) => ({
+    // Astro 7 콘텐츠 레이어는 slug 대신 id(파일 경로 기반 슬러그)를 노출한다.
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const data = post.data;
+const canonical = data.canonical;
+// pubDate가 미래인 카드는 색인 전에 배포될 수 있으므로 noindex로 보호한다.
+const noindex = data.pubDate.getTime() > Date.now();
+
+const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localhost:4321';
+const pageUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
+const coverUrl = data.image ? new URL(data.image, siteUrl).toString() : undefined;
+const toolVersionEntries = Object.entries(data.toolVersions);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: data.title,
+  description: data.description,
+  inLanguage: 'ko',
+  url: pageUrl,
+  ...(coverUrl ? { image: coverUrl } : {}),
+  // 예약 공개 시각(publishAt)이 아니라 실제 작성·배포 시각 기준 (DeepSeek 4.3)
+  datePublished: toIsoDate(data.pubDate),
+  ...(data.testedAt ? { dateModified: toIsoDate(data.testedAt) } : {}),
+  author: { '@type': 'Person', name: data.author },
+  publisher: { '@type': 'Organization', name: '업무도구 실험실', url: new URL('/', siteUrl).toString() },
+};
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '글 목록', item: new URL('/', siteUrl).toString() },
+    { '@type': 'ListItem', position: 2, name: data.title },
+  ],
+};
+---
+<BaseLayout
+  title={`${data.title} | 업무도구 실험실`}
+  description={data.description}
+  canonical={canonical}
+  ogType="article"
+  ogImage={data.image}
+  noindex={noindex}
+  jsonLd={[jsonLd, breadcrumbs]}
+>
+  <article class="article">
+    <header class="post-header">
+      <p class="post-badges">
+        <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
+        {data.testedAt && <span class="badge badge--verified">직접 테스트</span>}
+        {data.aiAssisted && <span class="badge badge--pending">AI 보조 · 사람 검토</span>}
+      </p>
+      <h1>{data.title}</h1>
+      <p class="byline">
+        <a href="/author">{data.author}</a>
+        · <time datetime={toIsoDate(data.pubDate)}>{formatKoDate(data.pubDate)} 작성</time>
+        {data.testedAt && (
+          <> · <time datetime={toIsoDate(data.testedAt)}>{formatKoDate(data.testedAt)} 직접 확인</time></>
+        )}
+      </p>
+      <p class="lede">{data.description}</p>
+    </header>
+    {data.image && (
+      <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="eager" decoding="async" />
+    )}
+    <Content />
+    {(data.testedAt || toolVersionEntries.length > 0 || data.sourceIds.length > 0) && (
+      <section class="meta-panel" aria-labelledby="post-meta-heading">
+        <h2 id="post-meta-heading">테스트 정보</h2>
+        <dl>
+          {data.testedAt && (
+            <>
+              <dt>직접 테스트</dt>
+              <dd><time datetime={toIsoDate(data.testedAt)}>{formatKoDate(data.testedAt)}</time></dd>
+            </>
+          )}
+          {toolVersionEntries.length > 0 && (
+            <>
+              <dt>도구 버전</dt>
+              <dd>
+                <ul>
+                  {toolVersionEntries.map(([tool, version]) => <li><code>{tool}</code>: {version}</li>)}
+                </ul>
+              </dd>
+            </>
+          )}
+          {data.sourceIds.length > 0 && (
+            <>
+              <dt>출처·확인</dt>
+              <dd>
+                <ul>
+                  {data.sourceIds.map((source) => <li><code>{source}</code></li>)}
+                </ul>
+                {data.testedAt && <span>확인일: <time datetime={toIsoDate(data.testedAt)}>{formatKoDate(data.testedAt)}</time></span>}
+              </dd>
+            </>
+          )}
+        </dl>
+        {data.aiAssisted && (
+          <p class="meta-note">이 글은 AI의 도움으로 초안을 작성했고, 사람이 직접 실행하고 검토해 확인했습니다.</p>
+        )}
+      </section>
+    )}
+    <p><a href="/">글 목록으로 돌아가기</a></p>
+  </article>
+</BaseLayout>

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# local Codex/agent configuration
+.commandcode/
+
+# third-party tool clones (claude-blog, im-not-ai)
+tools/
+out/
+.trash/

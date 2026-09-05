@@ -1,0 +1,361 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+import { isPublicPost } from '../../lib/posts';
+
+const statusMeta = {
+  draft: { label: '초안', className: 'status-badge status-badge--draft' },
+  scheduled: { label: '예약', className: 'status-badge status-badge--scheduled' },
+  published: { label: '공개', className: 'status-badge status-badge--published' },
+} as const;
+
+type PostStatus = keyof typeof statusMeta;
+
+const statusOf = (status: string): PostStatus =>
+  status in statusMeta ? (status as PostStatus) : 'draft';
+const statusLabel = (status: string) => statusMeta[statusOf(status)].label;
+const statusClass = (status: string) => statusMeta[statusOf(status)].className;
+const authorLabel = (author: string) => author === 'TBD' ? '작성자 미정' : author;
+
+const now = new Date();
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const effectiveStatus = (post: (typeof posts)[number]): PostStatus => {
+  if (isPublicPost(post, now)) return 'published';
+  if (post.data.publishAt && post.data.publishAt > now) return 'scheduled';
+  return statusOf(post.data.status);
+};
+const publicPosts = posts.filter((post) => isPublicPost(post, now));
+const reviewPosts = posts.filter(
+  (post) => effectiveStatus(post) !== 'published' || !post.data.testedAt || post.data.author === 'TBD',
+);
+const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
+---
+
+<BaseLayout
+  title="관리 대시보드 | 업무도구 실험실"
+  description="업무도구 실험실 콘텐츠 상태와 발행 현황을 확인하는 관리자 대시보드"
+  noindex
+>
+  {import.meta.env.DEV ? (
+  <div class="dashboard">
+    <header class="dashboard-header">
+      <div>
+        <p class="eyebrow">운영 작업 공간</p>
+        <h1>관리 대시보드</h1>
+        <p class="lede">콘텐츠 상태와 검토 대상을 한눈에 확인합니다.</p>
+      </div>
+      <div class="dashboard-actions">
+        <a class="btn btn--ghost" href="/">사이트 보기</a>
+        <a class="btn btn--ghost" href="#auto-publish">자동 글발행</a>
+        <a class="btn btn--primary" href="#content">글 현황 보기</a>
+      </div>
+    </header>
+
+    <div class="notice notice--warning dashboard-notice" role="status">
+      <strong id="admin-server-status">관리 서버 연결 확인 중…</strong>
+      <span id="admin-server-hint">
+        편집·삭제·상태 변경(발행)·새 글 작성을 쓰려면 터미널에서 <code>npm run admin</code>을 실행하세요 —
+        개발 서버도 함께 실행·관리되며, 글 변경 후 사이트 반영까지 약 10초(자동 재시작·재동기화)가 걸립니다.
+        관리 API는 localhost 전용(127.0.0.1)이라 외부에 노출되지 않으며, 이 화면과 함께 개발 환경 전용입니다.
+        상태를 공개(published)로 바꿔도 정적 사이트 반영에는 빌드·배포가 필요합니다.
+      </span>
+    </div>
+
+    <section class="dashboard-section" aria-labelledby="overview-heading">
+      <div class="dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Overview</p>
+          <h2 id="overview-heading">콘텐츠 요약</h2>
+        </div>
+        <p class="dashboard-section-note">현재 저장된 글 기준 · 공개 중은 현재 날짜 기준</p>
+      </div>
+      <div class="dashboard-stats">
+        <article class="stat-card">
+          <p class="stat-label">전체 글</p>
+          <p class="stat-value">{posts.length}</p>
+          <p class="stat-note">Markdown 파일</p>
+        </article>
+        <article class="stat-card stat-card--success">
+          <p class="stat-label">공개 중</p>
+          <p class="stat-value">{publicPosts.length}</p>
+          <p class="stat-note">방문자에게 표시</p>
+        </article>
+        <article class="stat-card stat-card--warning">
+          <p class="stat-label">검토 필요</p>
+          <p class="stat-value">{reviewPosts.length}</p>
+          <p class="stat-note">초안·예약·확인 대기</p>
+        </article>
+        <article class="stat-card stat-card--info">
+          <p class="stat-label">테스트 기록</p>
+          <p class="stat-value">{testedPosts.length}</p>
+          <p class="stat-note">확인 날짜가 있는 글</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="dashboard-section" id="content" aria-labelledby="content-heading">
+      <div class="dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Content</p>
+          <h2 id="content-heading">글 현황</h2>
+        </div>
+        <p class="dashboard-section-note" id="post-result-count" aria-live="polite">{posts.length}개 글 표시</p>
+      </div>
+
+      <div class="dashboard-toolbar">
+        <div class="dashboard-field">
+          <label for="post-search">글 검색</label>
+          <input id="post-search" type="search" placeholder="제목·설명·작성자 검색" autocomplete="off" />
+        </div>
+        <div class="dashboard-field dashboard-field--status">
+          <label for="post-status">상태 필터</label>
+          <select id="post-status">
+            <option value="all">전체 상태</option>
+            <option value="draft">초안</option>
+            <option value="scheduled">예약</option>
+            <option value="published">공개</option>
+          </select>
+        </div>
+        <div class="dashboard-toolbar-actions">
+          <button id="new-post" class="btn btn--ghost" type="button" disabled>+ 새 글</button>
+          <button id="run-check" class="btn btn--ghost" type="button" disabled>콘텐츠 검사</button>
+        </div>
+      </div>
+      <p id="check-result" class="dashboard-footnote" hidden></p>
+
+      {posts.length ? (
+        <div class="dashboard-table-wrap">
+          <table class="dashboard-table">
+            <caption class="visually-hidden">콘텐츠 상태 목록</caption>
+            <thead>
+              <tr>
+                <th scope="col">글</th>
+                <th scope="col">상태</th>
+                <th scope="col">주제</th>
+                <th scope="col">게시일</th>
+                <th scope="col">예약·테스트</th>
+                <th scope="col">작성자</th>
+                <th scope="col">관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              {posts.map((post) => (
+                <tr
+                  data-post-row
+                  data-status={effectiveStatus(post)}
+                  data-search={`${post.data.title} ${post.data.description} ${authorLabel(post.data.author)}`}
+                >
+                  <td>
+                    <div class="dashboard-post-title">
+                      {isPublicPost(post) ? (
+                        <a href={`/posts/${post.id}`}>{post.data.title}</a>
+                      ) : (
+                        <span>{post.data.title}</span>
+                      )}
+                      <small>{post.data.description}</small>
+                      <code>{post.id}.md</code>
+                    </div>
+                  </td>
+                  <td><span class={statusClass(effectiveStatus(post))}>{statusLabel(effectiveStatus(post))}</span></td>
+                  <td><span class={topicBadgeClass(post.data.topic)}>{topicLabel(post.data.topic)}</span></td>
+                  <td><time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)}</time></td>
+                  <td>
+                    <div class="dashboard-date-stack">
+                      {post.data.publishAt && (
+                        <time datetime={toIsoDate(post.data.publishAt)}>예약 {formatKoDate(post.data.publishAt)}</time>
+                      )}
+                      {post.data.testedAt && (
+                        <time datetime={toIsoDate(post.data.testedAt)}>테스트 {formatKoDate(post.data.testedAt)}</time>
+                      )}
+                      {!post.data.publishAt && !post.data.testedAt && (
+                        <span class="dashboard-muted">확인 날짜 없음</span>
+                      )}
+                    </div>
+                  </td>
+                  <td>{authorLabel(post.data.author)}</td>
+                  <td>
+                    <div class="row-actions" data-file={`${post.id}.md`}>
+                      <button type="button" class="row-btn" data-action="edit">편집</button>
+                      <button type="button" class="row-btn" data-action="status">상태</button>
+                      <button type="button" class="row-btn row-btn--danger" data-action="delete">삭제</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p id="post-filter-empty" class="dashboard-filter-empty" hidden>조건에 맞는 글이 없습니다.</p>
+      ) : (
+        <div class="empty">
+          <p><strong>아직 등록된 글이 없습니다.</strong></p>
+          <p>콘텐츠 폴더에 첫 번째 Markdown 글을 추가하면 여기에 표시됩니다.</p>
+        </div>
+      )}
+      <noscript><p class="dashboard-footnote">검색과 상태 필터를 사용하려면 JavaScript를 켜 주세요.</p></noscript>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="workflow-heading">
+      <div class="dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Workflow</p>
+          <h2 id="workflow-heading">권장 발행 흐름</h2>
+        </div>
+      </div>
+      <div class="workflow-grid">
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">1</p>
+          <div>
+            <h3>초안 작성</h3>
+            <p><code>src/content/posts</code>에 Markdown 파일을 추가합니다.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">2</p>
+          <div>
+            <h3>직접 확인</h3>
+            <p>절차·결과·도구 버전과 확인 날짜를 기록합니다.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">3</p>
+          <div>
+            <h3>검사 후 공개</h3>
+            <p><code>npm run check:content</code>와 빌드를 통과한 뒤 상태를 변경합니다.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dashboard-section" id="auto-publish" aria-labelledby="auto-publish-heading">
+      <div class="dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Auto Publish</p>
+          <h2 id="auto-publish-heading">자동 글발행 파이프라인</h2>
+        </div>
+        <p class="dashboard-section-note">명령 1줄로 발행 직전까지 · 상세: <code>scripts/auto-publish/README.md</code></p>
+      </div>
+
+      <div class="notice notice--warning" role="note">
+        <strong>필수 게이트 2개는 자동화하지 않습니다.</strong>
+        ① 윤문·검수(90점 게이트)는 <code>npm run auto:write</code>에 내장돼 자동 수행되지만, 통과하지 못한 글은 저장되지 않습니다.
+        ② 사람이 실제 테스트·승인하기 전까지 <code>status: draft</code>가 유지되며, 무검토 대량 발행은
+        구글 규모화 콘텐츠 악용 정책 위반으로 애드센스 계정을 위태롭게 합니다.
+        현재 검증 대기 중인 글: <strong>{reviewPosts.length}개</strong>
+      </div>
+
+      <div class="workflow-grid workflow-grid--pipeline">
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">1</p>
+          <div>
+            <h3>초안+윤문+검수 (자동)</h3>
+            <p><code>npm run auto:write "주제"</code> — API 키가 있으면 3단계 프롬프트(초안 → AI 티 제거 → 90점 채점)를 자동 실행합니다. 키가 없으면 수동 모드 안내가 출력됩니다.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">2</p>
+          <div>
+            <h3>변환·저장 (자동)</h3>
+            <p>같은 명령이 <code>status: draft</code>로 스키마 변환까지 수행합니다. 90점 미만이면 저장 거부.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">3</p>
+          <div>
+            <h3>사람 검증 <span class="badge-required">필수</span></h3>
+            <p>실제로 따라 해보고 스크린샷·버전·테스트 날짜를 채웁니다. 마커가 남아 있으면 발행 금지.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">4</p>
+          <div>
+            <h3>승인·발행</h3>
+            <p><code>npm run check:content</code> 통과 → 사람이 status 변경 → 예약 빌드·배포.</p>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <p class="workflow-number" aria-hidden="true">5</p>
+          <div>
+            <h3>주간 자동 초안</h3>
+            <p>GitHub 연결 후 Actions가 월·목 10시에 캘린더(<code>calendar.md</code>)의 다음 주제로 초안 PR을 제안합니다. <strong>PR 머지 = 승인.</strong></p>
+          </div>
+        </article>
+      </div>
+
+      <div class="pipeline-commands">
+        <h3>실행 명령 순서</h3>
+        <ol class="pipeline-command-list">
+          <li><code>npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level 완전초보 --stage 도구 --topic productivity</code></li>
+          <li><code>npm run check:content</code> <span class="pipeline-note">(사람 검증 후)</span></li>
+        </ol>
+        <p class="dashboard-footnote">API 키 설정(<code>.env</code>)·수동 ChatGPT 모드·GitHub Actions 세팅은 <code>scripts/auto-publish/README.md</code>를 참고하세요.</p>
+      </div>
+    </section>
+
+    <div class="admin-modal" id="edit-modal" hidden>
+      <div class="admin-modal-panel">
+        <h3 id="edit-modal-title">글 편집</h3>
+        <div class="admin-field" id="edit-name-field" hidden>
+          <label for="edit-file">파일명 (src/content/posts/ 아래, .md)</label>
+          <input id="edit-file" type="text" placeholder="my-new-post.md" autocomplete="off" />
+        </div>
+        <textarea id="edit-content" rows="20" spellcheck="false" aria-label="마크다운 편집"></textarea>
+        <p class="admin-modal-error" id="edit-error" hidden></p>
+        <div class="admin-modal-actions">
+          <button type="button" class="btn btn--ghost" data-modal-close>취소</button>
+          <button type="button" class="btn btn--primary" id="edit-save">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-modal" id="status-modal" hidden>
+      <div class="admin-modal-panel">
+        <h3 id="status-modal-title">상태 변경</h3>
+        <p class="admin-modal-desc" id="status-modal-target"></p>
+        <div class="admin-field">
+          <label for="status-select">상태</label>
+          <select id="status-select">
+            <option value="draft">초안 (draft)</option>
+            <option value="scheduled">예약 (scheduled)</option>
+            <option value="published">공개 (published)</option>
+          </select>
+        </div>
+        <div class="admin-field" id="status-publish-field" hidden>
+          <label for="status-publish">예약일 (publishAt)</label>
+          <input id="status-publish" type="date" />
+        </div>
+        <div class="admin-field" id="status-tested-field">
+          <label for="status-tested">테스트 날짜 (testedAt) — 공개·예약 시 필수</label>
+          <input id="status-tested" type="date" />
+        </div>
+        <div class="admin-field" id="status-author-field">
+          <label for="status-author">작성자 (author) — 공개·예약 시 실명 필수</label>
+          <input id="status-author" type="text" placeholder="예: 최우진" autocomplete="off" />
+        </div>
+        <p class="admin-modal-error" id="status-error" hidden></p>
+        <div class="admin-modal-actions">
+          <button type="button" class="btn btn--ghost" data-modal-close>취소</button>
+          <button type="button" class="btn btn--primary" id="status-apply">적용</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  ) : (
+    <article class="article article--narrow admin-guard">
+      <p class="eyebrow">관리자 영역</p>
+      <h1>관리 화면은 외부에 공개하지 않습니다.</h1>
+      <p>이 대시보드는 개발 환경에서만 사용할 수 있습니다. 운영 환경에서는 관리자 인증을 연결한 별도 비공개 도구를 사용하세요.</p>
+      <p><a href="/">사이트로 돌아가기</a></p>
+    </article>
+  )}
+
+  {import.meta.env.DEV && (
+    <script is:inline type="module">
+      /* 개발 전용: 운영 빌드에는 이 요소 자체가 렌더링되지 않고, 대시보드 스크립트도 번들에 포함되지 않는다. */
+      import('/src/scripts/admin-dashboard.ts');
+    </script>
+  )}
+</BaseLayout>

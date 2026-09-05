@@ -1,0 +1,143 @@
+/* ============================================================
+   Design Tokens — 업무도구 실험실
+   canonical spec: .planning/design/DESIGN_SYSTEM.md
+   규격 출처: qwen-ui-system.md §3 (토큰) / §4 (브레이크포인트)
+
+   브레이크포인트 단일 출처 (CSS 변수는 @media에서 쓸 수 없어
+   주석 테이블 + 리터럴 px가 표준이다):
+     —      0~479px   기본(모바일)
+     sm     480px     메타 행·푸터 간격
+     md     768px     본문 17px·헤더 단행·nav 여백
+     lg     1024px    섹션 여백 상한 고정
+     xl     1280px    컨테이너 상한 유지(확장 없음)
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- 1) 색상: 중립 (파란기 gray) ---- */
+  --color-ink:          #172033; /* 본문·제목        on bg 13.8:1 */
+  --color-ink-soft:     #3d4a61; /* 보조 본문·리드   on #fff 9.4:1 */
+  --color-muted:        #5c6a80; /* 메타·캡션·푸터   on #fff 5.4:1 */
+  --color-faint:        #8a94a6; /* 장식 전용 — 텍스트 사용 금지(3.2:1) */
+  --color-line:         #e5e9f0; /* 기본 테두리 */
+  --color-line-strong:  #d4dae4; /* hover·구분 테두리 */
+  --color-bg:           #fbfcfe; /* 페이지 배경 */
+  --color-surface:      #ffffff; /* 카드·헤더·푸터 */
+  --color-surface-sunken: #f3f6fa; /* 코드블록·표 헤더·빈칸 */
+
+  /* ---- 브랜드·링크 ---- */
+  --color-brand:        #174ea6; /* on #fff 7.8:1 — AA 본문 통과 */
+  --color-brand-hover:  #123f88;
+  --color-brand-active: #0e3269;
+  --color-brand-soft:   #eef4ff;
+  --color-link:         #174ea6;
+  --color-link-hover:   #123f88;
+
+  /* ---- 시맨틱 (배경 위 텍스트 AA 재계산 포함) ---- */
+  --color-info:     #174ea6;  --color-info-bg:     #eef4ff;
+  --color-success:  #0e6f4c;  --color-success-bg:  #e7f4ee; /* on bg 5.6:1 */
+  --color-warning:  #8a5a00;  --color-warning-bg:  #fdf3dd; /* on bg 5.4:1 */
+  --color-danger:   #a52a1a;  --color-danger-bg:   #fbeae7; /* on bg 5.9:1 */
+
+  /* ---- 주제 두 개 고정 (핵심/인접) ---- */
+  --color-topic-prod: #174ea6; --bg-topic-prod: #eef4ff;
+  --color-topic-ai:   #5b3a8f; --bg-topic-ai:   #f1ecfa; /* on bg 7.3:1 */
+
+  /* ---- 광고 — 본문 컴포넌트와 절대 공유 금지 ---- */
+  --color-ad-bg:    #f4f6f9;
+  --color-ad-line:  #d6dce5;
+  --color-ad-label: #5c6a80;
+
+  /* ---- 포커스·선택 ---- */
+  --color-focus:     #2f6fed;
+  --shadow-focus:    0 0 0 3px rgba(47, 111, 237, 0.35);
+  --color-selection: #d9e7fb;
+
+  /* ---- 2) 타이포 ---- */
+  /* 웹폰트 0개: Pretendard 자기호스팅은 P2 보류(결정 로그 필요) */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
+    "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono",
+    "D2Coding", Menlo, Consolas, monospace;
+
+  --text-2xs: 0.75rem;        /* 12px — 라벨 전용 */
+  --text-xs: 0.8125rem;       /* 13px — pill 배지 한정 최소 */
+  --text-sm: 0.875rem;        /* 14px — 메타·캡션·푸터: 한글 최소 */
+  --text-base: 1rem;          /* 16px */
+  --text-body-lg: 1.0625rem;  /* 17px — ≥768px 본문 */
+  --text-lede: 1.125rem;      /* 18px */
+  --text-card-title: 1.25rem; /* 20px */
+  --text-h3: clamp(1.125rem, 1.07rem + 0.26vw, 1.25rem);  /* 18→20 */
+  --text-h2: clamp(1.375rem, 1.25rem + 0.52vw, 1.625rem); /* 22→26 */
+  --text-h1: clamp(1.75rem, 1.48rem + 1.15vw, 2.375rem);  /* 28→38 */
+
+  --leading-body: 1.75;    /* 한글 본문 */
+  --leading-snug: 1.5;     /* 카드 제목·리스트 */
+  --leading-head: 1.35;    /* 헤드라인 */
+  --tracking-head: -0.01em; /* 한글 헤드라인 상한 */
+  --tracking-body: 0;       /* 한글 본문 자간 — 양수 금지 */
+
+  --flow-space: 1.15em;     /* 연속 문단 간격 */
+  --measure-prose: 44rem;   /* 704px ≈ 한글 40~42자/줄 */
+
+  /* ---- 3) 간격 (4px 스케일) ---- */
+  --space-1: 0.25rem;   /* 4  */
+  --space-2: 0.5rem;    /* 8  */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-5: 1.5rem;    /* 24 */
+  --space-6: 2rem;      /* 32 */
+  --space-7: 2.5rem;    /* 40 */
+  --space-8: 3rem;      /* 48 */
+  --space-9: 4rem;      /* 64 */
+  --space-10: 5rem;     /* 80 */
+  --space-12: 6rem;     /* 96 */
+
+  --section-gap: clamp(var(--space-7), 6vw, var(--space-9)); /* 40→64 */
+  --gutter-inline: clamp(1rem, 4vw, 1.25rem);                /* 16→20 */
+
+  /* ---- 4) 레이아웃 폭 계층 ---- */
+  --container-narrow: 36rem; /* 576 — 법률·단문(privacy/contact/author) */
+  --container-prose:  44rem; /* 704 — 글 상세 본문 */
+  --container-page:   60rem; /* 960 — 헤더·목록·푸터 공통 프레임 */
+  --container-wide:   72rem; /* 1152 — futura: TOC 사이드바 */
+  --header-h: 4rem;          /* 64px — sticky 오프셋 계산용 */
+
+  /* ---- 5) 라운드·그림자·모션·z ---- */
+  --radius-sm: 0.375rem;  /* 6  — kbd·인라인 코드 */
+  --radius-md: 0.5rem;    /* 8  — 코드블록·이미지·버튼 */
+  --radius-lg: 0.75rem;   /* 12 — 카드·notice */
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(23, 32, 51, 0.05);  /* 헤더 경계 대용 */
+  --shadow-2: 0 4px 12px rgba(23, 32, 51, 0.08); /* 카드 hover 단일 단계 */
+
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --z-header: 10;
+  --z-skip: 100;
+}
+
+/* [보관] 다크 모드 — AdSense 결정 전 켜지 않는다. `html`에
+   data-theme="dark"를 부여하기 전까지 비활성(토큰 구조만 준비).
+   광고 슬롯 배경(--color-ad-*)은 다크에서도 light 유지. */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="dark"] {
+    --color-ink: #e7ecf5;        --color-ink-soft: #c4cdda;
+    --color-muted: #97a3b4;      --color-faint: #6b7688;
+    --color-line: #2b3648;       --color-line-strong: #3a475c;
+    --color-bg: #10151f;         --color-surface: #171e2b;
+    --color-surface-sunken: #1f2837;
+    --color-brand: #93b8f7;      --color-brand-hover: #b5cffa; /* on #10151f 8.4:1 */
+    --color-link: #93b8f7;       --color-link-hover: #b5cffa;
+    --color-success: #5ecf9f;    --color-warning: #e5b558;    --color-danger: #f08c7f;
+    --color-info: #93b8f7;       --color-info-bg: #1c2a42;
+    --color-selection: #2f4a66;
+  }
+}
+
+::selection { background: var(--color-selection); color: var(--color-ink); }

@@ -1,0 +1,24 @@
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
+  schema: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    pubDate: z.coerce.date(),
+    publishAt: z.coerce.date().optional(),
+    status: z.enum(['draft', 'scheduled', 'published']),
+    topic: z.enum(['productivity', 'ai-workflows']),
+    angle: z.string().min(1),
+    author: z.string().min(1),
+    sourceIds: z.array(z.string()).default([]),
+    testedAt: z.coerce.date().optional(),
+    toolVersions: z.record(z.string(), z.string()).default({}),
+    aiAssisted: z.boolean().default(true),
+    canonical: z.string().url().optional(),
+    image: z.string().optional(),
+  }),
+});
+
+export const collections = { posts };
