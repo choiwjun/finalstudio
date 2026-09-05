@@ -4,7 +4,7 @@ Astro 기반의 정적 블로그 골격입니다.
 
 ## 현재 방향
 
-- 핵심 주제: 업무 생산성 소프트웨어 활용법
+- 핵심 카테고리: 업무도구 실전 (Excel·Google Sheets·Notion·Google Workspace)
 - 인접 주제: 직접 테스트한 AI 업무 활용법
 - 콘텐츠 원본: Git/Markdown
 - 공개 읽기 경로: 정적 HTML

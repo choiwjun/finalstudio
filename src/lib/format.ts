@@ -14,7 +14,7 @@ export function toIsoDate(date: Date): string {
 }
 
 const topicLabels: Record<string, string> = {
-  productivity: '업무 생산성',
+  productivity: '업무도구 실전',
   'ai-workflows': 'AI 업무 활용',
 };
 
