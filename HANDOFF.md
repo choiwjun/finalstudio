@@ -822,5 +822,30 @@ git diff --check        # 통과
 
 ### 다음 세션 과제
 
-- Codex OAuth 로그인 상태에서 형식별로 `auto:write`를 실제 실행해 기계 게이트·독립 심사 점수가 의도대로 작동하는지 확인한다.
 - 실행 결과를 평가 사례에 반영하고, `out/prompt-lab/`의 첫 개선 diff를 사람 검토 후 승인한다.
+
+## 2026-09-06 쓰기 시스템 실실행 검증 완료 (Codex OAuth)
+
+`codex login` 상태에서 실제 생성 2건을 실행해 게이트가 의도대로 작동하는 것을 확인했다.
+
+### 실행 1 — how-to (`npm run auto:write -- "PC 브라우저 북마크 중복 정리하는 방법" --topic 업무도구 --format how-to`)
+
+- 1차 판정: 기계 실패 1건(윤문 리포트 잔여물 "변경률: 약 6%"의 출처 없는 수치) + 심사 90점 → **기계 게이트가 심사 통과분을 정지시킴** (작가≠심사자 분리의 의도대로 기계 검사가 우선 작동).
+- 2차 판정: 기계 실패 0건 + 심사 90점 → 통과, `src/content/posts/post-2026-09-06.md`로 draft 저장. `check:content` 통과.
+- `prompt-manifest.json`에 gates(mechanical/judge 90/bestOf)와 모듈 해시 8종이 기록됨.
+
+### 실행 2 — experience + 원자료 (`--format experience --notes notes/2026-09-wireless-mouse.md`)
+
+- 원자료 없이는 생성 거부 확인 (무료 즉시 실패).
+- 1차 심사 85점(미달) → 수정 루프 → 2차 **91점 통과**, 기계 실패 0건. `wireless-mouse-first-week.md`로 draft 저장.
+- 본문 품질: 원자료에 없는 것을 만들지 않았고("포트 이동과 증상 소실만 확인했으므로 USB 3.0이 단독 원인이라고 확정하지 않습니다"), 모르는 것은 마커로 남김.
+
+### 실측에서 발견·수정한 버그
+
+- 같은 날 2회 실행 시 기본 slug(`post-<날짜>`) 충돌로 변환 실패 → `convert-post.mjs`가 `--slug` 미지정 시 `-2`, `-3` 접미사로 자동 분리하도록 수정. 커밋 `1ad6828`.
+
+### 남은 관찰 (비차단)
+
+- `convert-post.mjs`가 experience 글에도 "안 될 때"·FAQ 경고를 출력함 — how-to 전용 경고가 형식 무관하게 붙는 것. 경고라서 게이트는 아니며, 형식별 경고 분리는 후순위.
+- 기계 검사의 `unsourced-claim` 경고는 원자료에서 온 수치(3초, 80%)도 잡음. 경고 수준이라 허용되지만, notes 제공 시 원자료에 있는 수치는 제외하는 개선 여지가 있음.
+- 명령 사용 시 `npm run auto:write -- "주제" --topic ...`처럼 `--` 구분자가 필요함 (HANDOFF 일부 예시에 누락되어 있었음).
