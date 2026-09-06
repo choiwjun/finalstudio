@@ -11,7 +11,7 @@ const { Content } = await render(post);
 const data = post.data;
 ---
 
-<article id={`post-${post.id}`} class="article article--narrow draft-preview-article">
+<article id={`post-${post.id}`} class="article draft-preview-article">
   <p class="post-badges">
     <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
     <span class="badge badge--pending">{data.status}</span>

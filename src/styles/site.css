@@ -142,6 +142,10 @@ a:hover { color: var(--site-accent-hover); }
 
 /* 글 상세 */
 .post-layout { display: grid; grid-template-columns: minmax(0, var(--site-prose)) 15rem; gap: clamp(var(--space-7), 7vw, var(--space-10)); justify-content: center; align-items: start; padding-top: var(--space-7); }
+.draft-preview-page { display: grid; gap: var(--space-10); padding-top: var(--space-7); }
+.draft-preview-page > .article { width: 100%; }
+.draft-preview-page > .draft-preview-article { max-width: var(--site-prose); padding-top: var(--space-8); border-top: 1px solid var(--site-line); }
+.draft-preview-article h2 { margin-block-start: 0; }
 .article { max-width: var(--site-prose); margin: 0; }
 .article .breadcrumbs { margin-bottom: var(--space-6); }
 .post-header { padding-bottom: var(--space-5); border-bottom: 1px solid var(--site-line-strong); }
