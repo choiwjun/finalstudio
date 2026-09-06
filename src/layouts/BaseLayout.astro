@@ -11,6 +11,7 @@ interface Props {
   ogImage?: string;
   noindex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  shell?: 'public' | 'admin';
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   ogImage,
   noindex = false,
   jsonLd,
+  shell = 'public',
 } = Astro.props;
 
 const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localhost:4321';
@@ -69,30 +71,41 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   </head>
   <body>
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
-    <header class="site-header">
+    <header class:list={['site-header', shell === 'admin' && 'site-header--admin']}>
       <div class="container header-inner">
         <a class="brand" href="/" aria-label="WJ Blog 홈">WJ Blog</a>
         <div class="header-navigation">
           <nav class="site-nav" aria-label="주요 메뉴">
             <ul>
-              <li><a href="/" aria-current={isCurrent('/') ? 'page' : undefined}>홈</a></li>
-              <li><a href="/categories" aria-current={isCurrent('/categories') ? 'page' : undefined}>카테고리</a></li>
-              {navItems.map((item) => (
-                <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
-              ))}
+              {shell === 'admin' ? (
+                <>
+                  <li><a href="/admin/" aria-current={isCurrent('/admin/') ? 'page' : undefined}>운영 홈</a></li>
+                  <li><a href="/admin/preview">초안 미리보기</a></li>
+                  <li><a href="/">사이트 보기</a></li>
+                </>
+              ) : (
+                <>
+                  <li><a href="/" aria-current={isCurrent('/') ? 'page' : undefined}>읽기</a></li>
+                  <li><a href="/categories" aria-current={isCurrent('/categories') ? 'page' : undefined}>주제</a></li>
+                  {navItems.map((item) => (
+                    <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
+                  ))}
+                </>
+              )}
             </ul>
           </nav>
-          <a class="header-search-link" href="/search">
-            <span class="search-icon" aria-hidden="true">⌕</span>
-            <span>검색</span>
-          </a>
+          {shell === 'admin' ? (
+            <span class="header-shell-label">LOCAL</span>
+          ) : (
+            <a class="header-search-link" href="/search"><span>검색</span><span aria-hidden="true">↗</span></a>
+          )}
         </div>
       </div>
     </header>
-    <main id="main" class="container site-main">
+    <main id="main" class:list={['container', 'site-main', shell === 'admin' && 'site-main--admin']}>
       <slot />
     </main>
-    <footer class="site-footer">
+    <footer class:list={['site-footer', shell === 'admin' && 'site-footer--admin']}>
       <div class="container footer-inner">
         <div>
           <p class="footer-brand">WJ Blog</p>

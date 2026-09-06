@@ -470,3 +470,56 @@ npm run auto:improve -- --input src/content/posts/excel-vlookup-other-sheet.md
 - `src/content/posts/*.md`의 `draft` 상태를 임의로 `published`로 바꾸지 않는다.
 - `public/images/`의 실제 Excel 증거 이미지는 삭제하지 않는다.
 - `out/`과 `dist/`는 실행 생성물이며 커밋하지 않는다.
+
+## 2026-09-06 Signal Archive v2 전면 디자인 재설계
+
+기존 v1은 일반 블로그 구조를 갖췄지만, 공개 화면과 관리자 화면 모두 `컨테이너 + 카드 + 얇은 선` 패턴이 반복되고, `tokens.css`의 파란 `--color-*` 계열과 청록 `--site-*` 계열이 함께 존재해 시각적 위계가 약했다. 사용자가 “무엇이 몬지 구분이 안 간다”고 피드백했으므로 색상 보정이 아닌 정보 구조·토큰·쉘을 함께 재설계했다.
+
+### 선택한 디자인 방향
+
+사용자가 선택한 2번과 3번 시안을 결합했다.
+
+- 2번에서 검색을 첫 행동으로 두는 홈, 대표 글, 번호형 최신 읽기 큐, 명확한 검증 신호를 가져왔다.
+- 3번에서 따뜻한 중립 배경, 넓은 여백, 세로 규칙선, 아카이브·독서실 같은 차분한 리듬을 가져왔다.
+- 관리자 화면은 공개 블로그를 재사용하지 않고 `LOCAL` 운영 쉘로 분리했다.
+
+상세 결정은 `.planning/design/DESIGN_SYSTEM_V2.md`에 기록했다.
+
+### 반영한 소스
+
+- `src/styles/tokens.css`: 색상·타이포·간격·레이아웃 토큰을 v2 단일 방향으로 교체했다.
+- `src/styles/site.css`: 홈·아카이브·검색·글 상세·관리자 화면을 Signal Archive 규칙으로 재작성했다. 카드 반복과 장식용 패널을 줄이고 정렬·여백·규칙선으로 구분한다.
+- `src/layouts/BaseLayout.astro`: 공개 쉘과 관리자 쉘을 `shell` prop으로 분리했다.
+- `src/pages/index.astro`: `검색 → 오늘의 읽을 글 → 최근 읽기 큐 → 주제 지도` 홈 흐름으로 교체했다.
+- `src/pages/admin/index.astro`, `src/pages/admin/preview.astro`: 관리자 전용 헤더·메인·푸터 쉘을 적용했다.
+- `README.md`: 현재 디자인 기준을 v2 문서로 갱신했다.
+
+### 현재 검증 결과
+
+통과:
+
+```bash
+npm run check:content
+npm run check:prompts
+git diff --check
+node --check scripts/qa-cdp.mjs
+node --check scripts/check-prompts.mjs
+powershell.exe -NoProfile -Command "npm.cmd run build"
+powershell.exe -NoProfile -Command "npm.cmd run check:build"
+```
+
+Windows 빌드는 11개 페이지를 생성했고, 빌드 경계 검사는 23개 출력 파일을 확인했다.
+
+보류:
+
+- 현재 실행 환경에는 Chrome/Chromium 실행 파일과 Chrome DevTools 포트가 없어 새 v2 화면의 실제 캡처·시각 비교를 완료하지 못했다.
+- 따라서 이번 단계는 코드·정적 빌드·계약 검증 완료 상태이며, 브라우저 시각 QA는 별도 게이트다.
+- 브라우저가 가능한 환경에서 1440px·768px·390px 홈, 글 상세, 관리자 화면을 캡처하고 선택 시안과 비교한 뒤 최종 승인한다.
+
+### 다음 순서
+
+1. 브라우저가 가능한 환경에서 v2 홈·글 상세·관리자 화면을 실제 캡처한다.
+2. 390px에서 헤더, 검색 입력, 읽기 큐, 글 본문, 관리자 표의 가로 overflow를 확인한다.
+3. 1440px에서 대표 글과 읽기 큐의 우선순위, 글 상세의 본문·우측 목차, 관리자 검토 큐의 주 행동을 확인한다.
+4. 시각 QA에서 P0/P1 문제가 없을 때만 디자인 v2를 승인하고 커밋·푸시한다.
+5. 디자인 승인 후 사람 검증을 완료한 글만 `published`로 전환한다.

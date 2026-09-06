@@ -10,13 +10,15 @@ Astro 기반으로 만든 나만의 정적 블로그입니다. 카테고리와 �
 - 공개 읽기 경로: 정적 HTML
 - 자동화: 사람 승인 이후에만 예약 빌드·배포
 
-## 블로그 UI/UX v1
+## 블로그 UI/UX v2 — Signal Archive
 
-- v0 랜딩페이지형 시안은 반려하고, 티스토리·워드프레스처럼 일반적인 블로그 헤더·카테고리·최근 글 목록 중심으로 전면 재설계했습니다.
+- v0 랜딩페이지형 시안과 v1 일반 블로그 템플릿을 재검토하고, 검색·읽기 큐·주제 인덱스를 중심으로 한 `Signal Archive` 방향으로 전면 재설계했습니다.
+- 2번 시안의 검색 우선 정보 구조와 3번 시안의 차분한 아카이브 리듬을 결합했습니다.
 - 카테고리 목록: `/categories`, 개별 카테고리: `/categories/<category>`
 - 공개 글 검색: `/search`
 - 조사 근거: `.planning/research/blog-design-benchmark-2026-09-06.md`
-- 현재 디자인 규격: `.planning/design/DESIGN_SYSTEM_V1.md`
+- 현재 디자인 규격: `.planning/design/DESIGN_SYSTEM_V2.md`
+- 공개 홈은 `검색 → 오늘의 읽을 글 → 최근 읽기 큐 → 주제 지도` 순서로 동작하고, 관리자 화면은 별도 운영 쉘을 사용합니다.
 
 ## 개발
 
