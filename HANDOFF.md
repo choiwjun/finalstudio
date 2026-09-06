@@ -107,9 +107,9 @@ v0는 기술적으로 구현됐지만 블로그 스타일과 맞지 않아 소�
 ## 배포·인증 메모
 
 - GitHub 연결 및 `origin/main` 푸시는 완료됨.
-- Codex OAuth 로그인은 로컬 글쓰기 작업용이며, `OPENAI_API_KEY`와는 별개다.
+- Codex OAuth 로그인은 로컬 글쓰기와 커버 이미지 생성에 함께 사용한다. OpenAI API 키는 사용하지 않는다.
 - 호스팅 연결과 `DEPLOY_HOOK_URL` 등록은 아직 완료되지 않음.
-- `npm run image` 등 API 기반 이미지 생성을 사용할 경우에는 별도의 `OPENAI_API_KEY` 설정이 필요할 수 있다. 키를 Markdown, 로그, Git에 기록하지 않는다.
+- `npm run image -- --slug <슬러그>`는 Codex `$imagegen`으로 커버를 생성하고, `--engine manual`은 ChatGPT Images에서 생성한 파일을 등록한다. 본문 UI 스크린샷은 사람이 직접 촬영한다.
 
 ## 안전 규칙
 

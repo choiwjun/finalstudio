@@ -34,9 +34,9 @@ npm run dev
 
 - `/admin/` 대시보드의 **자동 글발행** 메뉴에서 전체 흐름과 실행 명령을 확인할 수 있습니다.
 - **`npm run auto:write "주제"` 한 줄**로 초안 생성 → 윤문 → 검수(90점 게이트) → draft 저장까지 자동 실행됩니다.
-  기본은 로그인된 Codex 구독 엔진이며, `OPENAI_API_KEY`를 설정하면 API 엔진을 사용할 수 있습니다. 둘 다 없으면 ChatGPT 수동 모드 안내로 전환됩니다.
-- 저장소를 GitHub에 연결하고 `OPENAI_API_KEY` 시크릿을 등록하면, Actions가 매주 월·목 10시(KST)에
-  `scripts/auto-publish/calendar.md`의 다음 주제로 초안 **PR**을 제안합니다 (PR 머지 = 사람 승인).
+  모든 생성 단계는 ChatGPT OAuth로 로그인한 Codex CLI를 사용하며, OpenAI API 키를 사용하지 않습니다.
+- GitHub Actions는 API 키 없는 운영 원칙에 따라 콘텐츠 검사·빌드·배포 검증만 담당합니다. 초안 생성은
+  로컬 Codex 세션에서 `npm run auto:write --calendar scripts/auto-publish/calendar.md`로 실행합니다.
 - 예약 글의 `publishAt` 시각에 정적 호스팅을 다시 빌드하려면 `scheduled-publish.yml`을 사용하고,
   호스팅 Deploy Hook URL을 GitHub `DEPLOY_HOOK_URL` secret으로 등록해야 합니다.
 - 프롬프트 파일은 `.planning/prompts/`의 content-writer / chatgpt-humanize / chatgpt-review.

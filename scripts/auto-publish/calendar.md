@@ -1,7 +1,7 @@
 # 편집 캘린더 — 자동 초안 대기열
 
 > 형식: `- [ ] 주제 | 독자수준 | 사다리단계 | 주제태그`
-> `npm run auto:write --calendar scripts/auto-publish/calendar.md` 또는 GitHub Actions 예약 실행이
+> `npm run auto:write --calendar scripts/auto-publish/calendar.md`가
 > 가장 위의 미완료 항목을 가져가 초안을 만들고, 성공하면 `[x]`로 표시합니다.
 >
 > **시리즈 단위로 발행하세요** (BRAND.md 발행 리듬). 한 시리즈 3~5편을 연속 발행하고
@@ -10,7 +10,7 @@
 
 ## 시리즈 A — 엑셀 데이터 다루기 (도구)
 
-- [ ] 엑셀 VLOOKUP 다른 시트 데이터 가져오기 | 완전초보 | 도구 | productivity
+- [x] (2026-09-06) 엑셀 VLOOKUP 다른 시트 데이터 가져오기 | 완전초보 | 도구 | productivity
 - [ ] 엑셀 상위 N개만 필터링해서 추출하는 법 | 완전초보 | 도구 | productivity
 - [ ] 구글 스프레드시트 중복 제거 후 원본 보존 | 실무자 | 도구 | productivity
 

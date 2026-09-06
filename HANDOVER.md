@@ -24,7 +24,7 @@
 | Astro | 7.3.1 | 콘텐츠 레이어(glob loader), 정적 빌드 |
 | Codex CLI | 0.153.4 | `npm install -g @openai/codex` — ChatGPT 구독 OAuth 엔진 |
 | 실행 OS | Windows 10/11 | OneDrive 경로, Git Bash 사용 — §10 트러블슈팅 참조 |
-| 리포지토리 | git (main) | **GitHub 원격 아직 없음** — §12 참조 |
+| 리포지토리 | git (main) | `origin/main` 연결·푸시 완료 — §12 참조 |
 
 ## 3. 전체 아키텍처
 
@@ -36,8 +36,7 @@
 │        ▼   npm run auto:write                                    │
 │  auto-write.mjs ── 엔진 선택 ──┬─ codex: Codex CLI (ChatGPT 구독   │
 │        │                       │   OAuth, 과금 없음) ★기본        │
-│        │                       ├─ api:   OpenAI 호환 API (키 과금)  │
-│        │                       └─ 수동:  ChatGPT에 프롬프트 붙여넣기 │
+│        │                       └─ 수동: ChatGPT 검수본을 --from-final로 변환 │
 │        │                                                          │
 │        ├─ [1] 초안   : BRAND.md + VOICE.md + content-writer-      │
 │        ├─ [2] 윤문   : im-not-ai 규칙 이식 (AI 티 제거)            │
@@ -64,9 +63,9 @@
         │
         ▼
    Astro 정적 빌드 (npm run build + check:build)
-   ※ 배포 파이프라인은 아직 미구현 — §12 남은 과제.
-     GitHub Actions 두 개는 배포가 아니라: quality.yml = CI 검사,
-     auto-draft.yml = 주간 초안 PR 제안 (머지 = 사람 승인)
+   ※ 정적 호스팅 연결과 Deploy Hook 등록은 아직 남아 있다 — §12 남은 과제.
+     GitHub Actions는 quality.yml = CI 검사,
+     scheduled-publish.yml = 예약 글 재빌드 검증·Hook 호출
 ```
 
 ## 4. 파일 지도 (인수인계 시 이 표부터)
@@ -88,11 +87,11 @@
 
 | 경로 | 역할 |
 |---|---|
-| `scripts/auto-publish/auto-write.mjs` | **자동화 코어** — 1~4단계 한 줄 실행. 엔진 추상화(codex/api), 캘린더 모드, --input, --from-final. 재검수 후 수정본을 유지하고 `pubDate`를 변환한다. |
+| `scripts/auto-publish/auto-write.mjs` | **자동화 코어** — Codex OAuth로 1~4단계 한 줄 실행. 캘린더 모드, --input, --from-final. 재검수 후 수정본을 유지하고 `pubDate`를 변환한다. |
 | `scripts/auto-publish/convert-post.mjs` | ChatGPT 출력 → 우리 스키마 변환. `status: draft`·`aiAssisted: true` 강제, 스키마 밖 필드(coverImage/tags) 제거, 마커·FAQ·"안 될 때" 존재 경고 |
-| `scripts/auto-publish/generate-image.mjs` | 썸네일 생성 (API 자동 / ChatGPT 수동 프롬프트 출력 / --attach 등록) |
+| `scripts/auto-publish/generate-image.mjs` | 썸네일 생성 (Codex `$imagegen` / ChatGPT Images 수동 프롬프트 / --attach 등록) |
 | `scripts/auto-publish/calendar.md` | 발행 대기열 — **시리즈 클러스터** 구조(§7). 형식: `- [ ] 주제 \| 독자수준 \| 사다리단계 \| 주제태그` |
-| `scripts/auto-publish/README.md` | 파이프라인 사용 설명서 (설정 A~D, 명령 레퍼런스, 이미지 규칙, 하드 룰) |
+| `scripts/auto-publish/README.md` | 파이프라인 사용 설명서 (Codex 설정, 명령 레퍼런스, 이미지 규칙, 하드 룰) |
 | `scripts/auto-publish/persona/upmu-lab.json` | 문체 페르소나 스펙(JSON) — 톤 차원·가독성 수치 |
 | `scripts/lib/content-contract.mjs` | **콘텐츠 계약 라이브러리** — parseFrontmatter(파싱+수정), bodyCharCount(공백 제외), validatePost, MIN_BODY_CHARS=1500. 관리 서버·체커가 공유 |
 | `scripts/check-content.mjs` | 콘텐츠 계약 검사기 (npm run check:content) |
@@ -115,8 +114,7 @@
 
 | 경로 | 역할 |
 |---|---|
-| `.github/workflows/quality.yml` | PR/push → check:content + build + check:build |
-| `.github/workflows/auto-draft.yml` | **월·목 10:00 KST** 캘린더 다음 주제 자동 초안 → PR 제안 (머지 = 사람 승인). `secrets.OPENAI_API_KEY` 필요(api 엔진 — CI는 토큰 입력 불가) |
+| `.github/workflows/quality.yml` | PR/push → check:content + build + check:build. 초안 생성은 로컬 Codex OAuth에서 수행 |
 | `.github/workflows/scheduled-publish.yml` | 15분마다 콘텐츠 계약·빌드 검증 후 `DEPLOY_HOOK_URL`이 있으면 정적 호스팅 재빌드 요청. 예약 공개에는 호스팅 Deploy Hook 설정 필요 |
 | `.env.example` | 환경변수 문서 (§9) |
 | `.gitignore` | node_modules/dist/.astro/.env·tools/·out/·.trash/ — `tools/`는 오픈소스 참고 클론(커밋 안 함) |
@@ -140,15 +138,13 @@ npm run auto:write --input 초안.md --topic 카테고리           # 초안에 
 npm run auto:write --from-final 검수통과본.md --topic t --angle "..."  # 엔진 없이 변환·저장만
 ```
 
-- **엔진 결정**: `--engine codex|api` 플래그 > `.env`의 `AUTO_ENGINE` > 자동(API 키 있으면 api, 없으면 codex) > 둘 다 없으면 수동 모드 안내 후 종료.
-- **codex 엔진** (기본, 과금 없음): Codex CLI를 `node <전역>/@openai/codex/bin/codex.js exec --sandbox read-only --ephemeral [유저지시]`로 호출. **stdin = 규칙·컨텍스트, 인자 = 지시문** (Codex 공식 문서의 파이프 패턴 — Windows 32k 인자 길이 문제 회피). Windows에서 `codex`는 .cmd 셔미라 직접 호출 불가 → JS 진입점 경로로 해결(§10). 로그인 상태는 `codex login status` 종료코드로 판정.
-- **api 엔진**: OpenAI 호환 `/chat/completions` (키·BASE_URL·AUTO_MODEL). GitHub Actions에서는 이것만 가능(CI는 브라우저 OAuth 불가).
+- **엔진**: Codex CLI만 사용한다. `node <전역>/@openai/codex/bin/codex.js exec --sandbox read-only --ephemeral [유저지시]`로 호출하며, **stdin = 규칙·컨텍스트, 인자 = 지시문**으로 긴 프롬프트를 전달한다. Windows에서 `codex`는 .cmd 셔미라 직접 호출 불가 → JS 진입점 경로로 해결(§10). 로그인 상태는 `codex login status` 종료코드로 판정한다.
 - **게이트**: 자동작성 파이프라인의 검수 90점 미만이면 draft 저장을 거부하고 `out/auto-publish/<실행시각>/`에 중간 산출물 보존. 콘텐츠 계약은 별도로 공개 글의 분량·testedAt·author·마커를 검사한다.
 
 ### c. 이미지 생성 (generate-image.mjs)
 
-- `npm run image -- --slug <슬러그>`: API 키 있으면 gpt-image-1(1536×1024, quality medium) 자동 생성 → `public/images/<슬러그>.png` 저장.
-- 키 없으면: ChatGPT(구독)에 붙여넣을 **이미지 프롬프트를 출력** → 받은 파일을 `npm run image -- --slug <슬러그> --attach "파일.png"`로 등록.
+- `npm run image -- --slug <슬러그>`: Codex OAuth 세션에서 `$imagegen`을 호출해 `public/images/<슬러그>.png`로 저장.
+- `npm run image -- --slug <슬러그> --engine manual`: ChatGPT Images용 프롬프트를 출력하고, 받은 파일을 `--attach`로 등록.
 - 등록되면 글 frontmatter에 `image: /images/<슬러그>.png` 기록 + astro sync → 글 상단 커버, og:image, twitter:card, JSON-LD image까지 자동 반영.
 - **경계선**: 썸네일·커버 일러스트만 AI. **본문 UI 스크린샷은 사람 직접 촬영** — 가짜 스크린샷은 E-E-A-T와 애드센스 신뢰를 무너뜀(README 하드 룰로 기재).
 
@@ -218,16 +214,13 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 
 | 변수 | 기본 | 설명 |
 |---|---|---|
-| `OPENAI_API_KEY` | (없음) | api 엔진·이미지 자동 생성용. 없으면 codex 엔진(구독) 또는 수동 모드 |
-| `OPENAI_BASE_URL` | https://api.openai.com/v1 | 호환 API 교체용 |
-| `AUTO_MODEL` | gpt-4o-mini | api 엔진 텍스트 모델 (글 1장당 약 $0.01~0.05) |
-| `AUTO_ENGINE` | 자동 | codex \| api 강제 (--engine 플래그가 더 우선) |
-| `CODEX_MODEL` | (플랜 기본) | codex 엔진 모델 지정 |
+| `AUTO_ENGINE` | codex | ChatGPT OAuth Codex 엔진 고정 |
+| `CODEX_MODEL` | (플랜 기본) | Codex 모델 선택(선택) |
 | `AUTO_MAX_PASSES` | 2 | 검수 최대 라운드 |
-| `IMAGES_MODEL` / `IMAGES_QUALITY` | gpt-image-1 / medium | 이미지 (장당 약 $0.02~0.07) |
+| `IMAGE_ENGINE` | codex | Codex `$imagegen` 이미지 생성 엔진 |
 | `PUBLIC_SITE_URL` | — | 실제 도메인 승인 시 설정 |
 
-비용 전략: **텍스트는 ChatGPT 구독(OAuth)으로 무료화**했고, 이미지만 API 과금(또는 ChatGPT 웹 수동 생성). GitHub Actions 예약 초안 실행만 API 키 필요.
+비용 전략: 텍스트와 커버 이미지는 모두 로그인된 ChatGPT/Codex 사용량으로 처리한다. GitHub Actions는 생성이 아니라 검사·빌드·배포 검증만 수행한다.
 
 ## 10. 알려진 이슈·트러블슈팅 (Windows 특이점 포함)
 
@@ -235,7 +228,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 |---|---|---|
 | 관리자에서 글 수정했는데 블로그에 반영 안 됨 | 개발 서버가 콘텐츠를 감시하지 않음 | `npm run admin`으로 감독 모드 사용. 이미 떠 있으면 정상(변경마다 자동 재시작) |
 | `EADDRINUSE 4322` | npm 래퍼 종료 후 node 고아 프로세스 잔존 | `netstat -ano \| grep LISTENING`으로 PID 찾고 `taskkill //PID <pid> //T //F` |
-| codex 엔진이 codex를 못 찾음 | Windows .cmd 셔미는 spawn으로 직접 실행 불가 | 스크립트가 `%APPDATA%\npm\node_modules\@openai\codex\bin\codex.js`를 node로 직접 실행함 — 코드 수정 시 이 경로 로직 유지할 것 |
+| codex 엔진이 codex를 못 찾음 | Windows .cmd 셔미는 spawn으로 직접 실행 불가하거나 standalone 경로가 다름 | 스크립트가 Windows JS 진입점을 우선 사용하고, 그 외에는 PATH의 `codex` standalone 실행 파일을 찾음 |
 | check:build 실패 — dist에 금지 토큰 | `.planning/`·`sourceIds`·`TBD`가 빌드 결과로 누출 | admin 대시보드 스크립트는 `is:inline` 동적 import로 유지(번들 포함 금지). 초안의 TBD는 발행 게이트가 잡음 |
 | Git Bash에서 백틱이 명령 치환됨 | 셸 특성 | 긴 텍스트/마크다운 생성은 Bash 명령 대신 파일 쓰기 도구 사용 |
 | astro sync 후에도 삭제된 글이 남음 | sync는 삭제를 반영 못 함 | 관리 서버 재시작 모델이 처리. 수동이면 개발 서버 재시작 |
@@ -245,7 +238,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 ## 11. 의사결정 로그 (왜 이렇게 만들었나 — 되돌리기 전에 읽기)
 
 1. **Claude Code를 쓰지 않는다**: 운영자가 ChatGPT 구독자. 오픈소스(여러 CLI 에이전트 전제)는 코드 복사가 아니라 **규칙 이식**으로 흡수했다.
-2. **사람 승인 게이트를 자동화하지 않는다**: 무검토 대량 발행은 구글 규모화 콘텐츠 악용 정책 위반 → 애드센스 계정 단위 리스크. 하루 3편 자동발행 제안은 거절하고 "매일 초안 + 사람 검증 발행"으로 설계. GitHub Actions 초안도 PR 머지 = 승인 구조.
+2. **사람 승인 게이트를 자동화하지 않는다**: 무검토 대량 발행은 구글 규모화 콘텐츠 악용 정책 위반 → 애드센스 계정 단위 리스크. 하루 3편 자동발행 제안은 거절하고 "매일 초안 + 사람 검증 발행"으로 설계. GitHub Actions는 검사·빌드·배포 검증만 수행한다.
 3. **경험·스크린샷은 지어내지 않는다**: 마커(`[직접 확인 필요]` 등)는 윤문·검수가 절대 지우지 못하게 하고, 발행 게이트가 testedAt을 강제. 본문 스크린샷은 AI 이미지 금지(§5c).
 4. **발행 리듬 주 3~5 + 시리즈 클러스터**: 추정이 아니라 2026-09 벤치마크 실측 근거(§7). 품질 게이트 통과분만 발행하므로 검토 시간 부족 시 개수를 낮춘다(상한이지 하한이 아님).
 5. **개발 서버 감독 모델**: 콘텐츠 핫리로드가 이 환경에서 작동하지 않는 것이 "버그"라기보다 제약 — 왕복 문제를 실험으로 확인하고(utimes/동기화/config 재시작 모두 실패) kill+respawn으로 해결.
@@ -253,16 +246,16 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 
 ## 12. 남은 과제 / 다음 단계 (우선순위 순)
 
-- [ ] **`codex login` 실행** (사람 5분) — 구독 기반 자동화 활성화. 전제: `npm install -g @openai/codex` (이 기계엔 0.153.4 설치돼 있음 — 새 기계라면 먼저 설치)
-- [ ] **첫 글 완성**: `src/content/posts/excel-linked-picture.md` — 미해결 마커: `[스크린샷]` 6건 · `[직접 확인 필요]` 8건 · `[테스트 필요]` 2건 · `[출처 URL 확인 필요]` 1건. author 실명 교체("테스터"는 기계가 못 잡음), testedAt·toolVersions·sourceIds 기입. 완료 후 **기술 검증**: `check:content` → `build` → `check:build` → `.env`에 `PUBLIC_SITE_URL` 설정(설정 전엔 canonical이 localhost로 떨어지고 sitemap이 비활성) → 실제 `/posts/excel-linked-picture/` 접속 확인 → canonical·robots.txt(Disallow /admin/ + Sitemap 라인)·sitemap-index.xml 확인 → status 변경 발행 (현재 draft, 2,401자 공백 제외)
-- [ ] **GitHub 연결 + Secrets**: 원격 리포지토리가 없어 auto-draft.yml이 아직 비활성. 푸시 후 Settings→Secrets→`OPENAI_API_KEY` 등록 (api 엔진만 CI 가능). 자동 초안 검증은 새로 생성된 파일만 검사하므로 기존 published 글 때문에 실패하지 않는다. 보안 메모: 워크플로 입력의 eval 인젝션은 2026-09-05 제거됐다(입력은 env로만 전달) — 이후 워크플로 수정 시에도 `${{ }}` 셸 직접 치환·eval 금지 유지
-- [ ] **배포 파이프라인**: 호스팅(예: Cloudflare Pages/Netlify/GitHub Pages) 연결 + 애드센스 도메인 승인 대기. 예약 글까지 자동 공개하려면 `scheduled-publish.yml`을 활성화하고 호스팅 Deploy Hook을 `DEPLOY_HOOK_URL` secret으로 등록한다. "사람 승인 후 예약 빌드·배포" 원칙 유지
-- [ ] `.env`에 실제 키 설정 여부 결정 (이미지 자동 생성 시에만 필요)
+- [x] **`codex login` 실행** — 이 환경의 Codex CLI 0.153.4에서 ChatGPT 로그인 상태 확인 완료
+- [ ] **첫 글 완성**: `src/content/posts/excel-linked-picture.md` — 현재 남은 직접 확인 마커 3건(고DPI·웹용 Excel·원본 삭제 동작). author 실명 교체, testedAt 기입. 완료 후 `check:content` → `build` → `check:build` → `PUBLIC_SITE_URL` 설정 → 브라우저 확인 → status 변경 발행.
+- [x] **GitHub 연결 + 푸시** — `origin/main` 연결 및 품질 워크플로 포함 커밋 푸시 완료. 초안 생성은 로컬 Codex OAuth로 수행하며 API secret은 등록하지 않는다.
+- [ ] **배포 파이프라인**: 호스팅(예: Cloudflare Pages/Netlify/GitHub Pages) 연결 + `PUBLIC_SITE_URL` 설정. 예약 글까지 자동 공개하려면 호스팅 Deploy Hook을 `DEPLOY_HOOK_URL` secret으로 등록한다.
+- [x] **실제 Codex 글·이미지 생성 실측** — 2026-09-06 OAuth 세션으로 3단계 글 생성(93점 게이트 통과·캘린더 `[x]`)과 `$imagegen` 커버 저장을 확인했다.
 - [ ] **실행 환경 고정**: npm 명령은 **Windows 또는 WSL 중 하나로만** — node_modules는 플랫폼별 네이티브 바인딩을 담으므로 두 환경이 같은 폴더를 공유하면 안 된다(§10). 이 기계 기준 Windows(Git Bash) 권장
 - [ ] 분기 1회 벤치마크 재조사 — `.planning/research/benchmark-2026-09.md` 방법론 참고
 - [ ] 애드센스 신청: 필수 페이지는 이미 구비(about·privacy·contact·editorial-policy). Google 공식 요건은 "고품질·독창적 콘텐츠 + 정책 준수"이며 **고정 글 수 기준은 없다**(15~20개는 커뮤니티 관행적 내부 목표일 뿐). 승인 후 ads.txt·광고 코드 삽입 (승인 전 코드 삽입 금지)
 
-## 13. 검증 상태 (최종 확인: 2026-09-05, 2차 리뷰 재검증 포함)
+## 13. 검증 상태 (최종 확인: 2026-09-06, 2차 리뷰 재검증 포함)
 
 **1차(초판) 주장 중 정정된 것**: 초판은 "관리자 E2E·자동 새로고침 완료"로 썼으나 재검증에서
 세 가지 코드 문제가 발견돼 수정했다 — ① `reloadAfterSync`가 `location.reload()` 없이 자기 자신을
@@ -273,17 +266,15 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 **2차 리뷰 후 실측으로 확인한 것 (2026-09-05)**:
 - 위 3건 수정 완료. 마커 게이트 4시나리오 실측: 마커 없는 공개 글 통과 / 마커 남은 공개 글 차단(남은 마커 명시) / 분량 미달 차단 / 마커 있는 초안은 자유 통과
 - `node --check` — auto-write.mjs·content-contract.mjs 통과
-- `npm run check:content` — 통과 (2개 파일)
+- `npm run check:content` — 통과 (3개 파일)
 - `npm run build` (8페이지) + `check:build` 경계 검사 — **Windows 환경에서 통과**
 - WSL(`/mnt/c`)에서의 빌드 실패 — 재현·진단 완료: Windows 설치 node_modules의 rolldown 네이티브 바인딩을 Linux Node가 못 읽음(§10 해결법)
 - 서버 — 4321(개발)·4322(관리 API) 정상 응답
-- 3차 리뷰(같은 날): auto-draft.yml의 eval 스크립트 인젝션 제거 — 워크플로 입력을 `${{ }}` 셸 직접 치환 없이 env 변수로만 전달하도록 재작성(YAML 로컬 파서 부재로 구문은 구조 점검으로 대체 — GitHub 첫 파싱에서 재확인할 것). 마커 게이트 정규식에 `[출처 URL 확인 필요]` 보강 — 감지 실측 완료. 첫 글 마커 실측 집계: `[스크린샷]` 6 · `[직접 확인 필요]` 8 · `[테스트 필요]` 2 · `[출처 URL 확인 필요]` 1
-- 4차 리뷰(2026-09-05): auto-draft.yml이 기존 published/scheduled 글을 오탐하지 않고 새로 생성된 글만 `status: draft`로 검사하도록 수정. auto-write 재검수 수정본 보존, 검수 응답의 채점표 제거, 0~100 점수 범위 검증, `--input` 무주제 모드 지원. 변환기가 `pubDate`를 우선 읽고 구형 `date`도 호환하도록 수정. `scheduled-publish.yml` 추가 — 15분 주기 빌드 검증 및 `DEPLOY_HOOK_URL` 호스팅 재빌드 hook 호출.
-- 이번 수정 후 정적 검증: 변경된 JavaScript 5개 `node --check` 통과, `npm run check:content` 통과, 변환기 smoke test에서 `pubDate: 2026-09-05` 보존 확인. 현재 WSL 셸의 `npm run build`는 기존 Windows용 Rolldown 바인딩 재사용으로 실패하므로, Windows 또는 WSL 한 환경에서 의존성을 새로 설치한 뒤 재실행해야 한다.
+- 3차 리뷰(같은 날): 마커 게이트 정규식에 `[출처 URL 확인 필요]` 보강 — 감지 실측 완료. 첫 글 화면·출처 캡처는 반영됐고, 본문에는 직접 확인 3건이 남아 있다.
+- 4차 리뷰(2026-09-05): Codex OAuth 기반 auto-write와 `$imagegen` 기반 이미지 생성으로 단일화. `scheduled-publish.yml`은 15분 주기 빌드 검증 및 `DEPLOY_HOOK_URL` 호스팅 재빌드 hook 호출.
+- 5차 실측(2026-09-06): OAuth Codex 3단계 글 생성이 93점으로 통과했고 `post-2026-09-06.md` 저장·캘린더 완료 표시를 확인했다. `$imagegen` 커버도 `public/images/excel-linked-picture.png`에 저장·frontmatter 등록했다.
+- 이번 수정 후 정적 검증: auto-write/generate-image `node --check` 통과, `npm run check:content` 통과, `npm run build`와 `npm run check:build` 통과. WSL(`/mnt/c`)에서도 현재 설치된 Linux 바인딩으로 빌드가 완료됐다.
 
 **아직 실측하지 못한 것 (거짓말 방지 목록)**:
-- codex 로그인 후 실제 3단계 파이프라인 실행 (로그인은 사람이 해야 함)
-- 캘린더 `[x]` 표시의 종단 간 동작 — 성공 경로가 API 키(또는 구독 로그인)를 필요로 해, 섀도잉 수정은 코드·정적 확인까지만 검증
-- 실제 이미지 API 호출 (키 없음), 관리자 자동 새로고침의 브라우저 실측(다음 저장 시 눈으로 확인할 것), 실제 배포
-- GitHub Actions (원격 리포지토리 없음 — auto-draft.yml 비활성)
+- 관리자 자동 새로고침의 브라우저 실측(다음 저장 시 눈으로 확인할 것), 실제 배포
 - 예약 발행의 실제 호스팅 공개(호스팅 선택·Deploy Hook secret 등록 전)

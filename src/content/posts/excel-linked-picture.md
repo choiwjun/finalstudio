@@ -10,6 +10,7 @@ sourceIds: [microsoft-excel-paste-options]
 toolVersions:
   Excel: "Microsoft 365 (16.0) — 2026-09-05 Windows 화면 실측"
 aiAssisted: true
+image: /images/excel-linked-picture.png
 ---
 
 엑셀 표가 깨져서 붙는 이유는 표를 "셀 덩어리"로 복사하기 때문이에요. 해답은 복사 방식을 바꿔 **표를 그림으로 붙여넣는 것**, 그중에서도 원본과 연결이 살아 있는 **연결된 그림**이에요. 붙여넣은 표는 그림처럼 절대 깨지지 않고, 원본 숫자를 고치면 함께 갱신돼요. 이번 실측에서는 원본 값을 바꾼 뒤 연결 개체의 갱신 명령을 실행해 화면 변화를 확인했어요. 자동 갱신 시점은 문서·Office 설정에 따라 달라질 수 있으니 제출 전 한 번 더 확인하세요.

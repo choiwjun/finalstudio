@@ -10,21 +10,17 @@
  *
  * 모드:
  *   (기본)            LLM 엔진 3단계 전부 자동 실행
- *   --calendar <파일>  편집 캘린더에서 다음 미완료 주제를 가져와 자동 실행 후 체크 표시 (GitHub Actions용)
+ *   --calendar <파일>  편집 캘린더에서 다음 미완료 주제를 가져와 자동 실행 후 체크 표시 (로컬 Codex용)
  *   --input <파일>     이미 작성된 초안에 2단계 윤문 + 3단계 검수만 적용
  *   --from-final <파일> 엔진 없이 변환·저장만 수행 (ChatGPT 수동 흐름 마무리용)
  *
- * 엔진 (--engine codex|api, 기본: OPENAI_API_KEY 있으면 api, 없으면 codex):
- *   codex  Codex CLI가 ChatGPT 구독 계정(OAuth 로그인)으로 3단계 실행 — API 과금 없음.
- *          사전 준비: `npm install -g @openai/codex` 후 `codex login` (브라우저에서 ChatGPT 로그인)
- *   api    OpenAI 호환 API를 API 키로 호출 (GitHub Actions 등 서버 자동화용)
+ * 엔진:
+ *   codex  Codex CLI가 ChatGPT 계정(OAuth 로그인)으로 3단계 실행.
+ *          사전 준비: `npm install -g @openai/codex` 후 `codex login`
  *
- * 환경변수 (codex·api 둘 다 없으면 수동 모드 안내를 출력하고 종료):
- *   OPENAI_API_KEY   api 엔진 필수 (글 1장당 약 $0.01~0.05 — gpt-4o-mini 기준)
- *   OPENAI_BASE_URL  선택 (기본 https://api.openai.com/v1 — 호환 API 사용 시 변경)
- *   AUTO_MODEL       선택, api 엔진 (기본 gpt-4o-mini)
- *   AUTO_ENGINE      선택 (codex | api — --engine보다 약함)
- *   CODEX_MODEL      선택, codex 엔진 (기본: ChatGPT 플랜 기본 모델)
+ * 환경변수:
+ *   AUTO_ENGINE      codex만 지원 (기본: codex)
+ *   CODEX_MODEL      선택 (기본: ChatGPT 플랜 기본 모델)
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync, spawn } from 'node:child_process';
@@ -84,18 +80,17 @@ const inputPath = getArg('input');
 const finalPath = getArg('from-final');
 const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|calendar|input|from-final)$/)));
 
-const API_KEY = process.env.OPENAI_API_KEY;
-const BASE_URL = (process.env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1').replace(/\/$/, '');
-const MODEL = process.env.AUTO_MODEL ?? 'gpt-4o-mini';
 const CODEX_MODEL = process.env.CODEX_MODEL;
 
 const fail = (msg) => { console.error(`[auto-write] 오류: ${msg}`); process.exit(1); };
 
-/* ── LLM 엔진: codex(ChatGPT 구독 OAuth) | api(API 키) ────── */
+/* ── LLM 엔진: codex(ChatGPT OAuth) ───────────────────────── */
 // Windows에서 npm 전역 codex는 .cmd 셔미이므로 실제 JS 진입점을 직접 호출한다.
+// standalone Codex 설치본(예: ~/.local/bin/codex)도 지원한다.
 const CODEX_JS = (() => {
   if (process.platform === 'win32') {
-    return join(process.env.APPDATA ?? '', 'npm', 'node_modules', '@openai', 'codex', 'bin', 'codex.js');
+    const candidate = join(process.env.APPDATA ?? '', 'npm', 'node_modules', '@openai', 'codex', 'bin', 'codex.js');
+    return existsSync(candidate) ? candidate : undefined;
   }
   const home = process.env.HOME ?? '';
   return [
@@ -104,10 +99,29 @@ const CODEX_JS = (() => {
   ].find((p) => existsSync(p));
 })();
 
+const CODEX_BIN = (() => {
+  try {
+    const lookup = process.platform === 'win32' ? 'where' : 'which';
+    return execFileSync(lookup, ['codex'], { encoding: 'utf8' }).split(/\r?\n/)[0].trim() || undefined;
+  } catch {
+    return undefined;
+  }
+})();
+
+const CODEX_COMMAND = CODEX_JS
+  ? { executable: process.execPath, prefix: [CODEX_JS], shell: false }
+  : CODEX_BIN
+    ? { executable: CODEX_BIN, prefix: [], shell: process.platform === 'win32' }
+    : undefined;
+
 const codexRun = (codexArgs, stdinText) =>
   new Promise((resolveP, rejectP) => {
-    if (!CODEX_JS) return rejectP(new Error('codex CLI가 설치되어 있지 않습니다 (npm install -g @openai/codex).'));
-    const child = spawn(process.execPath, [CODEX_JS, ...codexArgs], { cwd: ROOT, stdio: ['pipe', 'pipe', 'pipe'] });
+    if (!CODEX_COMMAND) return rejectP(new Error('codex CLI가 설치되어 있지 않습니다 (npm install -g @openai/codex).'));
+    const child = spawn(CODEX_COMMAND.executable, [...CODEX_COMMAND.prefix, ...codexArgs], {
+      cwd: ROOT,
+      shell: CODEX_COMMAND.shell,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
     let out = '';
     let err = '';
     child.stdout.on('data', (d) => { out += d; });
@@ -134,29 +148,10 @@ const codexLoggedIn = async () => {
 const callCodex = async (system, user) => {
   const codexArgs = ['exec', '--sandbox', 'read-only', '--ephemeral'];
   if (CODEX_MODEL) codexArgs.push('-m', CODEX_MODEL);
-  codexArgs.push(user);
+  // 초안은 YAML frontmatter(`---`)로 시작할 수 있으므로 CLI 옵션과 분리한다.
+  codexArgs.push('--', user);
   const out = await codexRun(codexArgs, system);
   return stripFences(out.trim());
-};
-
-const callChat = async (system, user) => {
-  const res = await fetch(`${BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => '');
-    fail(`API 호출 실패 (${res.status}): ${detail.slice(0, 300)}`);
-  }
-  const data = await res.json();
-  return stripFences(data.choices?.[0]?.message?.content ?? '');
 };
 
 const convert = (inputFile, topicTag, angle, fileSlug) => {
@@ -216,34 +211,19 @@ const stage = stageOverride ?? stageArg ?? '도구';
 if (!subject && !inputPath) fail('주제가 필요합니다. 예: npm run auto:write "주제" --topic 카테고리');
 if (!topicTag?.trim()) fail('--topic 카테고리이름을 지정하세요.');
 
-/* ── 엔진 결정 + 수동 폴백 ───────────────────────────────── */
-const ENGINE = getArg('engine') ?? process.env.AUTO_ENGINE ?? (API_KEY ? 'api' : 'codex');
-if (!['codex', 'api'].includes(ENGINE)) fail('--engine codex|api 만 지원합니다.');
-const callModel = ENGINE === 'codex' ? callCodex : callChat;
-
-if (ENGINE === 'codex') {
-  if (!CODEX_JS) {
-    fail('codex CLI가 없습니다. `npm install -g @openai/codex` 후 터미널에서 `codex login` (브라우저에서 ChatGPT 계정 로그인)을 먼저 실행하세요.');
-  }
-  if (!(await codexLoggedIn())) {
-    fail('codex가 로그인되어 있지 않습니다. 터미널에서 `codex login` 실행 → 브라우저에서 ChatGPT 계정으로 로그인하세요. (API 과금 없이 구독 플랜 사용량으로 실행됩니다)');
-  }
-  console.log('[auto-write] 엔진: codex — ChatGPT 구독(OAuth) 사용량으로 실행 (API 과금 없음)');
-} else if (!API_KEY) {
-  console.log(`[auto-write] OPENAI_API_KEY가 없어 api 엔진 실행을 건너뜁니다. 수동 모드 안내:\n`);
-  console.log(`  주제: ${subject} / 독자: ${level} / 사다리: ${stage} / 주제태그: ${topicTag}`);
-  console.log(`\n  1) ChatGPT에 다음 3개 파일을 순서대로 붙여넣어 진행 (같은 대화에서):`);
-  console.log(`     - BRAND.md + VOICE.md + .planning/prompts/content-writer-prompt.md`);
-  console.log(`     - .planning/prompts/chatgpt-humanize-prompt.md (윤문 — 필수)`);
-  console.log(`     - .planning/prompts/chatgpt-review-prompt.md (검수 — 90점 이상)`);
-  console.log(`\n  2) 검수 통과본을 파일로 저장한 뒤:`);
-  console.log(`     npm run auto:write --from-final 검수통과본.md --topic ${topicTag} --angle "관점"`);
-  console.log(`\n  ※ 구독으로 자동화하려면: npm install -g @openai/codex && codex login 후 다시 실행 (codex 엔진).`);
-  console.log(`  ※ API 자동화를 원하면 .env에 OPENAI_API_KEY를 설정하세요 (글 1장당 약 $0.01~0.05).`);
-  process.exit(1);
-} else {
-  console.log(`[auto-write] 엔진: api (${MODEL})`);
+/* ── 엔진 결정: Codex OAuth만 사용 ───────────────────────── */
+const ENGINE = getArg('engine') ?? process.env.AUTO_ENGINE ?? 'codex';
+if (ENGINE !== 'codex') {
+  fail('이 파이프라인은 ChatGPT OAuth 기반 Codex만 지원합니다. `--engine codex`를 사용하세요.');
 }
+if (!CODEX_COMMAND) {
+  fail('codex CLI가 없습니다. `npm install -g @openai/codex` 후 `codex login` (브라우저에서 ChatGPT 계정 로그인)을 먼저 실행하세요.');
+}
+if (!(await codexLoggedIn())) {
+  fail('codex가 로그인되어 있지 않습니다. `codex login` 실행 후 브라우저에서 ChatGPT 계정으로 로그인하세요.');
+}
+const callModel = callCodex;
+console.log('[auto-write] 엔진: codex — ChatGPT OAuth 세션으로 실행');
 
 /* ── 1~3단계 실행 ───────────────────────────────────────── */
 const runId = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
@@ -261,7 +241,7 @@ if (inputPath) {
   draft = readDoc(inputPath);
   console.log('[auto-write] 1단계 초안: --input 파일 사용');
 } else {
-  console.log(`[auto-write] 1단계 초안 생성 중... (${ENGINE === 'codex' ? 'codex' : MODEL})`);
+  console.log('[auto-write] 1단계 초안 생성 중... (codex)');
   draft = await callModel(
     writerSystem,
     `주제/키워드: ${subject}\n대상 독자 수준: ${level}\n확장 사다리 단계: ${stage}\n문체: ${tone}`,
