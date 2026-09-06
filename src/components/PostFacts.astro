@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { difficultyLabel, formatKoDate, toIsoDate } from '../lib/format';
+
+interface Props {
+  data: CollectionEntry<'posts'>['data'];
+  readMinutes: number;
+  toolVersionEntries: [string, string][];
+}
+
+const { data, readMinutes, toolVersionEntries } = Astro.props;
+const versionText = toolVersionEntries.map(([tool, version]) => `${tool} ${version}`).join(' · ');
+---
+
+<ul class="post-facts" aria-label="글 요약 정보">
+  <li><span>읽는 시간</span><strong>약 {readMinutes}분</strong></li>
+  {difficultyLabel(data.difficulty) && <li><span>난이도</span><strong>{difficultyLabel(data.difficulty)}</strong></li>}
+  {versionText && <li><span>사용 환경</span><strong>{versionText}</strong></li>}
+  {data.testedAt ? (
+    <li><span>테스트</span><strong><time datetime={toIsoDate(data.testedAt)}>{formatKoDate(data.testedAt)} 확인</time></strong></li>
+  ) : (
+    <li><span>검증 상태</span><strong>사람 검토 전</strong></li>
+  )}
+</ul>

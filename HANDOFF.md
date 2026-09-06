@@ -1,14 +1,16 @@
 # WJ Blog — 첫 글 발행·디자인 핸드오프
 
-작성일: 2026-09-05 (Asia/Seoul)
+작성일: 2026-09-06 (Asia/Seoul)
 
 ## 현재 상태
 
 - 저장소: <https://github.com/choiwjun/finalstudio>
 - 브랜치: `main`
-- 마지막 커밋: `944b1de docs: add first post publishing handoff`
+- 기준 커밋: `46c36fe fix: constrain preview layout on mobile`
+- 최신 작업 상태: 아래 최신 핸드오프와 이번 변경 소스 전체가 하나의 작업 묶음으로 커밋되며 `origin/main`에 반영 대상
 - 첫 글: `src/content/posts/excel-linked-picture.md`
 - 현재 상태: `status: draft`
+- 콘텐츠 현황: Markdown 3개, 공개 0개, 검토 대상 3개
 - Excel 사용자가 라이선스 동의 화면에서 `수락`을 직접 눌렀음.
 
 ## 완료된 작업
@@ -28,7 +30,96 @@ npm run check:build
 
 - 로컬 정적 미리보기에서 홈 `/`은 HTTP 200을 확인함.
 - 첫 글 경로 `/posts/excel-linked-picture/`는 `draft` 보호 때문에 HTTP 404인 것을 확인함.
-- 현재 변경사항은 GitHub `main`에 푸시되어 있음.
+- 기준 커밋 `46c36fe` 이후의 이번 세션 변경사항은 아직 커밋·푸시하지 않음.
+
+## 2026-09-06 비교분석 결과 및 실행 기준
+
+이번 분석은 정확한 트래픽 순위가 아니라, 현재 검색 노출과 콘텐츠 완성도가 높은 대표 사례를 기준으로 했다.
+
+- [오빠두엑셀 VLOOKUP 가이드](https://www.oppadu.com/functions/%EC%97%91%EC%85%80-vlookup-%ED%95%A8%EC%88%98/): 버전 범위, 예제 파일, 핵심 단계, 상세 설명, 오류·FAQ, 댓글·평가를 한 페이지에 제공한다.
+- [VLOOKUP/XLOOKUP 다른 시트 예시](https://designed-by-me.tistory.com/m/217): 문제 상황 → 수식 → 화면 이미지 → 실무 주의사항 순서가 빠르다.
+- [브런치 업무툴 비교 글](https://brunch.co.kr/@shopl/13): 섹션별 이미지, 장단점 목록, 비교 흐름과 다음 읽을거리를 제공한다.
+- [Microsoft VLOOKUP 공식 문서](https://support.microsoft.com/ko-kr/excel/functions/vlookup-function): 버전·인수·오류·모범 사례의 사실성 기준으로 사용한다.
+
+### 현재 판단
+
+WJ Blog는 현재의 차분한 teal 계열과 넓은 본문 폭을 유지하되, 포지셔닝을 **직접 검증한 실용 정보 블로그**로 명확히 한다. 색상 전면 교체보다 글 상세 구조, 실측 증거, 시리즈 탐색, 발행 게이트를 먼저 개선한다.
+
+### UI·UX 전면 재검토 기준
+
+1. 글 상세 첫 화면에 `핵심 답변`, 사용 버전, 난이도, 예상 읽기 시간, 테스트 날짜를 표시한다.
+2. 데스크톱에는 목차·진행 동선, 모바일에는 접이식 목차를 제공한다.
+3. 절차형 글은 실제 UI 스크린샷과 캡션을 중심으로 구성한다. AI 이미지는 커버·일러스트에만 사용하고 본문 화면을 대체하지 않는다.
+4. 오류 해결 표, FAQ, 한눈에 보기 표 뒤에 실제 출처 링크와 시리즈 이전·다음 글을 연결한다.
+5. 홈에는 대표 시리즈·추천 글·최신 글·카테고리 칩을 제공한다. 현재 `최근 글 + 카테고리`만으로는 첫 방문자의 시작점이 약하다.
+6. 관리자에는 글별 스크린샷 수, 출처 수, 미확인 마커, 내부 링크, 테스트 메타데이터와 발행 차단 이유를 보여준다.
+
+### 스타일 구조상 우선 해결할 문제
+
+`src/styles/global.css`와 `src/styles/site.css`가 `.site-header`, `.brand`, `.post-card`, `.article`, `.badge` 등을 중복 정의하고 서로 다른 색상 토큰을 사용한다. 현재는 import 순서로 보정되지만 향후 CSS 수정 시 다시 덮어쓰기 문제가 발생할 수 있다. P0에서 단일 디자인 토큰과 단일 컴포넌트 규칙으로 통합한다.
+
+### 현재 글 품질 평가
+
+- `excel-linked-picture.md`: 공백 제외 약 2,313자, 본문 이미지 6개, H2 6개·H3 4개. 실측 화면과 오류 사례가 강점이고 단정 표현과 첫 이미지 캡션은 보정했다. 다만 `testedAt`이 없고 고DPI·웹 Excel·원본 삭제 동작에 대한 미확인 마커 3개가 남아 있다.
+- `excel-vlookup-other-sheet.md`: 본문 이미지 2개, H2 9개·H3 10개. 실제 Excel 16.0(Build 20326)에서 다른 시트 조회, 저장 후 재열기, `#N/A`·`#REF!` 오류를 확인했고 공식 출처·작성자·테스트 날짜를 채웠다. 현재는 `draft`를 유지하며 사람의 최종 화면 검토만 남겼다.
+- 두 글 모두 현재 `draft`다. 첫 글은 직접 확인 3건이 남아 있고, VLOOKUP 글은 증거와 메타데이터가 채워졌지만 사람 승인 전에는 공개하지 않는다.
+
+### 콘텐츠 검사 확장 기준
+
+현재 계약 검사는 필수 frontmatter, 공개 글 작성자·테스트 날짜, 최소 1,500자, 위험 검토, 미확인 마커를 검사한다. 다음 항목을 추가한다.
+
+- 절차형 글의 실제 스크린샷 또는 명시적인 비시각형 예외
+- `testedAt`, `toolVersions`, 공식 출처 링크의 동시 존재
+- 실제 내부 링크 수와 시리즈 연결
+- `슬러그 제안`, `내부 링크 후보`, `스크린샷 필요` 같은 운영 문구의 본문 잔류
+- H2/H3 과분할, 문체 종결어미 혼용, 이미지 alt·캡션 불일치
+- 독자에게 노출되는 출처가 내부 ID가 아닌 사람이 읽는 이름·URL인지 여부
+
+### P0 실행 순서
+
+1. 이 핸드오프를 기준 문서로 저장한다.
+2. CSS 토큰·중복 컴포넌트 규칙을 통합한다.
+3. 글 상세 템플릿을 `핵심 답변 → 검증 정보 → 목차 → 단계·스크린샷 → 오류 → FAQ → 출처·시리즈` 구조로 개편한다.
+4. VLOOKUP 글을 실제 Excel 환경에서 확인하고 스크린샷·버전·출처·작성자 정보를 채운다. **완료**
+5. 콘텐츠 검사와 관리자 검토 요약을 확장한다.
+6. 데스크톱·390px 모바일 캡처와 빌드·콘텐츠 검사를 다시 실행한다.
+
+## 2026-09-06 현재 화면 검증 기록
+
+- 데스크톱 초안 미리보기: 글이 단일 열로 정상 배치됨.
+- 390px Chrome 에뮬레이션: 헤더·검색 버튼·본문이 화면 안에 들어오며 가로 overflow 없음.
+- 관리자 대시보드: 관리 서버 연결 상태, 콘텐츠 요약, 글 검색·필터 영역 정상 표시.
+- 최신 캡처 파일: `/mnt/c/Users/wj941/AppData/Local/Temp/wj-blog-preview-redesign-desktop.png`, `/mnt/c/Users/wj941/AppData/Local/Temp/wj-blog-preview-cdp-mobile-full.png`, `/mnt/c/Users/wj941/AppData/Local/Temp/wj-blog-admin-cdp-mobile-full.png`, `/mnt/c/Users/wj941/AppData/Local/Temp/wj-blog-admin-review-signals.png`
+- `scripts/qa-cdp.mjs`로 Chrome DevTools Protocol 기반 390px 에뮬레이션을 자동화했다. `innerWidth`, `scrollWidth`, `clientWidth`가 모두 390px로 일치한다.
+- 재실행: `powershell.exe -NoProfile -Command "node scripts/qa-cdp.mjs"` (`--full`을 붙이면 전체 페이지 캡처; 플래그 파싱 버그도 수정함)
+- 이 검증은 Chrome 데스크톱과 390px 에뮬레이션 기준이며 실제 Safari/iOS 검증을 의미하지 않는다.
+
+## 2026-09-06 1차 반영 완료
+
+- 글 상세에 빠른 답변 카드, 읽는 시간, 난이도, 사용 환경, 테스트 상태를 추가했다.
+- `render()`가 제공하는 headings로 데스크톱 목차와 모바일 접이식 목차를 추가했다.
+- `series`·`seriesOrder` 메타데이터를 추가하고 공개 글의 이전·다음 시리즈 탐색을 구현했다.
+- 출처 ID를 독자용 출처명·공식 URL로 변환해 테스트 정보에 표시하도록 했다.
+- VLOOKUP 초안에서 `슬러그 제안`, 내부 링크 후보, AI 작업 메모를 제거했다. Excel 코드 블록은 Shiki 경고가 없는 `text` 언어로 정리했다.
+- 사용하지 않는 v0 헤더·홈·카드 중복 CSS를 `global.css`에서 제거해 `site.css`가 일반 블로그 헤더·홈·카드 UI를 단일 소유하도록 정리했다.
+- 공개 발행 게이트에 절차형 글의 이미지·출처·도구 버전, 운영 메모 잔류, H2 과분할, seriesOrder 검사를 추가했다.
+- 관리자 글 현황에 이미지 수, 출처 수, 도구 버전, 미확인 마커를 `검토 신호` 열로 추가했다.
+- `scripts/qa-excel-vlookup.ps1`로 임시 통합 문서를 만들고 실제 Excel COM 계산·재열기·오류 결과를 검증했다. 결과 이미지는 `public/images/excel-vlookup-orders.png`, `public/images/excel-vlookup-products.png`에 저장했다.
+- 위 VLOOKUP 이미지는 실제 Excel 범위를 렌더링한 계산 증거이며, Excel 전체 창의 리본·수식 입력줄을 포함한 UI 캡처는 아니다. 전체 UI 화면이 필요하면 발행 전에 사람이 추가 캡처한다.
+- VLOOKUP 초안에 `testedAt: 2026-09-06`, `Microsoft 365 (16.0, Build 20326)`, 실제 결과·오류 설명·이미지 2건을 반영했다.
+- 다음 검사 통과:
+
+```bash
+npm run check:content
+npm run build
+npm run check:build
+```
+
+### 아직 남은 P0
+
+- `excel-linked-picture.md`의 사람 최종 확인 3건, `testedAt`, 캡션 의미를 확정한다.
+- `excel-vlookup-other-sheet.md`는 실제 Excel 증거 반영을 완료했으며, 발행 전 사람이 결과 이미지와 본문 수식만 최종 확인한다.
+- 사람 확인이 끝난 글만 `status: published`로 전환한다.
 
 ## 발행 전 반드시 처리할 일
 
@@ -56,9 +147,8 @@ npm run check:build
 
 ### 3. 작성자와 테스트 메타데이터 확정
 
-- `author: 테스터`를 실제 표시할 작성자명으로 변경.
-- 실제 최종 테스트 날짜를 `testedAt: YYYY-MM-DD`로 추가.
-- `toolVersions.Excel`에 실제 확인한 Office 버전을 유지.
+- 첫 글의 `author: 테스터`가 실제 표시할 작성자명인지 확인하고, 최종 테스트 날짜를 확정한다.
+- VLOOKUP 글은 `author: 테스터`, `testedAt: 2026-09-06`, `toolVersions.Excel: Microsoft 365 (16.0, Build 20326)`을 실제 검증 결과로 기록했다.
 - 위 확인이 끝나기 전에는 `status: published`로 바꾸지 않는다.
 
 ### 4. 브라우저 실측 후 발행
@@ -111,9 +201,272 @@ v0는 기술적으로 구현됐지만 블로그 스타일과 맞지 않아 소�
 - 호스팅 연결과 `DEPLOY_HOOK_URL` 등록은 아직 완료되지 않음.
 - `npm run image -- --slug <슬러그>`는 Codex `$imagegen`으로 커버를 생성하고, `--engine manual`은 ChatGPT Images에서 생성한 파일을 등록한다. 본문 UI 스크린샷은 사람이 직접 촬영한다.
 
+## 2026-09-06 편집 품질 재진단 — 본문 전면 재작성 기준
+
+현재 글은 정보 누락보다 **문장과 흐름의 편집 부족**이 더 큰 문제다. 상위 실용 글은 독자의 문제를 한 문장으로 잡은 뒤 `결과 예시 → 최소 수식 → 따라 하기 → 자주 틀리는 지점 → 대안`으로 빠르게 끝내지만, 현재 VLOOKUP 글은 같은 설명을 여러 번 반복하고 체크리스트·FAQ·오류 섹션이 서로 겹친다.
+
+- 현재 문장은 `~해요` 종결이 거의 모든 문장에 반복되어 안내문 메모처럼 보인다. 제목도 섹션마다 비슷한 동사를 반복해 리듬이 없다.
+- `VLOOKUP은 ...` 정의, `FALSE`, `$A$2:$C$100`, 열 번호 설명이 핵심 요약·본문·수식 구성·오류·정리에서 되풀이된다.
+- 실제 독자가 가장 먼저 원하는 “어떤 셀에 무엇을 넣고 어떤 값이 나오는가”가 데이터 준비와 긴 정의 뒤에 있다. 상위 사례는 문제 상황과 기본 수식을 초반에 바로 제시한다. [다른 시트 조회 예시](https://designed-by-me.tistory.com/m/217)
+- VLOOKUP의 제약과 XLOOKUP으로 넘어갈 시점을 별도 판단 기준으로 정리하지 않아, 공식 설명을 길게 옮긴 글처럼 느껴진다. Microsoft 공식 문서는 구문·인수·오류·모범 사례를 분리하고, 오빠두는 기초에서 제한 사항·왼쪽 조회·다중 조건으로 이어지는 학습 경로를 제공한다. [Microsoft VLOOKUP 문서](https://support.microsoft.com/ko-kr/excel/functions/vlookup-function), [오빠두 VLOOKUP 강의 구성](https://www.oppadu.com/live/33/)
+- 연결된 그림 글도 해결책·카메라 도구·실패 사례·FAQ가 한 문서에 동시에 들어가 핵심 절차가 희석된다. 첫 화면에서 “보고서가 자주 바뀌면 연결된 그림, 확정본이면 그림”이라는 선택을 먼저 보여줘야 한다.
+
+### 재작성 원칙
+
+1. 첫 문단에서 독자의 상황과 결과를 말하고, 첫 화면 안에 완성 수식과 결과 표를 둔다.
+2. 한 글에서 다루는 예시는 하나만 유지한다. `주문서 A2 → 상품목록 A:C → 상품명·가격` 흐름을 처음부터 끝까지 따라간다.
+3. 정의를 반복하지 않고 수식 아래에 인수별 의미를 한 번만 붙인다.
+4. 오류는 `#N/A`, 범위 이동, VLOOKUP의 구조적 한계 세 가지로 줄이고, 각각 원인·해결 수식·판단 기준을 한 단락에 담는다.
+5. 검증 메타데이터는 본문 문장에 흩뿌리지 않고 테스트 정보·캡션으로 분리한다. 말투는 짧고 단정하되, 확인하지 않은 범위는 확정하지 않는다.
+6. 끝에는 “VLOOKUP을 계속 써도 되는 경우 / XLOOKUP으로 바꿀 경우”를 한 표로 정리해 다음 행동을 분명히 한다.
+
+### 이번 편집 작업 범위
+
+- `excel-vlookup-other-sheet.md`: 현재 본문을 위 순서로 전면 재작성하고, 실제 Excel 이미지 2개·공식 출처·검증 결과는 유지한다.
+- `excel-linked-picture.md`: 도입부와 방법 1의 선택 기준을 압축하고, 카메라 도구·실패 사례·FAQ의 중복 문장을 줄인다.
+- 문장 개편 후 콘텐츠 검사·Windows 빌드·390px 미리보기를 다시 실행한다. 발행 상태는 계속 `draft`로 유지한다.
+
+### 1차 문장 재작성 완료
+
+- VLOOKUP 글을 `결과 수식 → 두 시트 준비 → 입력·복사 → 세 가지 오류 → XLOOKUP 전환 기준` 순서로 다시 썼다. 반복되던 함수 정의·체크리스트·FAQ를 줄이고, 실제 예제의 입력과 결과를 한 흐름으로 연결했다.
+- 연결된 그림 글을 `그림과 연결된 그림의 선택 → 붙여넣기 4단계 → 카메라 도구 → 갱신 실패 상황 → FAQ` 순서로 다시 썼다. “언제 무엇을 선택하는가”를 본문 첫 화면으로 끌어올렸다.
+- 두 글의 제목·설명·편집 메모도 문장형으로 정리하고, 확인하지 않은 웹 Excel·고DPI·원본 삭제 범위는 여전히 미확인 상태로 표시했다.
+- 재작성 후 `npm run check:content`, Windows `npm.cmd run build`, `npm.cmd run check:build`, 390px CDP 검사를 다시 통과했다.
+
+## 2026-09-06 콘텐츠 생성 시스템 기획 판단
+
+### 결론
+
+글 생성 프롬프트·페르소나·본문 구조·문장 스타일을 하나의 운영 체계로 묶는 작업은 **기획이 필요한 중간 규모 작업**이다. 단순히 프롬프트 문장을 길게 추가하는 수준이 아니라, 앞으로 생성되는 모든 글의 품질 기준과 검수 흐름을 바꾸기 때문이다. 다만 데이터베이스나 외부 AI 플랫폼을 새로 구축하는 대규모 프로젝트는 아니다.
+
+현재 저장소에는 `BRAND.md`, `VOICE.md`, 3단계 프롬프트, `scripts/auto-publish/persona/upmu-lab.json`이 있지만 다음 문제가 있다.
+
+- `upmu-lab.json` 페르소나가 실제 `auto-write` 프롬프트 조립 과정에 연결되어 있지 않다.
+- `VOICE.md`의 해요체 기준과 최근 본문에서 채택한 합니다체가 충돌한다.
+- 글 유형별 구조가 별도 템플릿이 아니라 긴 작성 프롬프트에 흩어져 있다.
+- 현재 90점 검수는 있지만, 프롬프트 버전별 전후 품질을 비교하는 고정 평가 세트가 없다.
+- `content-pipeline.md`에는 API 엔진 설명이 남아 있지만 현재 실행 코드는 Codex OAuth 엔진만 허용한다. 문서와 실제 동작을 일치시켜야 한다.
+
+### 권장 설계
+
+```text
+사람이 관리하는 편집 헌법
+  └─ 주제별 페르소나
+      └─ 글 유형별 구조 템플릿
+          └─ Codex OAuth 글 생성
+              └─ 문체·사실·구조 검수
+                  └─ draft 저장
+                      └─ 평가 세트 기반 프롬프트 개선 제안
+                          └─ 사람 승인 후에만 프롬프트 반영
+```
+
+#### 자동으로 바꿀 수 없는 기준
+
+- 브랜드 정체성·금지 주제·사실 검증 원칙
+- 사람 승인 전 발행 금지
+- 실제 테스트·스크린샷을 검증 완료로 둔갑하지 않는 규칙
+- 90점 품질 게이트와 콘텐츠 계약
+
+#### 페르소나에 배치할 기준
+
+- 독자와 글의 목적
+- 말투와 격식
+- 문장 길이·문단 길이
+- 자주 쓰는 표현과 금지 표현
+- 주제에 맞는 도입·전개·마무리 방식
+
+#### 글 유형 템플릿에 배치할 기준
+
+- 업무 도구: 문제 → 완성 예시 → 단계 → 오류 → 대안 → 요약
+- 리뷰: 사용 목적 → 평가 기준 → 실제 사용 → 장단점 → 추천 대상
+- 경험 기록: 배경 → 선택 → 과정 → 결과 → 다음에 할 일
+
+### 자가개선의 안전한 범위
+
+페르소나가 자기 규칙을 즉시 덮어쓰게 하지 않는다. 최근 초안·검수 결과·사람 수정 내역을 바탕으로 다음 파일만 생성하게 한다.
+
+```text
+prompt-proposal.md
+prompt-proposal.diff
+eval-before.json
+eval-after.json
+```
+
+개선안은 고정 평가 세트에서 회귀가 없을 때만 사람이 승인해 반영한다. 핵심 브랜드 규칙·금지 규칙·발행 게이트·사실 검증 기준은 자가개선 대상에서 제외한다. 이 방식은 OpenAI 공식 가이드가 안내하는 “명시적인 문체 지시 + 평가 세트 기반 반복 개선” 방향과도 맞는다.
+
+### 예상 작업 규모
+
+| 단계 | 작업 | 규모 |
+| --- | --- | --- |
+| 1단계 | 편집 헌법·문체 기준 통합, 해요체/합니다체 결정 | 작음 |
+| 2단계 | 페르소나 JSON을 실제 Codex 프롬프트 조립에 연결 | 작음 |
+| 3단계 | `how-to`, `review`, `experience` 구조 템플릿 분리 | 중간 |
+| 4단계 | 대표 주제 10~20개 평가 세트와 점수 기준 고정 | 중간 |
+| 5단계 | Codex OAuth 기반 개선안 생성·전후 평가·diff 저장 | 중간 |
+| 6단계 | 관리자에서 프롬프트 버전·점수·승인 상태 표시 | 선택 사항 |
+
+1~3단계만 하면 생성 품질을 안정시키는 1차 개선이 된다. 4~5단계까지 하면 자가개선 시스템의 핵심이 완성된다. 6단계는 운영 편의를 위한 후순위다.
+
+### 작업 전 기획 산출물
+
+코드부터 수정하지 않고 다음 세 가지를 먼저 확정한다.
+
+1. 기본 문체: 현재 재작성한 글에 맞춘 `합니다체`를 기본값으로 할지 결정한다.
+2. 품질 점수표: 문장 품질·구조·사실성·검색 의도·실행 가능성의 배점을 고정한다.
+3. 평가용 대표 글: 업무 도구 3개, 리뷰 2개, 경험 기록 2개 이상을 기준 사례로 저장한다.
+
+이 세 가지가 정해지면 이후 프롬프트 변경은 취향 논쟁이 아니라 전후 평가로 판단할 수 있다.
+
+### 현재 판단
+
+지금 바로 필요한 것은 “무한히 자기 수정하는 에이전트”가 아니라 **버전 관리되는 편집 시스템과 안전한 개선 루프**다. 1차 구현은 기존 Codex OAuth 생성기를 유지하면서 프롬프트 조립부와 평가 산출물만 확장하는 방향이 적절하다. OpenAI API 키나 별도 API 서버는 필요하지 않다.
+
+### 1차 구현 완료
+
+- `.editorial/constitution.md`에 사람이 관리하는 고정 편집 헌법을 추가했다.
+- `.editorial/style-guide.md`에 기본 합니다체, 문장 리듬, 중복·과장 표현 금지 기준을 추가했다.
+- `.editorial/blueprints/how-to.md`에 실용 튜토리얼의 고정 흐름을 추가했다.
+- `.editorial/manifest.json`에서 편집 시스템 버전·기본 페르소나·기본 글 유형·보호 파일을 선언했다.
+- `scripts/auto-publish/auto-write.mjs`가 위 모듈과 페르소나를 실제 Codex OAuth 프롬프트에 조립하고, 실행별 `prompt-manifest.json`에 버전과 모듈 해시를 저장하도록 연결했다.
+- `scripts/check-prompts.mjs`와 `npm run check:prompts`로 모듈·페르소나·평가 사례 계약을 검사한다.
+- `scripts/auto-publish/prompt-improve.mjs`와 `npm run auto:improve`를 추가했다. 이 명령은 Codex OAuth로 개선안·unified diff·스냅샷만 만들고 저장소 파일은 자동 수정하지 않는다.
+- `.editorial/evals/writing-cases.jsonl`에 업무도구·연결된 그림·리뷰 유형의 기준 사례를 추가했다.
+- 품질·예약 배포 GitHub Actions에 `check:prompts`를 추가했다.
+- 생성 기본 문체를 합니다체로 통일하고, 오래된 API 엔진 설명을 Codex OAuth 전용 동작과 일치시켰다.
+
+### 다음 작업
+
+- Codex OAuth 로그인 상태에서 `npm run auto:write`를 실제 1회 실행해 `prompt-manifest.json`과 세 단계 출력물을 확인한다.
+- 평가 사례를 실제 생성 결과와 사람 수정 결과로 7개 이상 확장한다.
+- `auto:improve`가 만든 diff를 사람이 검토하고 첫 번째 프롬프트 버전 변경을 승인한다.
+- 프롬프트 버전별 점수 비교를 관리자에 표시하는 작업은 후순위로 둔다.
+
 ## 안전 규칙
 
 - 발행 전까지 첫 글은 `draft`로 유지한다.
 - 출처 없는 가격·버전·지원 범위를 확정적으로 쓰지 않는다.
 - 사용자가 열어 둔 Office 문서는 닫거나 강제 종료하지 않는다. QA가 만든 임시 파일·창만 대상으로 정리한다.
 - `dist/`는 생성물이며 커밋 대상이 아니다.
+
+## 2026-09-06 최신 핸드오프 — 현재까지의 전체 작업과 다음 실행 순서
+
+이 섹션은 이번 작업 묶음의 최종 기준이다. 이전 섹션은 조사·판단·중간 실행 기록으로 보존하고, 다음 작업자는 이 섹션의 현재 상태와 발행 게이트를 우선 확인한다.
+
+### 현재 목표와 운영 원칙
+
+WJ Blog는 일반적인 개인 블로그 탐색 구조를 유지하면서, **실제로 확인한 업무 도구 사용법을 짧고 명확하게 전달하는 검증형 블로그**를 지향한다.
+
+- 공개 전 글은 항상 `status: draft`로 둔다.
+- 확인하지 않은 기능·버전·지원 범위는 확정 문장으로 쓰지 않는다.
+- 글 생성과 커버 이미지 생성은 OpenAI API 키/API 서버가 아니라 ChatGPT 계정의 Codex OAuth와 Codex 도구 흐름을 사용한다.
+- 본문 UI 스크린샷은 실제 앱 화면을 사람이 캡처한다. 생성 이미지는 커버·일러스트 용도로만 사용하고 실제 사용 화면을 대체하지 않는다.
+- 프롬프트·페르소나의 자동 개선은 저장소를 직접 덮어쓰지 않는 제안 전용으로 제한하고, 사람 승인 후에만 반영한다.
+
+### 이번 변경 묶음에 포함된 구현
+
+#### 블로그 UI·UX
+
+- 랜딩페이지형 v0를 일반 블로그 v1 구조로 교체했다.
+- 헤더·홈·푸터·카테고리·검색·글 상세를 범용 블로그 탐색 흐름으로 정리했다.
+- 글 상세에 브레드크럼, 빠른 답변, 읽기 시간, 난이도, 사용 환경, 테스트 날짜, 목차, 출처, 관련 글, 시리즈 이전·다음 탐색을 추가했다.
+- 데스크톱 목차와 모바일 접이식 목차를 제공한다.
+- `global.css`와 `site.css`의 중복된 v0 규칙을 정리하고 현재 디자인 토큰·컴포넌트 규칙을 `site.css` 중심으로 통합했다.
+- 관리자 화면에 이미지 수, 출처 수, 도구 버전, 미확인 마커, 검토 신호를 표시한다.
+
+#### 콘텐츠·검증
+
+- `excel-vlookup-other-sheet.md`를 결과 수식과 실제 예시를 먼저 보여주는 구조로 전면 재작성했다.
+- `excel-linked-picture.md`를 선택 기준 → 4단계 절차 → 카메라 도구 → 실패 상황 → FAQ 순서로 재작성했다.
+- VLOOKUP 글은 실제 Excel COM 계산·재열기·오류 결과를 확인하고 계산된 범위 이미지를 추가했다.
+- 이미지와 공식 출처·도구 버전·테스트 날짜를 frontmatter와 본문에 연결했다.
+- 두 글 모두 사람 최종 승인 전까지 `draft`로 유지한다.
+- 콘텐츠 계약에 절차형 이미지, 공식 출처, 도구 버전, 내부 링크·시리즈, 운영 메모 잔류, H2 과분할 등의 공개 게이트를 추가했다.
+
+#### 편집 시스템·글 생성
+
+- `.editorial/constitution.md`: 사람이 관리하는 편집 헌법, 발행 금지·사실 검증·이미지 원칙
+- `.editorial/style-guide.md`: 기본 `합니다체`, 문장 길이, 문단 리듬, 반복·과장 표현 금지
+- `.editorial/blueprints/how-to.md`: `문제 → 완성 예시 → 준비 → 단계 → 오류 → 대안 → FAQ` 구조
+- `.editorial/manifest.json`: 편집 시스템 버전, 기본 페르소나, 글 유형, 보호 파일, 개선 모드
+- `scripts/auto-publish/persona/upmu-lab.json`: 독자·목적·문체·협업 규칙
+- `scripts/auto-publish/auto-write.mjs`: 위 모듈을 Codex OAuth 프롬프트에 조립하고 실행별 모듈 해시를 기록
+- `scripts/check-prompts.mjs`: 편집 모듈·페르소나·평가 사례 계약 검사
+- `.editorial/evals/writing-cases.jsonl`: 업무 도구·연결된 그림·리뷰 기준 사례 3건
+- `scripts/auto-publish/prompt-improve.mjs`: Codex OAuth 기반 개선 제안·diff·스냅샷 생성. 저장소 파일은 자동 수정하지 않음
+- CI와 예약 발행 전에 `check:prompts`를 실행하도록 연결했다.
+- 오래된 OpenAI API 엔진 설명을 제거하고 Codex OAuth 전용 실행 흐름으로 문서를 일치시켰다.
+
+#### 자동 QA·운영 문서
+
+- `scripts/qa-cdp.mjs`: Chrome DevTools Protocol 기반 390px 모바일 폭·가로 overflow·핵심 레이아웃 검사
+- `scripts/qa-excel-vlookup.ps1`: 임시 Excel 파일을 만들어 수식·결과·오류·재열기를 검증하고 결과 범위를 캡처
+- `HANDOFF.md`, `README.md`, `VOICE.md`, 자동 발행 README·프롬프트 문서를 현재 구조와 일치시켰다.
+
+### 이번 변경에서 확인한 결과
+
+다음 검사를 통과했다.
+
+```bash
+npm run check:prompts
+npm run check:content
+node --check scripts/auto-publish/auto-write.mjs
+node --check scripts/auto-publish/prompt-improve.mjs
+node --check scripts/check-prompts.mjs
+git diff --check
+```
+
+Windows Node 환경에서도 다음을 통과했다.
+
+```powershell
+npm.cmd run build
+npm.cmd run check:build
+node scripts/qa-cdp.mjs
+```
+
+마지막 390px 검사 결과는 `innerWidth`, `scrollWidth`, `clientWidth`, `body` 폭이 모두 390px이며 핵심 콘텐츠 박스가 화면 밖으로 나가지 않았다. 이 결과는 Chrome 데스크톱 에뮬레이션 기준이며 실제 iOS Safari 검증을 대체하지 않는다.
+
+### 앞으로 진행할 작업
+
+#### P0 — 발행 전 사람 확인
+
+1. 연결된 그림 글에서 실제 Excel → Word 경로를 사람이 재현하고 `연결된 그림` 선택·원본 변경 후 갱신을 확인한다.
+2. 고DPI/화면 배율, 웹용 Excel 지원 여부, 원본 시트·파일 삭제 시 동작을 확인하거나 미확인 주의사항으로 유지한다.
+3. `author: 테스터`가 실제 표시할 작성자명인지 확인하고 테스트 날짜를 확정한다.
+4. VLOOKUP 결과 이미지·수식·오류 설명을 사람이 마지막으로 대조한다.
+5. 승인한 글만 `status: published`로 변경하고 `check:content`, `build`, `check:build`를 다시 실행한다.
+
+#### P1 — 생성 품질 운영 루프
+
+1. Codex OAuth 로그인 상태에서 `npm run auto:write`를 실제 1회 실행한다.
+2. 생성 결과가 `draft`로 저장되는지, `out/auto-publish/<run>/prompt-manifest.json`에 편집 버전·페르소나·형식·모듈 해시가 남는지 확인한다.
+3. 실제 생성 결과와 사람 수정 결과를 반영해 평가 사례를 최소 7건으로 늘린다.
+4. `npm run auto:improve -- --input <초안>`으로 첫 개선 제안을 만들고, diff·회귀 위험을 사람이 검토한 뒤에만 편집 모듈에 반영한다.
+5. 프롬프트 변경 전후의 문장·구조·사실성·실행성 점수를 기록한다.
+
+#### P2 — 후순위 제품화·배포
+
+1. 관리자 화면에 편집 시스템 버전, 평가 점수, 개선안 승인 상태를 표시한다.
+2. 390px·768px·1440px 실측, 키보드 전체 순회, 200% 확대, 표·코드 가로 스크롤과 접근성을 다시 점검한다.
+3. 호스팅 연결과 `DEPLOY_HOOK_URL` 등록을 완료하고 실제 배포 후 글 경로·이미지·검색을 확인한다.
+4. 첫 공개 글 이후 홈 카드 밀도, 관련 글, 카테고리·검색 결과를 실제 콘텐츠 기준으로 재조정한다.
+
+### 다음 작업자가 바로 실행할 명령
+
+```bash
+npm install
+npm run check:prompts
+npm run check:content
+npm run build
+npm run check:build
+npm run auto:write "주제" --topic productivity --format how-to
+npm run auto:improve -- --input src/content/posts/excel-vlookup-other-sheet.md
+```
+
+`auto:write`와 `auto:improve` 실행 전에는 Codex CLI 설치와 `codex login` 상태를 확인한다. 두 명령 모두 OpenAI API 키를 요구하지 않는다. 개선 제안의 diff는 사람이 검토하기 전에는 적용하지 않는다.
+
+### 인수인계 시 주의할 파일
+
+- `.editorial/constitution.md`, `.editorial/manifest.json`, `scripts/lib/content-contract.mjs`는 자동 개선 보호 대상이다.
+- `src/content/posts/*.md`의 `draft` 상태를 임의로 `published`로 바꾸지 않는다.
+- `public/images/`의 실제 Excel 증거 이미지는 삭제하지 않는다.
+- `out/`과 `dist/`는 실행 생성물이며 커밋하지 않는다.

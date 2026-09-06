@@ -23,11 +23,13 @@
  *   CODEX_MODEL      선택 (기본: ChatGPT 플랜 기본 모델)
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 
 const ROOT = process.cwd();
 const PROMPTS_DIR = join(ROOT, '.planning', 'prompts');
+const EDITORIAL_DIR = join(ROOT, '.editorial');
 const OUT_DIR = join(ROOT, 'out', 'auto-publish');
 
 const args = process.argv.slice(2);
@@ -72,17 +74,60 @@ const extractArticle = (text, fallback) => {
 const topicArg = getArg('topic');
 const levelArg = getArg('level');
 const stageArg = getArg('stage');
-const tone = getArg('tone') ?? '해요체';
+const tone = getArg('tone') ?? '합니다체';
 const slug = getArg('slug');
 const angleArg = getArg('angle');
+const formatArg = getArg('format') ?? getArg('type');
+const personaArg = getArg('persona');
 const calendarPath = getArg('calendar');
 const inputPath = getArg('input');
 const finalPath = getArg('from-final');
-const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|calendar|input|from-final)$/)));
+const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|format|type|persona|calendar|input|from-final)$/)));
 
 const CODEX_MODEL = process.env.CODEX_MODEL;
 
 const fail = (msg) => { console.error(`[auto-write] 오류: ${msg}`); process.exit(1); };
+
+const readJson = (p) => {
+  try {
+    return JSON.parse(readDoc(p));
+  } catch (error) {
+    fail(`JSON 파일을 읽을 수 없습니다: ${p} (${error instanceof Error ? error.message : String(error)})`);
+  }
+};
+
+const editorialManifest = readJson(join(EDITORIAL_DIR, 'manifest.json'));
+const editorialVersion = editorialManifest.version ?? 'unversioned';
+const format = formatArg ?? editorialManifest.defaultFormat ?? 'how-to';
+const personaName = personaArg ?? editorialManifest.defaultPersona;
+const blueprintPath = editorialManifest.modules?.blueprints?.[format];
+const personaPath = editorialManifest.modules?.personas?.[personaName];
+
+if (!blueprintPath) fail(`지원하지 않는 글 유형입니다: ${format}`);
+if (!personaPath) fail(`페르소나를 찾을 수 없습니다: ${personaName}`);
+
+const editorialModules = {
+  constitution: readDoc(editorialManifest.modules.constitution),
+  styleGuide: readDoc(editorialManifest.modules.styleGuide),
+  blueprint: readDoc(blueprintPath),
+  persona: readJson(personaPath),
+};
+
+const moduleText = [
+  `EDITORIAL_SYSTEM_VERSION: ${editorialVersion}`,
+  `SELECTED_PERSONA: ${personaName}`,
+  `SELECTED_FORMAT: ${format}`,
+  '--- 편집 헌법 ---',
+  editorialModules.constitution,
+  '--- 문체 가이드 ---',
+  editorialModules.styleGuide,
+  '--- 글 유형 템플릿 ---',
+  editorialModules.blueprint,
+  '--- 페르소나 ---',
+  JSON.stringify(editorialModules.persona, null, 2),
+].join('\n\n');
+
+const hashText = (text) => createHash('sha256').update(text).digest('hex');
 
 /* ── LLM 엔진: codex(ChatGPT OAuth) ───────────────────────── */
 // Windows에서 npm 전역 codex는 .cmd 셔미이므로 실제 JS 진입점을 직접 호출한다.
@@ -232,9 +277,27 @@ mkdirSync(runDir, { recursive: true });
 
 const brand = readDoc('BRAND.md');
 const voice = readDoc('VOICE.md');
-const writerSystem = `${brand}\n\n---\n\n${voice}\n\n---\n\n${extractPromptSection(readDoc(join(PROMPTS_DIR, 'content-writer-prompt.md')))}`;
-const humanizeSystem = extractPromptSection(readDoc(join(PROMPTS_DIR, 'chatgpt-humanize-prompt.md')));
-const reviewSystem = extractPromptSection(readDoc(join(PROMPTS_DIR, 'chatgpt-review-prompt.md')));
+const baseEditorialSystem = `${moduleText}\n\n--- 브랜드 ---\n\n${brand}\n\n--- 기존 문체 계약 ---\n\n${voice}`;
+const writerSystem = `${baseEditorialSystem}\n\n--- 작성 프롬프트 ---\n\n${extractPromptSection(readDoc(join(PROMPTS_DIR, 'content-writer-prompt.md')))}`;
+const humanizeSystem = `${baseEditorialSystem}\n\n--- 윤문 프롬프트 ---\n\n${extractPromptSection(readDoc(join(PROMPTS_DIR, 'chatgpt-humanize-prompt.md')))}`;
+const reviewSystem = `${baseEditorialSystem}\n\n--- 검수 프롬프트 ---\n\n${extractPromptSection(readDoc(join(PROMPTS_DIR, 'chatgpt-review-prompt.md')))}`;
+
+writeFileSync(join(runDir, 'prompt-manifest.json'), JSON.stringify({
+  version: editorialVersion,
+  persona: personaName,
+  format,
+  model: CODEX_MODEL ?? 'ChatGPT plan default',
+  engine: 'codex-oauth',
+  modules: {
+    constitution: hashText(editorialModules.constitution),
+    styleGuide: hashText(editorialModules.styleGuide),
+    blueprint: hashText(editorialModules.blueprint),
+    persona: hashText(JSON.stringify(editorialModules.persona)),
+    brand: hashText(brand),
+    voice: hashText(voice),
+  },
+}, null, 2), 'utf8');
+console.log(`[auto-write] 편집 시스템 ${editorialVersion} / 페르소나 ${personaName} / 유형 ${format}`);
 
 let draft;
 if (inputPath) {

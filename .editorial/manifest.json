@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "defaultPersona": "upmu-lab",
+  "defaultFormat": "how-to",
+  "modules": {
+    "constitution": ".editorial/constitution.md",
+    "styleGuide": ".editorial/style-guide.md",
+    "blueprints": {
+      "how-to": ".editorial/blueprints/how-to.md"
+    },
+    "personas": {
+      "upmu-lab": "scripts/auto-publish/persona/upmu-lab.json"
+    }
+  },
+  "selfImprovement": {
+    "mode": "proposal-only",
+    "requiresHumanApproval": true,
+    "protectedFiles": [
+      ".editorial/constitution.md",
+      ".editorial/manifest.json",
+      "scripts/lib/content-contract.mjs"
+    ]
+  }
+}

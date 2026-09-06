@@ -13,6 +13,8 @@ export const MIN_BODY_CHARS = 1500;
 /** 사람이 채워야 하는 검증 마커. 공개되는 글에 남아 있으면 발행 게이트가 차단한다 (draft는 자유). */
 export const UNRESOLVED_MARKER_RE =
   /\[(?:직접 확인 필요|출처 URL 확인 필요|테스트 필요|스크린샷)[^\]]*\]/;
+const EDITORIAL_LEAK_RE = /(?:슬러그 제안|내부 링크 후보|스크린샷 필요|발행 전 실제|후속 글 후보)/;
+const VISUAL_TOPIC_RE = /(?:엑셀|Excel|구글 스프레드시트|수식|메뉴|시트)/i;
 
 /** frontmatter 블록 파싱. 없으면 null. */
 export function parseFrontmatter(text) {
@@ -37,6 +39,10 @@ export function bodyCharCount(text) {
   return body.replace(/\s/g, '').length;
 }
 
+function bodyOf(text) {
+  return text.replace(/^---\n[\s\S]*?\n---/, '');
+}
+
 /**
  * 게시물 1개 검증. 오류 문자열 배열 반환 (빈 배열 = 통과).
  * @param {string} file 표시용 파일명
@@ -55,8 +61,13 @@ export function validatePost(file, text) {
   const author = front.match(/^author:\s*([^\n]+)/m)?.[1]?.trim();
   const testedAt = front.match(/^testedAt:\s*([^\n]+)/m)?.[1]?.trim();
   const topic = front.match(/^topic:\s*([^\n]+)/m)?.[1]?.trim();
+  const sourceIds = front.match(/^sourceIds:\s*\[([^\]]*)\]/m)?.[1]?.trim() ?? '';
+  const toolVersions = /^toolVersions:\s*\{\s*\}\s*$/m.test(front) ? '' : (front.match(/^toolVersions:\s*\{([^\n]*)\}/m)?.[1]?.trim() ?? 'block');
+  const series = front.match(/^series:\s*([^\n]+)/m)?.[1]?.trim();
+  const seriesOrder = front.match(/^seriesOrder:\s*([^\n]+)/m)?.[1]?.trim();
   const manualReview = front.match(/^manualReview:\s*([^\n]+)/m)?.[1]?.trim() ?? 'none';
   const detectedRisks = detectContentRisks(text);
+  const body = bodyOf(text);
 
   if (status && !ALLOWED_STATUS.has(status)) errors.push(`${file}: invalid status ${status}`);
   if (!['none', 'required', 'approved'].includes(manualReview)) errors.push(`${file}: invalid manualReview ${manualReview}`);
@@ -79,6 +90,25 @@ export function validatePost(file, text) {
   if (status !== 'draft' && UNRESOLVED_MARKER_RE.test(text)) {
     const found = (text.match(new RegExp(UNRESOLVED_MARKER_RE.source, 'g')) ?? []).slice(0, 3).join(', ');
     errors.push(`${file}: public posts must resolve all markers first (남은 마커: ${found})`);
+  }
+  if (status !== 'draft' && EDITORIAL_LEAK_RE.test(body)) {
+    errors.push(`${file}: public posts must remove editorial draft notes (슬러그·링크 후보·검증 메모)`);
+  }
+  if (status !== 'draft' && VISUAL_TOPIC_RE.test(body) && !/!\[[^\]]*\]\([^)]*\)/.test(body)) {
+    errors.push(`${file}: tool/how-to posts need at least one real body screenshot or image`);
+  }
+  if (status !== 'draft' && VISUAL_TOPIC_RE.test(body) && !sourceIds) {
+    errors.push(`${file}: tool/how-to posts need at least one sourceIds entry`);
+  }
+  if (status !== 'draft' && VISUAL_TOPIC_RE.test(body) && !toolVersions) {
+    errors.push(`${file}: tool/how-to posts need toolVersions metadata`);
+  }
+  const h2Count = (body.match(/^## /gm) ?? []).length;
+  if (status !== 'draft' && h2Count > 8) {
+    errors.push(`${file}: public posts should use 8 or fewer H2 sections (현재 ${h2Count}개)`);
+  }
+  if (status !== 'draft' && series && !seriesOrder) {
+    errors.push(`${file}: series posts need seriesOrder metadata`);
   }
   return errors;
 }

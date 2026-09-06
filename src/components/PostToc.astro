@@ -1,0 +1,28 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+  mobile?: boolean;
+}
+
+const { headings, mobile = false } = Astro.props;
+const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+{items.length > 0 && (
+  <nav class:list={['post-toc', mobile && 'post-toc--mobile']} aria-label="이 글의 목차">
+    {mobile ? <p class="post-toc-label">목차</p> : <p class="post-toc-label">이 글의 순서</p>}
+    <ol>
+      {items.map((heading) => (
+        <li class:list={[heading.depth === 3 && 'post-toc-subitem']}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

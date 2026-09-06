@@ -1,8 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostFacts from '../../components/PostFacts.astro';
+import PostToc from '../../components/PostToc.astro';
 import { getPublicPosts, isPublicPost, type Post } from '../../lib/posts';
-import { categoryPath, formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+import { categoryPath, formatKoDate, sourceMeta, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -14,10 +16,21 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: Post };
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const data = post.data;
 const canonical = data.canonical;
-const relatedPosts = (await getPublicPosts()).filter((candidate) => candidate.id !== post.id && candidate.data.topic === data.topic).slice(0, 3);
+const publicPosts = await getPublicPosts();
+const relatedPosts = publicPosts
+  .filter((candidate) => candidate.id !== post.id && (data.series ? candidate.data.series === data.series : candidate.data.topic === data.topic))
+  .slice(0, 3);
+const seriesPosts = data.series
+  ? publicPosts
+    .filter((candidate) => candidate.data.series === data.series)
+    .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0))
+  : [];
+const seriesIndex = seriesPosts.findIndex((candidate) => candidate.id === post.id);
+const previousPost = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : undefined;
+const nextPost = seriesIndex >= 0 ? seriesPosts[seriesIndex + 1] : undefined;
 // pubDate가 미래인 카드는 색인 전에 배포될 수 있으므로 noindex로 보호한다.
 const noindex = data.pubDate.getTime() > Date.now();
 
@@ -25,6 +38,8 @@ const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localh
 const pageUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
 const coverUrl = data.image ? new URL(data.image, siteUrl).toString() : undefined;
 const toolVersionEntries = Object.entries(data.toolVersions);
+const body = (post as Post & { body?: string }).body ?? '';
+const readMinutes = Math.max(1, Math.ceil(body.replace(/\s/g, '').length / 700));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -67,7 +82,6 @@ const breadcrumbs = {
       <p class="post-badges">
         <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
         {data.testedAt && <span class="badge badge--verified">직접 테스트</span>}
-        {data.aiAssisted && <span class="badge badge--pending">AI 보조 · 사람 검토</span>}
       </p>
       <h1>{data.title}</h1>
       <p class="byline">
@@ -79,6 +93,13 @@ const breadcrumbs = {
       </p>
       <p class="lede">{data.description}</p>
     </header>
+    <section class="post-quick-answer" aria-labelledby="quick-answer-heading">
+      <p class="eyebrow">빠른 답변</p>
+      <h2 id="quick-answer-heading">이 글에서 바로 확인할 내용</h2>
+      <p>{data.description}</p>
+    </section>
+    <PostFacts data={data} readMinutes={readMinutes} toolVersionEntries={toolVersionEntries} />
+    <PostToc headings={headings} mobile />
     {data.image && (
       <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="eager" decoding="async" />
     )}
@@ -108,7 +129,10 @@ const breadcrumbs = {
               <dt>출처·확인</dt>
               <dd>
                 <ul>
-                  {data.sourceIds.map((source) => <li><code>{source}</code></li>)}
+                  {data.sourceIds.map((source) => {
+                    const meta = sourceMeta(source);
+                    return <li>{meta.url ? <a href={meta.url} rel="nofollow noopener">{meta.label}</a> : <span>{meta.label}</span>}</li>;
+                  })}
                 </ul>
                 {data.testedAt && <span>확인일: <time datetime={toIsoDate(data.testedAt)}>{formatKoDate(data.testedAt)}</time></span>}
               </dd>
@@ -123,13 +147,14 @@ const breadcrumbs = {
     <p class="post-backlink"><a href={categoryPath(data.topic)}>← {topicLabel(data.topic)} 글 목록</a></p>
     </article>
     <aside class="post-aside" aria-label="글 보조 정보">
+      <PostToc headings={headings} />
       <div class="post-aside-block">
         <p class="aside-label">이 글의 상태</p>
         <p class="post-aside-title">{data.testedAt ? '직접 테스트한 글' : '검토 중인 글'}</p>
         <p>{data.testedAt ? '작성 화면과 결과를 직접 확인했습니다.' : '사람 검토를 마친 뒤 공개됩니다.'}</p>
       </div>
       <div class="post-aside-block">
-        <p class="aside-label">다음 읽을거리</p>
+        <p class="aside-label">{data.series ? `${data.series} 시리즈` : '다음 읽을거리'}</p>
         {relatedPosts.length ? (
           <ul class="aside-related-list">
             {relatedPosts.map((related) => <li><a href={`/posts/${related.id}`}>{related.data.title}</a></li>)}
@@ -140,4 +165,10 @@ const breadcrumbs = {
       </div>
     </aside>
   </div>
+  {(previousPost || nextPost) && (
+    <nav class="post-series-nav" aria-label="시리즈 탐색">
+      {previousPost ? <a href={`/posts/${previousPost.id}`}><span>이전 글</span><strong>{previousPost.data.title}</strong></a> : <span />}
+      {nextPost ? <a href={`/posts/${nextPost.id}`}><span>다음 글</span><strong>{nextPost.data.title}</strong></a> : <span />}
+    </nav>
+  )}
 </BaseLayout>

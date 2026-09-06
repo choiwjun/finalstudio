@@ -18,6 +18,17 @@ const topicLabels: Record<string, string> = {
   'ai-workflows': 'AI 업무 활용',
 };
 
+const sourceCatalog: Record<string, { label: string; url: string }> = {
+  'microsoft-excel-paste-options': {
+    label: 'Microsoft Excel 붙여넣기 옵션',
+    url: 'https://support.microsoft.com/en-us/excel/paste-options',
+  },
+  'microsoft-excel-vlookup': {
+    label: 'Microsoft VLOOKUP 함수',
+    url: 'https://support.microsoft.com/ko-kr/excel/functions/vlookup-function',
+  },
+};
+
 export function topicLabel(topic: string): string {
   return topicLabels[topic] ?? topic;
 }
@@ -28,4 +39,13 @@ export function topicBadgeClass(topic: string): string {
 
 export function categoryPath(topic: string): string {
   return `/categories/${encodeURIComponent(topic)}`;
+}
+
+export function sourceMeta(sourceId: string): { label: string; url?: string } {
+  return sourceCatalog[sourceId] ?? { label: sourceId };
+}
+
+export function difficultyLabel(difficulty?: string): string | undefined {
+  if (!difficulty) return undefined;
+  return difficulty;
 }

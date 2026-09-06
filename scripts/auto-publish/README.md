@@ -6,7 +6,7 @@
 ```
 npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카테고리
         │
-        ├─ [자동] 1단계 초안 (BRAND.md+VOICE.md+페르소나 프롬프트)
+        ├─ [자동] 1단계 초안 (편집 헌법+문체+페르소나+글 유형 템플릿)
         ├─ [자동] 2단계 윤문 — 한국어 AI 티 제거 (im-not-ai 규칙 이식)
         ├─ [자동] 3단계 검수 — 100점 채점, 90점 미만이면 수정·재채점 (claude-blog 게이트 이식)
         ├─ [자동] 프론트매터 변환 → status: draft 저장
@@ -27,7 +27,7 @@ npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카�
 
 ### B. 수동 모드 — ChatGPT 붙여넣기
 
-같은 대화에서 순서대로 붙여넣기: ① `BRAND.md`+`VOICE.md`+`content-writer-prompt.md` → ② `chatgpt-humanize-prompt.md` → ③ `chatgpt-review-prompt.md`.
+같은 대화에서 순서대로 붙여넣기: ① `.editorial/` 모듈+`BRAND.md`+`VOICE.md`+`content-writer-prompt.md` → ② `chatgpt-humanize-prompt.md` → ③ `chatgpt-review-prompt.md`.
 통과본을 파일로 저장한 뒤 변환만 자동화: `npm run auto:write --from-final 검수통과본.md --topic 카테고리`
 
 ### C. 예약 발행 재빌드 (호스팅 연결 후)
@@ -40,7 +40,7 @@ npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카�
 
 ```bash
 # 풀 자동 (주제 직접 지정) — ChatGPT OAuth Codex 세션 사용
-npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--slug my-slug] [--tone 해요체]
+npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--format how-to] [--persona upmu-lab] [--slug my-slug]
 
 # 캘린더에서 다음 주제 자동 가져오기 (성공 시 해당 항목 [x] 표시)
 npm run auto:write --calendar scripts/auto-publish/calendar.md
@@ -51,6 +51,12 @@ npm run auto:write --input 초안.md --topic 카테고리
 # 생성 없이 변환만 (수동 ChatGPT 흐름 마무리)
 npm run auto:write --from-final 검수통과본.md --topic 카테고리 --angle "관점"
 
+# 프롬프트와 페르소나 계약 검사
+npm run check:prompts
+
+# 최근 초안과 평가 사례를 바탕으로 개선안만 생성 (저장소 파일은 자동 수정하지 않음)
+npm run auto:improve -- --input src/content/posts/excel-vlookup-other-sheet.md
+
 # 썸네일 이미지 (Codex OAuth + $imagegen)
 npm run image -- --slug 글슬러그
 npm run image -- --slug 글슬러그 --engine manual          # ChatGPT Images에서 생성 후
@@ -60,6 +66,8 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 - 주제 태그: 고정 목록이 없습니다. `topic`에 원하는 카테고리 이름을 사용합니다.
 - 캘린더 형식: `- [ ] 주제 | 독자수준 | 사다리단계 | 주제태그`
 - 중간 산출물(초안·윤문본·검수 리포트)은 `out/auto-publish/<실행시각>/`에 저장 (커밋되지 않음)
+- 생성 실행마다 선택된 편집 시스템 버전·페르소나·모듈 해시를 `prompt-manifest.json`에 저장합니다.
+- 개선안은 `out/prompt-lab/<실행시각>/proposal.md`와 `proposal.diff`에 저장하며, 사람 승인 전에는 적용하지 않습니다.
 
 ## 이미지 규칙 (중요)
 
@@ -81,3 +89,5 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 
 - 파이프라인 원문(단계별 상세·근거): `.planning/prompts/content-pipeline.md`
 - 1단계 초안: `.planning/prompts/content-writer-prompt.md` · 2단계 윤문: `chatgpt-humanize-prompt.md` · 3단계 검수: `chatgpt-review-prompt.md`
+- 고정 편집 헌법·문체·구조: `.editorial/constitution.md`, `.editorial/style-guide.md`, `.editorial/blueprints/`
+- 페르소나·평가 사례·버전: `.editorial/manifest.json`, `scripts/auto-publish/persona/`, `.editorial/evals/`

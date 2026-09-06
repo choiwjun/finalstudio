@@ -1,5 +1,7 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
+import PostFacts from './PostFacts.astro';
+import PostToc from './PostToc.astro';
 import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../lib/format';
 
 interface Props {
@@ -7,8 +9,11 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const data = post.data;
+const body = (post as CollectionEntry<'posts'> & { body?: string }).body ?? '';
+const readMinutes = Math.max(1, Math.ceil(body.replace(/\s/g, '').length / 700));
+const toolVersionEntries = Object.entries(data.toolVersions);
 ---
 
 <article id={`post-${post.id}`} class="article draft-preview-article">
@@ -23,6 +28,12 @@ const data = post.data;
     · <time datetime={toIsoDate(data.pubDate)}>{formatKoDate(data.pubDate)} 작성</time>
   </p>
   <p class="lede">{data.description}</p>
+  <section class="post-quick-answer" aria-label="빠른 답변">
+    <p class="eyebrow">빠른 답변</p>
+    <p>{data.description}</p>
+  </section>
+  <PostFacts data={data} readMinutes={readMinutes} toolVersionEntries={toolVersionEntries} />
+  <PostToc headings={headings} mobile />
   {data.image && (
     <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="lazy" decoding="async" />
   )}

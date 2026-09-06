@@ -40,6 +40,8 @@ npm run dev
 - 예약 글의 `publishAt` 시각에 정적 호스팅을 다시 빌드하려면 `scheduled-publish.yml`을 사용하고,
   호스팅 Deploy Hook URL을 GitHub `DEPLOY_HOOK_URL` secret으로 등록해야 합니다.
 - 프롬프트 파일은 `.planning/prompts/`의 content-writer / chatgpt-humanize / chatgpt-review.
+  고정 편집 헌법·문체·구조 템플릿은 `.editorial/`에서 관리하며, `npm run check:prompts`로 계약을 검사합니다.
+  `npm run auto:improve -- --input <초안>`은 Codex OAuth 기반 개선안만 생성하고 실제 파일은 자동 수정하지 않습니다.
   설치·명령 레퍼런스는 `scripts/auto-publish/README.md`, 파이프라인 원문은 `.planning/prompts/content-pipeline.md`.
 - `tools/` 아래 클론(im-not-ai, claude-blog)은 규칙을 추출한 **참고 자료**이며 실행 환경이 아닙니다 (커밋되지 않음).
 

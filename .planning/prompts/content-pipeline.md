@@ -2,17 +2,16 @@
 
 > 이 문서가 발행 흐름의 단일 근거(single source of truth)다. 개별 도구 문서와 충돌하면 이 문서가 우선한다.
 > 최종 승인자: Human(wj941). 발행 리듬: **주 3~5개, 고정 발행 시간 + 시리즈 단위 기획** (2026-09 벤치마크 실측 반영 — 상한이지 하한이 아님, `BRAND.md` 참조).
-> **실행: `npm run auto:write` 한 줄. 엔진은 ① Codex CLI(ChatGPT 구독 OAuth — 과금 없음) ② OpenAI API(키 과금) ③ ChatGPT 수동 중 자동 선택. Claude Code 불필요.**
+> **실행: `npm run auto:write` 한 줄. 엔진은 ChatGPT 구독 OAuth로 로그인한 Codex CLI만 사용한다. OpenAI API 키와 별도 API 서버는 사용하지 않는다.**
 
 ## 전체 흐름
 
 ```
 [1~3] 자동 실행 — npm run auto:write "주제" --topic ...
-    1단계 초안: BRAND.md + VOICE.md + content-writer-prompt.md (1단계 프롬프트)
+    1단계 초안: .editorial/헌법·문체·페르소나·구조 + BRAND.md + VOICE.md + content-writer-prompt.md
     2단계 윤문: chatgpt-humanize-prompt.md (★필수 — AI 티 제거, 구조·마커 보존)
     3단계 검수: chatgpt-review-prompt.md (★필수 — 100점 채점, 90점 미만이면 수정·재채점)
-    ※ 엔진: --engine codex|api 또는 .env AUTO_ENGINE. 기본: API 키 있으면 api, 없으면 codex.
-      codex = `codex login`(ChatGPT 계정 OAuth) 후 구독 사용량으로 실행. API 키가 없으면 수동 모드 안내 출력.
+    ※ 엔진: `codex` 고정. `codex login`(ChatGPT 계정 OAuth) 후 구독 사용량으로 실행.
         │
         ▼
 [4] 스키마 변환 — 자동 (같은 명령)
@@ -21,7 +20,7 @@
         │
         ▼
 [4.5] 썸네일 이미지 (선택) — npm run image -- --slug <슬러그>
-    API 키 있으면 gpt-image-1로 자동 생성(장당 약 $0.02~0.07), 없으면 ChatGPT(구독)용
+    Codex OAuth의 `$imagegen`으로 커버·일러스트를 생성하거나 ChatGPT Images용
     프롬프트를 출력 → 생성 후 --attach로 등록하면 frontmatter image 필드 + OG 이미지 반영.
     ★ 본문 UI 스크린샷은 AI 이미지 금지 — 사람이 직접 촬영한다 (E-E-A-T 해자)
         │
@@ -58,8 +57,10 @@
 
 | 파일 | 역할 | 단계 |
 |---|---|---|
-| `scripts/auto-publish/auto-write.mjs` | 자동화 코어 (1~4단계 한 줄 실행, codex/api 이중 엔진) | [1~4] |
-| `scripts/auto-publish/generate-image.mjs` | 썸네일 이미지 생성·등록 (API 자동 / ChatGPT 수동) | [4.5] |
+| `scripts/auto-publish/auto-write.mjs` | 자동화 코어 (편집 모듈 조립 + 1~4단계 실행, Codex OAuth) | [1~4] |
+| `scripts/auto-publish/generate-image.mjs` | 썸네일 이미지 생성·등록 (Codex OAuth / ChatGPT 수동) | [4.5] |
+| `.editorial/` | 고정 편집 헌법·문체·페르소나·글 유형·평가 사례 | [1~3] |
+| `scripts/auto-publish/prompt-improve.mjs` | 평가 사례 기반 개선안 생성 (proposal-only) | [부가] |
 | `content-writer-prompt.md` | 1단계 초안 페르소나 프롬프트 | [1] |
 | `chatgpt-humanize-prompt.md` | 2단계 윤문 프롬프트 (im-not-ai 규칙 이식) | [2] |
 | `chatgpt-review-prompt.md` | 3단계 검수 프롬프트 (claude-blog 루브릭 이식) | [3] |
