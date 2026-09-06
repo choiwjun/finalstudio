@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "check:content": "node scripts/check-content.mjs",
     "check:prompts": "node scripts/check-prompts.mjs",
+    "check:writing": "node scripts/check-writing.mjs",
     "check:build": "node scripts/check-build.mjs",
     "auto:write": "node scripts/auto-publish/auto-write.mjs",
     "auto:improve": "node scripts/auto-publish/prompt-improve.mjs",

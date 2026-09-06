@@ -5,7 +5,9 @@
  *   npm run auto:write "글 주제" --level 완전초보 --stage 도구 --topic 카테고리
  *
  * 동작:
- *   1단계 초안(BRAND+VOICE+writer 프롬프트) → 2단계 윤문 → 3단계 검수(90점 게이트, 미달 시 재수정)
+ *   1단계 초안(BRAND+VOICE+writer 프롬프트, --best-of N이면 N개 생성 후 기계 점수로 선택)
+ *   → 2단계 윤문 → 기계 검사(check-writing) + 독립 심사자 채점 → 3단계 수정 루프
+ *   → 기계 게이트 통과 + 심사 90점 이상일 때만 저장
  *   → scripts/auto-publish/convert-post.mjs 호출 → status: draft로 저장
  *
  * 모드:
@@ -13,6 +15,13 @@
  *   --calendar <파일>  편집 캘린더에서 다음 미완료 주제를 가져와 자동 실행 후 체크 표시 (로컬 Codex용)
  *   --input <파일>     이미 작성된 초안에 2단계 윤문 + 3단계 검수만 적용
  *   --from-final <파일> 엔진 없이 변환·저장만 수행 (ChatGPT 수동 흐름 마무리용)
+ *   --notes <파일>     원자료(notes). experience·place-log·book-memo·photo-log 형식은 필수.
+ *                      모델은 원자료에 없는 경험·수치를 만들 수 없다 (지어내기 방지)
+ *
+ * 게이트 (작가 ≠ 심사자 분리):
+ *   - 기계 검사: scripts/check-writing.mjs — 문장·구조·형식·마커·출처 없는 주장을 결정론적으로 측정
+ *   - 독립 심사: independent-judge-prompt.md — writer 컨텍스트를 배제한 맨 프롬프트로만 채점
+ *   - 최종 저장 조건: 기계 검사 통과 && 독립 심사 90점 이상
  *
  * 엔진:
  *   codex  Codex CLI가 ChatGPT 계정(OAuth 로그인)으로 3단계 실행.
@@ -21,11 +30,14 @@
  * 환경변수:
  *   AUTO_ENGINE      codex만 지원 (기본: codex)
  *   CODEX_MODEL      선택 (기본: ChatGPT 플랜 기본 모델)
+ *   AUTO_BEST_OF     1단계 초안 생성 수 (기본 1, --best-of로 우선)
+ *   AUTO_MAX_PASSES  수정 루프 최대 횟수 (기본 2)
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
+import { analyzePost, extractMarkers } from '../check-writing.mjs';
 
 const ROOT = process.cwd();
 const PROMPTS_DIR = join(ROOT, '.planning', 'prompts');
@@ -82,7 +94,9 @@ const personaArg = getArg('persona');
 const calendarPath = getArg('calendar');
 const inputPath = getArg('input');
 const finalPath = getArg('from-final');
-const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|format|type|persona|calendar|input|from-final)$/)));
+const notesPath = getArg('notes');
+const bestOfArg = getArg('best-of');
+const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|format|type|persona|calendar|input|from-final|notes|best-of)$/)));
 
 const CODEX_MODEL = process.env.CODEX_MODEL;
 
@@ -106,12 +120,24 @@ const personaPath = editorialManifest.modules?.personas?.[personaName];
 if (!blueprintPath) fail(`지원하지 않는 글 유형입니다: ${format}`);
 if (!personaPath) fail(`페르소나를 찾을 수 없습니다: ${personaName}`);
 
+/* 경험 계열 형식은 원자료 없이 생성하면 경험을 지어낼 수밖에 없다 — 원자료를 필수로 강제한다. */
+const NOTES_REQUIRED = new Set(['experience', 'place-log', 'book-memo', 'photo-log']);
+if (NOTES_REQUIRED.has(format) && !notesPath) {
+  fail(`형식 ${format}은(는) 원자료가 필요합니다. --notes <파일>로 사람이 남긴 메모·기록을 제공하세요 (notes/README.md 참고).`);
+}
+const notesContent = notesPath ? readDoc(notesPath) : undefined;
+
 const editorialModules = {
   constitution: readDoc(editorialManifest.modules.constitution),
   styleGuide: readDoc(editorialManifest.modules.styleGuide),
   blueprint: readDoc(blueprintPath),
   persona: readJson(personaPath),
+  exemplar: editorialManifest.modules?.exemplars?.[format]
+    ? readDoc(editorialManifest.modules.exemplars[format])
+    : undefined,
 };
+const judgePromptPath = editorialManifest.modules?.prompts?.judge ?? join(PROMPTS_DIR, 'independent-judge-prompt.md');
+const judgeSystem = extractPromptSection(readDoc(judgePromptPath));
 
 const moduleText = [
   `EDITORIAL_SYSTEM_VERSION: ${editorialVersion}`,
@@ -125,7 +151,9 @@ const moduleText = [
   editorialModules.blueprint,
   '--- 페르소나 ---',
   JSON.stringify(editorialModules.persona, null, 2),
-].join('\n\n');
+  editorialModules.exemplar ? '--- exemplar (이 형식의 문체·구조 기준 발췌 — 베끼지 말고 수준의 기준으로만) ---' : undefined,
+  editorialModules.exemplar ?? undefined,
+].filter((x) => x !== undefined).join('\n\n');
 
 const hashText = (text) => createHash('sha256').update(text).digest('hex');
 
@@ -270,6 +298,18 @@ if (!(await codexLoggedIn())) {
 const callModel = callCodex;
 console.log('[auto-write] 엔진: codex — ChatGPT OAuth 세션으로 실행');
 
+/* ── 게이트 상수와 작성자 입력 ───────────────────────────── */
+const JUDGE_THRESHOLD = 90;
+const BEST_OF = Math.max(1, Number(bestOfArg ?? process.env.AUTO_BEST_OF ?? 1));
+const writerInput = [
+  `주제/키워드: ${subject}`,
+  `대상 독자 수준: ${level}`,
+  `확장 사다리 단계: ${stage}`,
+  `문체: ${tone}`,
+  notesContent ? '\n--- 원자료 (유일한 사실·경험 재료 — 여기에 없는 경험·수치·장면을 만들지 마세요) ---' : undefined,
+  notesContent,
+].filter((x) => x !== undefined).join('\n');
+
 /* ── 1~3단계 실행 ───────────────────────────────────────── */
 const runId = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
 const runDir = join(OUT_DIR, runId);
@@ -288,77 +328,105 @@ writeFileSync(join(runDir, 'prompt-manifest.json'), JSON.stringify({
   format,
   model: CODEX_MODEL ?? 'ChatGPT plan default',
   engine: 'codex-oauth',
+  gates: { mechanical: 'check-writing.mjs', independentJudge: JUDGE_THRESHOLD, bestOf: BEST_OF },
   modules: {
     constitution: hashText(editorialModules.constitution),
     styleGuide: hashText(editorialModules.styleGuide),
     blueprint: hashText(editorialModules.blueprint),
     persona: hashText(JSON.stringify(editorialModules.persona)),
+    exemplar: editorialModules.exemplar ? hashText(editorialModules.exemplar) : null,
+    judge: hashText(judgeSystem),
     brand: hashText(brand),
     voice: hashText(voice),
   },
 }, null, 2), 'utf8');
-console.log(`[auto-write] 편집 시스템 ${editorialVersion} / 페르소나 ${personaName} / 유형 ${format}`);
+console.log(`[auto-write] 편집 시스템 ${editorialVersion} / 페르소나 ${personaName} / 유형 ${format} / 게이트 기계검사+독립심사${JUDGE_THRESHOLD}점`);
 
 let draft;
 if (inputPath) {
   draft = readDoc(inputPath);
   console.log('[auto-write] 1단계 초안: --input 파일 사용');
-} else {
+} else if (BEST_OF === 1) {
   console.log('[auto-write] 1단계 초안 생성 중... (codex)');
-  draft = await callModel(
-    writerSystem,
-    `주제/키워드: ${subject}\n대상 독자 수준: ${level}\n확장 사다리 단계: ${stage}\n문체: ${tone}`,
-  );
+  draft = await callModel(writerSystem, writerInput);
   writeFileSync(join(runDir, '01-draft.md'), draft, 'utf8');
+} else {
+  console.log(`[auto-write] 1단계 초안 생성 중... (codex, best-of ${BEST_OF})`);
+  const candidates = [];
+  for (let i = 1; i <= BEST_OF; i++) {
+    const text = await callModel(writerSystem, writerInput);
+    const candidateAnalysis = analyzePost(text, { format });
+    writeFileSync(join(runDir, `01-draft-${i}.md`), text, 'utf8');
+    candidates.push({ index: i, mechanicalFailures: candidateAnalysis.failures.length, mechanicalWarnings: candidateAnalysis.warnings.length });
+    console.log(`[auto-write] 후보 ${i}: 기계 실패 ${candidateAnalysis.failures.length}건 / 경고 ${candidateAnalysis.warnings.length}건`);
+  }
+  const best = candidates.reduce((a, b) =>
+    (b.mechanicalFailures < a.mechanicalFailures || (b.mechanicalFailures === a.mechanicalFailures && b.mechanicalWarnings < a.mechanicalWarnings) ? b : a));
+  draft = (await Promise.all(candidates.map((c) => readFileSync(join(runDir, `01-draft-${c.index}.md`), 'utf8'))))[best.index - 1];
+  writeFileSync(join(runDir, '01-draft-selection.json'), JSON.stringify({ bestOf: BEST_OF, selected: best.index, candidates }, null, 2), 'utf8');
+  console.log(`[auto-write] 후보 ${best.index} 선택 (기계 점수 기준)`);
 }
 
 console.log('[auto-write] 2단계 윤문 중... (AI 티 제거, 구조·마커 보존)');
 const humanized = await callModel(
   humanizeSystem,
-  `${draft}\n\n(윤문 대상은 위 전체입니다. 프론트매터(--- 블록)와 검증 마커, 마크다운 구조는 그대로 유지하세요.)`,
+  `${draft}\n\n(윤문 대상은 위 전체입니다. 프론트매터(--- 블록)와 검증 마커, 마크다운 구조는 그대로 유지하세요. SELECTED_FORMAT: ${format})`,
 );
 writeFileSync(join(runDir, '02-humanized.md'), humanized, 'utf8');
+const expectedMarkers = extractMarkers(humanized);
 
 const parseScore = (text) => {
   const score = Number(text.match(/총점:\s*(\d{1,3})\s*\/?\s*100/)?.[1] ?? NaN);
   return score >= 0 && score <= 100 ? score : NaN;
 };
-let reviewed = '';
-let score = NaN;
-let passes = 0;
-const MAX_PASSES = Number(process.env.AUTO_MAX_PASSES ?? 2);
-let finalText = humanized;
+
 let candidate = humanized;
+let finalText = humanized;
+let judgeScore = NaN;
+let analysis = analyzePost(candidate, { format, expectedMarkers });
+const MAX_PASSES = Number(process.env.AUTO_MAX_PASSES ?? 2);
+let passes = 0;
 
 while (passes < MAX_PASSES) {
   passes += 1;
-  console.log(`[auto-write] 3단계 검수 중... (${passes}/${MAX_PASSES})`);
-  reviewed = await callModel(reviewSystem, candidate);
-  writeFileSync(join(runDir, `03-review-${passes}.md`), reviewed, 'utf8');
-  score = parseScore(reviewed);
-  if (score >= 90) {
-    finalText = extractArticle(reviewed, candidate);
+  console.log(`[auto-write] 3단계 판정 중... 기계 검사 + 독립 심사 (${passes}/${MAX_PASSES})`);
+  analysis = analyzePost(candidate, { format, expectedMarkers });
+  writeFileSync(join(runDir, `05-writing-check-${passes}.json`), JSON.stringify(analysis, null, 2), 'utf8');
+  for (const f of analysis.failures) console.log(`  [기계 실패] [${f.check}] ${f.message}`);
+  const judgeOutput = await callCodex(judgeSystem, `SELECTED_FORMAT: ${format}\n\n${candidate}`);
+  judgeScore = parseScore(judgeOutput);
+  writeFileSync(join(runDir, `03-judge-${passes}.md`), judgeOutput, 'utf8');
+  console.log(`  [독립 심사] ${Number.isNaN(judgeScore) ? '점수 파싱 실패' : `${judgeScore}점`} / 기계 실패 ${analysis.failures.length}건`);
+  if (analysis.pass && judgeScore >= JUDGE_THRESHOLD) {
+    finalText = candidate;
     break;
   }
   if (passes < MAX_PASSES) {
-    console.log(`[auto-write] 점수 ${score}점 — 치명적 결함을 수정한 최종본만 출력하도록 재요청합니다.`);
-    const corrected = await callModel(
-      reviewSystem,
-      `${reviewed}\n\n(위 심사에서 감점된 부분을 모두 수정한 **최종 본문만** 출력하세요. 프론트매터·마커·구조는 유지.)`,
-    );
+    console.log('[auto-write] 게이트 미달 — 기계 실패 항목과 심사 지적을 반영한 수정본을 요청합니다.');
+    const fixInput = [
+      candidate,
+      '\n(아래 두 심사 결과를 모두 해소한 **최종 본문만** 출력하세요. 프론트매터·검증 마커·마크다운 구조는 유지.)',
+      '\n--- 기계 검사 실패 항목 (전부 해소할 것) ---',
+      analysis.failures.map((f) => `- [${f.check}] ${f.message}`).join('\n') || '(없음)',
+      '\n--- 독립 심사자 지적 ---',
+      judgeOutput,
+    ].join('\n');
+    const corrected = await callModel(reviewSystem, fixInput);
     candidate = extractArticle(corrected, candidate);
     finalText = candidate;
   }
 }
-if (!(score >= 90)) {
-  fail(`검수 점수 ${score}점 — 90점 게이트를 통과하지 못했습니다. out/auto-publish/${runId}/ 의 리포트를 확인하고 ChatGPT 수동 모드로 다듬으세요.`);
-}
 
-const saved = join(runDir, '04-final.md');
-writeFileSync(saved, finalText, 'utf8');
-console.log(`[auto-write] 90점 게이트 통과 (${score}점) — 중간 산출물: out/auto-publish/${runId}/`);
+const finalCheck = analyzePost(finalText, { format, expectedMarkers });
+writeFileSync(join(runDir, '05-writing-check-final.json'), JSON.stringify(finalCheck, null, 2), 'utf8');
+if (!(finalCheck.pass && judgeScore >= JUDGE_THRESHOLD)) {
+  fail(`게이트 미통과 — 기계 실패 ${finalCheck.failures.length}건, 독립 심사 ${Number.isNaN(judgeScore) ? '점수 없음' : `${judgeScore}점`}. out/auto-publish/${runId}/ 리포트를 확인하세요.`);
+}
+console.log(`[auto-write] 게이트 통과 — 기계 검사 실패 0건 / 독립 심사 ${judgeScore}점 — 중간 산출물: out/auto-publish/${runDir.split('/').pop()}/`);
 
 /* ── 4단계: 변환·저장 ───────────────────────────────────── */
+const saved = join(runDir, '04-final.md');
+writeFileSync(saved, finalText, 'utf8');
 const { get } = readFrontmatter(finalText);
 const angle = angleArg ?? get('angle');
 if (!angle) fail('angle을 확정할 수 없습니다. --angle "..." 을 지정하세요.');

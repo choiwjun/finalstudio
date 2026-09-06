@@ -8,15 +8,19 @@
 
 ```
 [1~3] 자동 실행 — npm run auto:write "주제" --topic ...
-    1단계 초안: .editorial/헌법·문체·페르소나·구조 + BRAND.md + VOICE.md + content-writer-prompt.md
+    1단계 초안: .editorial/헌법·문체·페르소나·블루프린트·exemplar + BRAND.md + VOICE.md + content-writer-prompt.md
+               (--best-of N이면 N개 생성 후 기계 점수로 선택; 경험 계열 형식은 --notes 원자료 필수)
     2단계 윤문: chatgpt-humanize-prompt.md (★필수 — AI 티 제거, 구조·마커 보존)
-    3단계 검수: chatgpt-review-prompt.md (★필수 — 100점 채점, 90점 미만이면 수정·재채점)
+    3단계 판정: scripts/check-writing.mjs 기계 검사 + independent-judge-prompt.md 독립 심사
+               (작가 컨텍스트를 배제한 심사자가 채점 — 작가 ≠ 심사자)
+               미달이면 기계 실패 목록 + 심사 지적을 반영한 수정 루프 (기본 2회)
     ※ 엔진: `codex` 고정. `codex login`(ChatGPT 계정 OAuth) 후 구독 사용량으로 실행.
         │
         ▼
 [4] 스키마 변환 — 자동 (같은 명령)
     status: draft / aiAssisted: true 강제 → src/content/posts/ 저장
-    ★ 90점 게이트 미통과 시 저장 거부, 중간 산출물은 out/auto-publish/에 보존
+    ★ 기계 검사 실패 0건 && 독립 심사 90점 이상일 때만 저장, 미달 시 거부 —
+      중간 산출물(05-writing-check-*.json, 03-judge-*.md 포함)은 out/auto-publish/에 보존
         │
         ▼
 [4.5] 썸네일 이미지 (선택) — npm run image -- --slug <슬러그>
@@ -46,8 +50,9 @@
 - **[2] 왜 필수인가**: 한국어 AI 티(번역투·AI 관용구·기계적 병렬·hedging)는 애드센스
   "도움이 되는 콘텐츠" 평가와 사용자 신뢰의 직접 감점 요인. 1단계 프롬프트의 예방 규칙만으로
   40+ 패턴을 다 잡을 수 없어 탐지·교정 단계를 게이트로 둔다.
-- **[3] 왜 채점 게이트인가**: "그럴듯함"을 점수로 강제로 끌어올린다. 치명적 결함(지어낸 수치,
-  테스트한 척, YMYL, 구조 파괴)은 90점 이상 불가로 규정해 구조적으로 차단한다.
+- **[3] 왜 이중 게이트인가**: 기계 검사가 측정 가능한 결함(문장·구조·형식·출처 없는 주장)을 100% 잡고,
+  독립 심사자가 작가 컨텍스트 없이 채점해 자기 선호 편향을 분리한다. 치명적 결함(지어낸 수치,
+  테스트한 척, YMYL, 구조 파괴)은 90점 이상 불가 + 기계 실패로 이중 차단된다.
 - **[4] 왜 변환기가 필요한가**: ChatGPT 출력은 우리 스키마(`src/content.config.ts`)와 다르다.
   변환기가 `status: draft`·`aiAssisted: true`를 강제해 무검토 발행을 구조적으로 막는다.
 - **[5] 자동화하지 않는 이유**: 실제 테스트·스크린샷은 이 블로그의 차별화이자 애드센스 승인 전략.

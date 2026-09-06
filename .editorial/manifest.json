@@ -1,16 +1,39 @@
 {
-  "version": "1.0.0",
-  "defaultPersona": "upmu-lab",
+  "version": "2.1.0",
+  "defaultPersona": "wj-editor",
   "defaultFormat": "how-to",
   "modules": {
     "constitution": ".editorial/constitution.md",
     "styleGuide": ".editorial/style-guide.md",
     "blueprints": {
-      "how-to": ".editorial/blueprints/how-to.md"
+      "how-to": ".editorial/blueprints/how-to.md",
+      "essay": ".editorial/blueprints/essay.md",
+      "experience": ".editorial/blueprints/experience.md",
+      "review": ".editorial/blueprints/review.md",
+      "place-log": ".editorial/blueprints/place-log.md",
+      "book-memo": ".editorial/blueprints/book-memo.md",
+      "photo-log": ".editorial/blueprints/photo-log.md"
     },
     "personas": {
-      "upmu-lab": "scripts/auto-publish/persona/upmu-lab.json"
+      "wj-editor": "scripts/auto-publish/persona/wj-editor.json"
+    },
+    "exemplars": {
+      "how-to": ".editorial/exemplars/how-to.md",
+      "essay": ".editorial/exemplars/essay.md",
+      "experience": ".editorial/exemplars/experience.md",
+      "review": ".editorial/exemplars/review.md",
+      "place-log": ".editorial/exemplars/place-log.md",
+      "book-memo": ".editorial/exemplars/book-memo.md",
+      "photo-log": ".editorial/exemplars/photo-log.md"
+    },
+    "prompts": {
+      "judge": ".planning/prompts/independent-judge-prompt.md"
     }
+  },
+  "generationGate": {
+    "mechanicalCheck": "scripts/check-writing.mjs",
+    "independentJudgeMinScore": 90,
+    "notesRequiredFormats": ["experience", "place-log", "book-memo", "photo-log"]
   },
   "selfImprovement": {
     "mode": "proposal-only",

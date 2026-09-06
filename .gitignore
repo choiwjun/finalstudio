@@ -13,3 +13,7 @@ dist/
 tools/
 out/
 .trash/
+
+# 개인 원자료 수함 (경험 계열 글 생성 재료)
+notes/*.md
+!notes/README.md

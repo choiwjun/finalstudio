@@ -92,9 +92,10 @@
 | `scripts/auto-publish/generate-image.mjs` | 썸네일 생성 (Codex `$imagegen` / ChatGPT Images 수동 프롬프트 / --attach 등록) |
 | `scripts/auto-publish/calendar.md` | 발행 대기열 — **시리즈 클러스터** 구조(§7). 형식: `- [ ] 주제 \| 독자수준 \| 사다리단계 \| 주제태그` |
 | `scripts/auto-publish/README.md` | 파이프라인 사용 설명서 (Codex 설정, 명령 레퍼런스, 이미지 규칙, 하드 룰) |
-| `scripts/auto-publish/persona/upmu-lab.json` | 문체 페르소나 스펙(JSON) — 톤 차원·가독성 수치 |
+| `scripts/auto-publish/persona/wj-editor.json` | 기본 페르소나 스펙(JSON) — 개인 편집자 정체성, 글 형식별 문체, 톤 차원·가독성 수치, 금지 표현·자가 점검 |
 | `scripts/lib/content-contract.mjs` | **콘텐츠 계약 라이브러리** — parseFrontmatter(파싱+수정), bodyCharCount(공백 제외), validatePost, MIN_BODY_CHARS=1500. 관리 서버·체커가 공유. 위험 주제의 `manualReview` 승인도 발행 게이트로 검사 |
 | `scripts/check-content.mjs` | 콘텐츠 계약 검사기 (npm run check:content) |
+| `scripts/check-writing.mjs` | 기계 문장·구조 검사기 (npm run check:writing) — 문장 길이·종결어미·형식 구조·출처 없는 주장·마커 무결성을 결정론적 측정. auto-write 게이트의 1축 |
 | `scripts/check-build.mjs` | 빌드 경계 검사 — dist에 `.planning/`·`sourceIds`·`TBD` 토큰 누출 금지 |
 | `scripts/admin-server.mjs` | 관리자 API 서버 (§5d) + 개발 서버 감독자 |
 
@@ -123,23 +124,25 @@
 
 ### a. 3단계 ChatGPT 프롬프트 파이프라인 (품질 엔진의 심장)
 
-1. **초안** — `content-writer-prompt.md`: 페르소나 + 독자 정의 + 글 구조 계약(H2 여정 순서, 1,000자당 시각 요소 1개, "한눈에 보기" 표) + SEO/AEO/GEO 규칙 + `[직접 확인 필요]`/`[테스트 필요]`/`[스크린샷: ...]` 마커 규칙. **"제가 테스트해봤다"식 경험 지어내기가 최대 금기**.
+1. **초안** — `content-writer-prompt.md` v5(형식 중립 골격): 독자 정의 + 공통 금기(경험 지어내기 최대 금기) + 원자료 규칙. 구조·SEO/AEO/GEO 세부는 형식별 블루프린트(`.editorial/blueprints/`)와 exemplar(`.editorial/exemplars/`)가 담당.
 2. **윤문(필수)** — `chatgpt-humanize-prompt.md`: 한국어 AI 티 제거. im-not-ai 스킬의 규칙을 프롬프트로 이식 — 번역투(A), 영어과다(B), 구조(C), AI 관용구(D), 리듬(E), 수식(F), 완곡(G), 접속사(H), 형식명사(I), 장식(J) 패턴 + 과윤문 가드(변경률 30%/50% 상한) + 자체검증 6항. 마커·번호 리스트·표·FAQ 구조는 절대 훼손 금지.
-3. **검수(필수)** — `chatgpt-review-prompt.md`: 100점 채점 — 콘텐츠 30 / SEO 25 / E-E-A-T 15 / AEO 15 / GEO 15. **90점 미만이면 스스로 수정 후 재채점**. 치명적 결함(지어낸 수치, 테스트한 척, YMYL, 구조 파괴, AI 관용구 잔존, 분량 미달)은 즉시 90점 이상 불가.
+3. **판정(필수)** — 이중 게이트: `scripts/check-writing.mjs` 기계 검사(문장·구조·형식·마커·출처 없는 주장을 결정론적 측정) + `independent-judge-prompt.md` 독립 심사(작가 컨텍스트를 배제하고 100점 채점). **기계 실패 0건 && 심사 90점 이상일 때만 저장**, 미달이면 기계 실패 목록 + 심사 지적을 반영한 수정 루프(기본 2회). `chatgpt-review-prompt.md`는 형식 인지형 수정·재채점 프롬프트로 루프에서 사용.
 
-왜 이 구조인가: "그럴듯함"을 점수로 강제로 끌어올리기 위해서. 자동 저장은 90점 통과분만 허용되고, 그 후에도 사람 테스트가 남는다(§11 의사결정 3번).
+왜 이 구조인가: 기계 검사는 측정 가능한 결함을 100% 잡고, 독립 심사자가 자기 선호 편향을 분리한다. 그 후에도 사람 테스트가 남는다(§11 의사결정 3번).
 
 ### b. 자동화 엔진 (auto-write.mjs)
 
 ```
-npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--slug x] [--angle "..."]
+npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--format 유형] [--slug x] [--angle "..."]
 npm run auto:write --calendar scripts/auto-publish/calendar.md   # 다음 미완료 주제 자동, 성공 시 [x] 표시
-npm run auto:write --input 초안.md --topic 카테고리           # 초안에 윤문+검수만 적용
+npm run auto:write --input 초안.md --topic 카테고리           # 초안에 윤문+판정만 적용
 npm run auto:write --from-final 검수통과본.md --topic t --angle "..."  # 엔진 없이 변환·저장만
+npm run auto:write "주제" --format experience --notes notes/memo.md  # 경험 계열은 원자료 필수
+npm run auto:write "주제" --topic t --best-of 2               # 초안 2개 생성 후 기계 점수로 선택
 ```
 
 - **엔진**: Codex CLI만 사용한다. `node <전역>/@openai/codex/bin/codex.js exec --sandbox read-only --ephemeral [유저지시]`로 호출하며, **stdin = 규칙·컨텍스트, 인자 = 지시문**으로 긴 프롬프트를 전달한다. Windows에서 `codex`는 .cmd 셔미라 직접 호출 불가 → JS 진입점 경로로 해결(§10). 로그인 상태는 `codex login status` 종료코드로 판정한다.
-- **게이트**: 자동작성 파이프라인의 검수 90점 미만이면 draft 저장을 거부하고 `out/auto-publish/<실행시각>/`에 중간 산출물 보존. 콘텐츠 계약은 별도로 공개 글의 분량·testedAt·author·마커를 검사한다.
+- **게이트**: 기계 검사 실패 0건 && 독립 심사 90점 이상일 때만 draft 저장, 미달 시 `out/auto-publish/<실행시각>/`에 중간 산출물(`05-writing-check-*.json`, `03-judge-*.md` 포함) 보존. 콘텐츠 계약은 별도로 공개 글의 분량·testedAt·author·마커를 검사한다.
 
 ### c. 이미지 생성 (generate-image.mjs)
 

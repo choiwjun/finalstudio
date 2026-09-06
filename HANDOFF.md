@@ -726,3 +726,101 @@ WJ Blog의 기준은 `Blocksy News`가 아니라 다음 조합으로 재정의�
 - 모바일에서 핵심 컨트롤이 잘리지 않고, 모든 공개 화면이 같은 개인 블로그 제품으로 인식된다.
 
 이번 분석은 방향 재정의를 위한 조사였으며, 위 계획을 기준으로 다음 소스 변경부터 `Personal Editorial v3`를 구현한다.
+
+## 2026-09-06 Personal Editorial v3 1차 구현 완료
+
+위 "개인 블로그 템플릿 리서치 및 포지셔닝 재정의" 계획의 P0·P1을 이번 세션에서 반영했다.
+
+### 완료된 작업
+
+- `.planning/design/DESIGN_SYSTEM_V3.md`를 Personal Editorial 기준으로 새로 작성했다. 제품 정의, 홈·상세 정보 구조, 토큰·컴포넌트 규칙, 반응형·접근성 기준, v3 완료 기준을 고정했다.
+- `src/lib/format.ts`에서 `업무도구 실전`, `AI 업무 활용` 고정 라벨과 카테고리별 배지 색상 분기를 제거했다. 카테고리는 이제 글 데이터 값을 그대로 표시하며 단일 배지 스타일을 사용한다.
+- `src/pages/index.astro`를 홈 흐름 규칙대로 재구성했다. `실무 지식 아카이브` 문구, 검색 히어로, Reading Queue, 번호형 목록, `검증됨` 마커를 제거하고 `개인 소개 → 최근 글(대표 카드) → 글 목록 → 카테고리 칩 → 소개 진입` 구조로 교체했다.
+- `src/styles/site.css`의 홈 전용 스타일을 새 구조에 맞게 교체하고 반응형 규칙(1440/1024/768/390)을 갱신했다.
+- `src/components/PostFacts.astro`를 조건부로 변경했다. 읽는 시간은 항상 표시하고 난이도·사용 환경·테스트는 데이터가 있을 때만 렌더링한다. "사람 검토 전" 기본 상태 문구는 제거했다.
+- `src/pages/posts/[...slug].astro`에서 빠른 답변 섹션과 "이 글의 상태" 보조 블록을 `testedAt`이 있을 때만 표시하도록 분리했다. 에세이·여행·책 글에는 검증 UI가 노출되지 않는다.
+- 확장성 fixture로 `책` 카테고리(`book-memo-draft.md`), `여행` 카테고리(`travel-record-draft.md`) 초안 2건을 추가했다. 둘 다 `draft` 상태로 공개되지 않는다.
+- 빈 디렉터리 `src/pages/topics`를 제거했다.
+
+### 검증 결과
+
+- `npm run check:content` 통과 (5개 Markdown)
+- `npm run build` 통과 (11페이지)
+- `npm run check:build` 통과 (23개 산출물)
+- CDP 화면 검증(`scripts/qa-cdp.mjs`, `--width` 플래그 추가): `/`, `/search`, `/categories` 1440px과 `/`, `/admin/preview` 390px에서 `scrollWidth == innerWidth`, 가로 overflow 없음
+- `design-qa.md`에 Personal Editorial v3 QA 섹션을 추가하고 `final result: passed` 기록
+
+### 아직 남은 작업
+
+- 첫 글(`excel-linked-picture.md`)의 사람 최종 확인 3건과 `testedAt` 확정 전까지는 공개 글이 0개라 홈 대표 카드·글 목록의 실제 콘텐츠 상태 화면 검증은 발행 후 다시 실행해야 한다.
+- 1024px·768px 중간 지점 화면 캡처와 실제 Safari/iOS 검증은 미실수 행이다.
+- 생성 프롬프트·페르소나(`scripts/auto-publish/persona/upmu-lab.json` 등)를 개인 편집자 기준으로 개편하는 작업은 다음 세션 과제다.
+
+## 2026-09-06 생성 페르소나 개인 편집자 개편 완료
+
+위 "아직 남은 작업"의 페르소나 개편 과제(개인 블로그 기준의 새 제품 규칙 — 콘텐츠·생성 규칙 항목)를 이번 세션에서 반영했다.
+
+### 바꾼 것
+
+- `scripts/auto-publish/persona/wj-editor.json`을 새 기본 페르소나로 추가했다. 업무 생산성 전문가가 아니라 **주제에 묶이지 않는 개인 편집자 겸 기록자**다. 상위 블로그 독법(빠른 답 → 근거 → 다음 행동)을 `craft_rules` 10개로 고정했고, 글 형식별 문체 조절(`format_voices`), 금지 표현 목록, 발행 전 자가 점검 목록을 포함한다.
+- `scripts/auto-publish/persona/upmu-lab.json`을 삭제했다. 참고용이 아니라 페르소나 레지스트리에서 완전히 제외했다.
+- `.editorial/blueprints/`에 글 형식 템플릿 6종을 추가했다: `essay`, `experience`, `review`, `place-log`, `book-memo`, `photo-log`. 기존 `how-to`는 유지하며, 사용법 글에만 단계·오류·검증 규칙을 강하게 적용한다.
+- `.editorial/evals/writing-cases.jsonl`을 글 형식별 균형 세트로 확장했다. 8건(how-to 2, review·essay·experience·place-log·book-memo·photo-log 각 1)이며 모두 `wj-editor` 페르소나를 참조한다.
+- `.editorial/manifest.json`을 v2.0.0으로 올리고 `defaultPersona`를 `wj-editor`로, 블루프린트 맵을 7종으로 교체했다.
+- `scripts/auto-publish/README.md`와 `HANDOVER.md`의 `upmu-lab` 참조를 갱신했다.
+
+### 검증 결과
+
+```bash
+npm run check:prompts   # Prompt contract OK: 2.0.0, 8 evaluation case(s)
+npm run check:content   # Content contract OK: 5 Markdown file(s)
+```
+
+### 다음 세션 과제
+
+- Codex OAuth 로그인 상태에서 `npm run auto:write "주제" --topic 카테고리 --format essay` 등 형식별 초안을 실제 1회씩 생성해 `prompt-manifest.json`과 출력 품질을 확인한다.
+- 생성 결과와 사람 수정을 반영해 평가 사례를 확장하고, `auto:improve` diff를 사람 검토 후 첫 프롬프트 개선을 승인한다.
+
+## 2026-09-06 쓰기 시스템 고도화 — 기계 게이트·독립 심사·원자료 수함 (v2.1.0)
+
+사람 개입 없이도 시스템이 스스로 품질을 판정·개선할 수 있게 세 축을 보강했다. 배경 진단: ① 판정자와 작가가 같은 모델이라 자기 선호 편향이 있고, ② 사실 검증이 모델의 양심에 의존하며, ③ 기계로 측정 가능한 규칙이 LLM 주의력에 맡겨져 있고, ④ 경험 계열 형식은 원자료 없이는 경험을 지어낼 수밖에 없었다.
+
+### P0 — 기계 검사 레이어 (`scripts/check-writing.mjs`)
+
+- 한국어 문장 분리기와 측정기: 평균·최장 문장 길이, 문단 문장수, 해요체 혼용(~세요 명령형은 제외), 피동 표현, 금지 표현, 이모지, 한글(영어) 병기 반복, 문맥 의존 표현을 결정론적으로 측정한다.
+- 형식별 구조 검증: how-to(표·번호 목록 필수, FAQ 권장), review(평가 기준·단점), essay(FAQ 금지), book-memo(인용), photo-log(이미지). 형식별 최소 분량도 별도(생성 루프 기준, 발행 게이트 1,500자와 별개).
+- 출처 없는 수치 주장 추출: 링크 없는 산문 문단의 수치·버전 주장을 감지한다. 검증 문장("~에서 직접 계산했습니다"), 범위 선언("~기준으로"), 명령형·목록·캡션은 제외해 오탐을 줄였다.
+- 마커 무결성: 윤문 전 마커 목록을 넘기면 최종본 유실을 잡는다.
+- `npm run check:writing -- <file.md> --format <유형>` 단독 실행 지원. 실측: 사람이 확정한 두 Excel 글 통과(vlookup은 FAQ 경고 1건), stub 초안 3건은 실제 결함만 적중.
+
+### P1 — 게이트 재구성 (`auto-write.mjs`)
+
+- **작가 ≠ 심사자 분리**: 독립 심사자(`.planning/prompts/independent-judge-prompt.md`)가 writer 지시 없이 맨 컨텍스트로 채점. 형식별 감점 기준 포함.
+- 최종 저장 조건: **기계 검사 실패 0건 && 독립 심사 90점 이상**. 수정 루프(기본 2회)는 기계 실패 목록 + 심사 지적을 그대로 주입해 "무엇을 고칠지"를 지시한다.
+- `--best-of N`(또는 `AUTO_BEST_OF`): 초안 N개 생성 후 기계 점수로 최적 선택, `01-draft-selection.json`에 기록.
+- 실행마다 `05-writing-check-*.json`, `03-judge-*.md` 산출물이 남아 게이트 통과 근거가 추적된다.
+
+### P2 — 형식 정합성·재료 기반
+
+- writer 프롬프트 v5: 형식 중립 골격으로 축소. SEO·AEO·GEO 세부는 `how-to` 블루프린트로 이관(FAQ 필수→경고 조정 포함), 우선순위는 헌법 > 블루프린트·페르소나 > writer.
+- 윤문 프롬프트: "블로그 가이드 장르" 고정 가정을 형식 인식으로 교체, 기계 검사 항목을 우선 해결하도록 수정.
+- 검수 프롬프트: 형식 인지(`SELECTED_FORMAT`) — essay·기록 계열은 SEO·FAQ를 채점하지 않고 오히려 형식 부적합으로 감점, 형식별 최소 분량 적용.
+- **원자료 수함**: `experience`·`place-log`·`book-memo`·`photo-log`는 `--notes` 필수. 모델은 원자료에 없는 경험·수치·장면을 만들지 못한다. `notes/README.md`에 형식 가이드, `notes/*.md`는 .gitignore(README만 추적).
+- **exemplar 7종**(`.editorial/exemplars/`): how-to는 실제 Excel 글 발췌, 나머지는 형식별 음성 기준 발췌. 프롬프트에 "베끼지 말고 수준의 기준으로만" 주입.
+- `manifest.json` v2.1.0: exemplars·prompts(judge)·generationGate(기계 검사 경로·심사 하한·원자료 필수 형식) 추가.
+
+### 검증 결과
+
+```bash
+npm run check:prompts   # Prompt contract OK: 2.1.0, 8 evaluation case(s)
+npm run check:content   # Content contract OK: 5 Markdown file(s)
+node --check            # check-writing, auto-write, check-prompts, prompt-improve 모두 통과
+git diff --check        # 통과
+```
+
+실측 검증: `check:writing`을 사람이 확정한 실제 글 2건과 stub 초안 3건에 실행 — 실제 글 통과(FAQ 경고만), stub은 분량·문장·인용 결함을 정확히 적중해 오탐 없음을 확인.
+
+### 다음 세션 과제
+
+- Codex OAuth 로그인 상태에서 형식별로 `auto:write`를 실제 실행해 기계 게이트·독립 심사 점수가 의도대로 작동하는지 확인한다.
+- 실행 결과를 평가 사례에 반영하고, `out/prompt-lab/`의 첫 개선 diff를 사람 검토 후 승인한다.

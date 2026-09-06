@@ -4,16 +4,21 @@
 **명령 1줄로 초안 생성 → 윤문 → 검수 → draft 저장까지 자동 실행**됩니다.
 
 ```
-npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카테고리
+npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카테고리 [--format 유형] [--notes 원자료]
         │
-        ├─ [자동] 1단계 초안 (편집 헌법+문체+페르소나+글 유형 템플릿)
+        ├─ [자동] 1단계 초안 (편집 헌법+문체+페르소나+블루프린트+exemplar)
+        │         --best-of N이면 N개 생성 후 기계 점수로 최적 선택
         ├─ [자동] 2단계 윤문 — 한국어 AI 티 제거 (im-not-ai 규칙 이식)
-        ├─ [자동] 3단계 검수 — 100점 채점, 90점 미만이면 수정·재채점 (claude-blog 게이트 이식)
+        ├─ [자동] 기계 검사 — check-writing.mjs (문장·구조·형식·마커·출처 없는 주장)
+        ├─ [자동] 독립 심사 — 작가 컨텍스트를 배제한 심사자만 채점 (작가 ≠ 심사자)
+        │         미달이면 기계 실패 목록 + 심사 지적을 반영한 수정 루프 (기본 2회)
         ├─ [자동] 프론트매터 변환 → status: draft 저장
-        │         (90점 미만이면 저장 거부 — 중간 산출물은 out/auto-publish/에 남음)
+        │         (기계 검사 0건 실패 && 심사 90점 이상일 때만 저장)
         ▼
 [사람] 실제 테스트 → 스크린샷·버전·마커 채우기 → npm run check:content → 승인·발행
 ```
+
+지원 글 형식: `how-to`(사용법) · `review`(리뷰) · `essay`(에세이) · `experience`(경험 기록) · `place-log`(여행·장소) · `book-memo`(책·콘텐츠 메모) · `photo-log`(사진 기록). `experience`·`place-log`·`book-memo`·`photo-log`는 `--notes` 원자료가 필수다 — 모델은 원자료에 없는 경험을 만들지 못한다 (`notes/README.md`).
 
 ## 1회 설정
 
@@ -40,7 +45,12 @@ npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카�
 
 ```bash
 # 풀 자동 (주제 직접 지정) — ChatGPT OAuth Codex 세션 사용
-npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--format how-to] [--persona upmu-lab] [--slug my-slug]
+npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--format how-to] [--persona wj-editor] [--slug my-slug]
+npm run auto:write "주제" --topic 일상 --format experience --notes notes/memo.md   # 경험 계열은 원자료 필수
+npm run auto:write "주제" --topic 카테고리 --best-of 2                            # 초안 2개 생성 후 기계 점수로 선택
+
+# 기계 문장·구조 검사 단독 실행 (생성 없이 기존 글 측정)
+npm run check:writing -- src/content/posts/excel-vlookup-other-sheet.md --format how-to
 
 # 캘린더에서 다음 주제 자동 가져오기 (성공 시 해당 항목 [x] 표시)
 npm run auto:write --calendar scripts/auto-publish/calendar.md
@@ -65,8 +75,9 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 
 - 주제 태그: 고정 목록이 없습니다. `topic`에 원하는 카테고리 이름을 사용합니다.
 - 캘린더 형식: `- [ ] 주제 | 독자수준 | 사다리단계 | 주제태그`
-- 중간 산출물(초안·윤문본·검수 리포트)은 `out/auto-publish/<실행시각>/`에 저장 (커밋되지 않음)
+- 중간 산출물(초안·윤문본·심사 리포트·기계 검사 JSON)은 `out/auto-publish/<실행시각>/`에 저장 (커밋되지 않음)
 - 생성 실행마다 선택된 편집 시스템 버전·페르소나·모듈 해시를 `prompt-manifest.json`에 저장합니다.
+- 최종 저장 조건은 **기계 검사 통과 + 독립 심사 90점 이상**입니다. 심사자는 글 작성 지시 없이 채점하므로 자기 선호 편향이 분리됩니다.
 - 개선안은 `out/prompt-lab/<실행시각>/proposal.md`와 `proposal.diff`에 저장하며, 사람 승인 전에는 적용하지 않습니다.
 
 ## 이미지 규칙 (중요)
@@ -77,7 +88,7 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 
 ## 하드 룰 (파이프라인 어떤 단계보다 우선)
 
-1. **검수 90점 게이트 미통과 글은 자동 저장되지 않습니다.**
+1. **게이트 미통과 글은 자동 저장되지 않습니다.** 기계 검사(check-writing) 실패 1건이라도 남으면, 또는 독립 심사가 90점 미만이면 저장이 거부됩니다.
 2. **사람 승인 없는 발행 금지.** 무검토 대량 발행은 구글 규모화 콘텐츠 악용 정책에 걸려 애드센스 계정 자체를 위태롭게 합니다.
    로컬 Codex로 생성한 초안도 사람 검토·승인 후에만 발행합니다. GitHub Actions는 검사·빌드·배포 검증만 수행합니다.
 3. **마커 보존·완결.** `[직접 확인 필요]`, `[테스트 필요]`, `[스크린샷: ...]` 마커를 사람이 모두 채운 뒤에만 발행합니다.
