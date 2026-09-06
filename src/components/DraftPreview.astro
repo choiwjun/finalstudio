@@ -1,0 +1,31 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../lib/format';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const data = post.data;
+---
+
+<article id={`post-${post.id}`} class="article article--narrow draft-preview-article">
+  <p class="post-badges">
+    <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
+    <span class="badge badge--pending">{data.status}</span>
+    {data.manualReview === 'required' && <span class="badge badge--pending">추가 검토 필요</span>}
+  </p>
+  <h2>{data.title}</h2>
+  <p class="byline">
+    <span>{data.author}</span>
+    · <time datetime={toIsoDate(data.pubDate)}>{formatKoDate(data.pubDate)} 작성</time>
+  </p>
+  <p class="lede">{data.description}</p>
+  {data.image && (
+    <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="lazy" decoding="async" />
+  )}
+  <div class="post-body"><Content /></div>
+  <p class="post-backlink"><a href="#main">↑ 초안 목록으로</a></p>
+</article>

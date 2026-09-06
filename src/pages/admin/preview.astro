@@ -1,16 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
 import { isPublicPost } from '../../lib/posts';
+import DraftPreview from '../../components/DraftPreview.astro';
 
 const posts = import.meta.env.DEV
   ? (await getCollection('posts')).filter((post) => !isPublicPost(post))
   : [];
-const previews = await Promise.all(posts.map(async (post) => ({
-  post,
-  Content: (await render(post)).Content,
-})));
 ---
 
 <BaseLayout
@@ -30,10 +26,10 @@ const previews = await Promise.all(posts.map(async (post) => ({
           <h1>검토 대기 중인 글</h1>
           <p class="lede">관리자 글 현황에서 미리보기를 누르면 해당 초안 위치로 이동합니다.</p>
         </header>
-        {previews.length ? (
+        {posts.length ? (
           <nav aria-label="초안 목록">
             <ul class="aside-related-list">
-              {previews.map(({ post }) => <li><a href={`#post-${post.id}`}>{post.data.title}</a></li>)}
+              {posts.map((post) => <li><a href={`#post-${post.id}`}>{post.data.title}</a></li>)}
             </ul>
           </nav>
         ) : (
@@ -41,29 +37,7 @@ const previews = await Promise.all(posts.map(async (post) => ({
         )}
       </section>
 
-      {previews.map(({ post, Content }) => {
-        const data = post.data;
-        return (
-          <article id={`post-${post.id}`} class="article article--narrow draft-preview-article">
-            <p class="post-badges">
-              <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
-              <span class="badge badge--pending">{data.status}</span>
-              {data.manualReview === 'required' && <span class="badge badge--pending">추가 검토 필요</span>}
-            </p>
-            <h2>{data.title}</h2>
-            <p class="byline">
-              <span>{data.author}</span>
-              · <time datetime={toIsoDate(data.pubDate)}>{formatKoDate(data.pubDate)} 작성</time>
-            </p>
-            <p class="lede">{data.description}</p>
-            {data.image && (
-              <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="lazy" decoding="async" />
-            )}
-            <div class="post-body"><Content /></div>
-            <p class="post-backlink"><a href="#main">↑ 초안 목록으로</a></p>
-          </article>
-        );
-      })}
+      {posts.map((post) => <DraftPreview post={post} />)}
     </div>
   ) : (
     <article class="article article--narrow admin-guard">
