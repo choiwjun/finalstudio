@@ -191,6 +191,9 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
                   <td>{authorLabel(post.data.author)}</td>
                   <td>
                     <div class="row-actions" data-file={`${post.id}.md`}>
+                      {!isPublicPost(post) && (
+                        <a class="row-btn" href={`/admin/preview#post-${post.id}`} target="_blank" rel="noreferrer">미리보기</a>
+                      )}
                       <button type="button" class="row-btn" data-action="edit">편집</button>
                       <button type="button" class="row-btn" data-action="status">상태</button>
                       <button type="button" class="row-btn row-btn--danger" data-action="delete">삭제</button>

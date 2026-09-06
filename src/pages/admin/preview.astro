@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+import { isPublicPost } from '../../lib/posts';
+
+const posts = import.meta.env.DEV
+  ? (await getCollection('posts')).filter((post) => !isPublicPost(post))
+  : [];
+const previews = await Promise.all(posts.map(async (post) => ({
+  post,
+  Content: (await render(post)).Content,
+})));
+---
+
+<BaseLayout
+  title="초안 미리보기 | WJ Blog"
+  description="개발 환경에서만 확인하는 WJ Blog 초안 미리보기"
+  noindex
+>
+  {import.meta.env.DEV ? (
+    <div class="post-layout">
+      <section class="article article--narrow">
+        <div class="notice notice--warning" role="status">
+          <strong>초안 미리보기</strong>
+          <p>이 페이지는 개발 환경에서만 보입니다. 아래 글은 아직 방문자에게 공개되지 않았습니다.</p>
+        </div>
+        <header class="post-header">
+          <p class="eyebrow">Draft preview</p>
+          <h1>검토 대기 중인 글</h1>
+          <p class="lede">관리자 글 현황에서 미리보기를 누르면 해당 초안 위치로 이동합니다.</p>
+        </header>
+        {previews.length ? (
+          <nav aria-label="초안 목록">
+            <ul class="aside-related-list">
+              {previews.map(({ post }) => <li><a href={`#post-${post.id}`}>{post.data.title}</a></li>)}
+            </ul>
+          </nav>
+        ) : (
+          <p>현재 검토 대기 중인 초안이 없습니다.</p>
+        )}
+      </section>
+
+      {previews.map(({ post, Content }) => {
+        const data = post.data;
+        return (
+          <article id={`post-${post.id}`} class="article article--narrow draft-preview-article">
+            <p class="post-badges">
+              <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
+              <span class="badge badge--pending">{data.status}</span>
+              {data.manualReview === 'required' && <span class="badge badge--pending">추가 검토 필요</span>}
+            </p>
+            <h2>{data.title}</h2>
+            <p class="byline">
+              <span>{data.author}</span>
+              · <time datetime={toIsoDate(data.pubDate)}>{formatKoDate(data.pubDate)} 작성</time>
+            </p>
+            <p class="lede">{data.description}</p>
+            {data.image && (
+              <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="lazy" decoding="async" />
+            )}
+            <div class="post-body"><Content /></div>
+            <p class="post-backlink"><a href="#main">↑ 초안 목록으로</a></p>
+          </article>
+        );
+      })}
+    </div>
+  ) : (
+    <article class="article article--narrow admin-guard">
+      <p class="eyebrow">관리자 영역</p>
+      <h1>초안 미리보기는 로컬 개발 환경에서만 사용할 수 있습니다.</h1>
+      <p><a href="/">사이트로 돌아가기</a></p>
+    </article>
+  )}
+</BaseLayout>
