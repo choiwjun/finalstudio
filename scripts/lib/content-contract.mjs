@@ -4,6 +4,8 @@
  * 규칙: src/content.config.ts 스키마의 필수 필드 + 발행 게이트(사람 검증 증거) 요건.
  */
 
+import { detectContentRisks } from './content-risk.mjs';
+
 export const REQUIRED_KEYS = ['title', 'description', 'pubDate', 'status', 'topic', 'angle', 'author'];
 export const ALLOWED_STATUS = new Set(['draft', 'scheduled', 'published']);
 /** 발행 최소 분량 (공백 제외 본문 글자수). 구글 공식 기준은 없으나 커뮤니티 검증치 1,500자를 게이트로 채택. */
@@ -53,12 +55,22 @@ export function validatePost(file, text) {
   const author = front.match(/^author:\s*([^\n]+)/m)?.[1]?.trim();
   const testedAt = front.match(/^testedAt:\s*([^\n]+)/m)?.[1]?.trim();
   const topic = front.match(/^topic:\s*([^\n]+)/m)?.[1]?.trim();
+  const manualReview = front.match(/^manualReview:\s*([^\n]+)/m)?.[1]?.trim() ?? 'none';
+  const detectedRisks = detectContentRisks(text);
 
   if (status && !ALLOWED_STATUS.has(status)) errors.push(`${file}: invalid status ${status}`);
+  if (!['none', 'required', 'approved'].includes(manualReview)) errors.push(`${file}: invalid manualReview ${manualReview}`);
   if (topic && !topic.replace(/^['"]|['"]$/g, '').trim()) errors.push(`${file}: topic cannot be empty`);
   if (status === 'scheduled' && !/^publishAt:\s*.+$/m.test(front)) errors.push(`${file}: scheduled post needs publishAt`);
   if (status !== 'draft' && author === 'TBD') errors.push(`${file}: public posts need a real author`);
   if (status !== 'draft' && (!testedAt || testedAt === 'TBD')) errors.push(`${file}: public posts need testedAt`);
+  if (status !== 'draft' && detectedRisks.length && manualReview !== 'approved') {
+    const labels = detectedRisks.map((risk) => risk.label).join(', ');
+    errors.push(`${file}: manual review approval is required before publishing (${labels})`);
+  }
+  if (status !== 'draft' && manualReview === 'approved' && detectedRisks.length === 0) {
+    errors.push(`${file}: manualReview approved but no review-triggering risk was detected`);
+  }
   // 발행 게이트: 초안은 자유롭되, 공개되는 글은 최소 분량(공백 제외 1,500자)을 강제한다
   if (status !== 'draft' && bodyCharCount(text) < MIN_BODY_CHARS) {
     errors.push(`${file}: public posts need at least ${MIN_BODY_CHARS} body characters (excluding whitespace)`);

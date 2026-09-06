@@ -17,6 +17,7 @@ const statusOf = (status: string): PostStatus =>
 const statusLabel = (status: string) => statusMeta[statusOf(status)].label;
 const statusClass = (status: string) => statusMeta[statusOf(status)].className;
 const authorLabel = (author: string) => author === 'TBD' ? '작성자 미정' : author;
+const manualReviewLabel = (review: string) => review === 'required' ? '추가 검토 필요' : review === 'approved' ? '추가 검토 완료' : '';
 
 const now = new Date();
 const posts = (await getCollection('posts')).sort(
@@ -162,7 +163,16 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
                       <code>{post.id}.md</code>
                     </div>
                   </td>
-                  <td><span class={statusClass(effectiveStatus(post))}>{statusLabel(effectiveStatus(post))}</span></td>
+                  <td>
+                    <div class="dashboard-status-stack">
+                      <span class={statusClass(effectiveStatus(post))}>{statusLabel(effectiveStatus(post))}</span>
+                      {manualReviewLabel(post.data.manualReview) && (
+                        <span class={`status-badge status-badge--review-${post.data.manualReview}`}>
+                          {manualReviewLabel(post.data.manualReview)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td><span class={topicBadgeClass(post.data.topic)}>{topicLabel(post.data.topic)}</span></td>
                   <td><time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)}</time></td>
                   <td>

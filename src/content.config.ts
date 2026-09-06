@@ -16,6 +16,8 @@ const posts = defineCollection({
     sourceIds: z.array(z.string()).default([]),
     testedAt: z.coerce.date().optional(),
     toolVersions: z.record(z.string(), z.string()).default({}),
+    manualReview: z.enum(['none', 'required', 'approved']).default('none'),
+    manualReviewReasons: z.array(z.string()).default([]),
     aiAssisted: z.boolean().default(true),
     canonical: z.string().url().optional(),
     image: z.string().optional(),

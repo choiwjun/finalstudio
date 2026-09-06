@@ -138,6 +138,8 @@ const openEdit = async (file) => {
         'angle: ""',
         'author: TBD',
         'sourceIds: []',
+        'manualReview: none',
+        'manualReviewReasons: []',
         'toolVersions: {}',
         'aiAssisted: true',
         '---',

@@ -93,7 +93,7 @@
 | `scripts/auto-publish/calendar.md` | 발행 대기열 — **시리즈 클러스터** 구조(§7). 형식: `- [ ] 주제 \| 독자수준 \| 사다리단계 \| 주제태그` |
 | `scripts/auto-publish/README.md` | 파이프라인 사용 설명서 (Codex 설정, 명령 레퍼런스, 이미지 규칙, 하드 룰) |
 | `scripts/auto-publish/persona/upmu-lab.json` | 문체 페르소나 스펙(JSON) — 톤 차원·가독성 수치 |
-| `scripts/lib/content-contract.mjs` | **콘텐츠 계약 라이브러리** — parseFrontmatter(파싱+수정), bodyCharCount(공백 제외), validatePost, MIN_BODY_CHARS=1500. 관리 서버·체커가 공유 |
+| `scripts/lib/content-contract.mjs` | **콘텐츠 계약 라이브러리** — parseFrontmatter(파싱+수정), bodyCharCount(공백 제외), validatePost, MIN_BODY_CHARS=1500. 관리 서버·체커가 공유. 위험 주제의 `manualReview` 승인도 발행 게이트로 검사 |
 | `scripts/check-content.mjs` | 콘텐츠 계약 검사기 (npm run check:content) |
 | `scripts/check-build.mjs` | 빌드 경계 검사 — dist에 `.planning/`·`sourceIds`·`TBD` 토큰 누출 금지 |
 | `scripts/admin-server.mjs` | 관리자 API 서버 (§5d) + 개발 서버 감독자 |
@@ -272,7 +272,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 - 서버 — 4321(개발)·4322(관리 API) 정상 응답
 - 3차 리뷰(같은 날): 마커 게이트 정규식에 `[출처 URL 확인 필요]` 보강 — 감지 실측 완료. 첫 글 화면·출처 캡처는 반영됐고, 본문에는 직접 확인 3건이 남아 있다.
 - 4차 리뷰(2026-09-05): Codex OAuth 기반 auto-write와 `$imagegen` 기반 이미지 생성으로 단일화. `scheduled-publish.yml`은 15분 주기 빌드 검증 및 `DEPLOY_HOOK_URL` 호스팅 재빌드 hook 호출.
-- 5차 실측(2026-09-06): OAuth Codex 3단계 글 생성이 93점으로 통과했고 `post-2026-09-06.md` 저장·캘린더 완료 표시를 확인했다. `$imagegen` 커버도 `public/images/excel-linked-picture.png`에 저장·frontmatter 등록했다.
+- 5차 실측(2026-09-06): OAuth Codex 3단계 글 생성이 93점으로 통과했고 `excel-vlookup-other-sheet.md` 저장·캘린더 완료 표시를 확인했다. `$imagegen` 커버도 `public/images/excel-linked-picture.png`에 저장·frontmatter 등록했다.
 - 이번 수정 후 정적 검증: auto-write/generate-image `node --check` 통과, `npm run check:content` 통과, `npm run build`와 `npm run check:build` 통과. WSL(`/mnt/c`)에서도 현재 설치된 Linux 바인딩으로 빌드가 완료됐다.
 
 **아직 실측하지 못한 것 (거짓말 방지 목록)**:

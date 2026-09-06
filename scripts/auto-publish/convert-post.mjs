@@ -16,6 +16,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
+import { detectContentRisks } from '../lib/content-risk.mjs';
 
 const args = process.argv.slice(2);
 const input = args[0];
@@ -70,8 +71,15 @@ if (/\[(?:스크린샷|직접 확인 필요|테스트 필요|출처 URL 확인 �
   console.log('[convert-post] 확인: 검증 마커가 있습니다 — 사람 테스트 후 모두 채워야 합니다.');
 }
 
+const contentRisks = detectContentRisks(`${title}\n${description}\n${body}`);
+if (contentRisks.length) {
+  console.warn(`[convert-post] 추가 사람 검토 필요: ${contentRisks.map((risk) => risk.label).join(', ')}`);
+}
+
+const suggestedSlug = body.match(/^슬러그\s*(?:제안|추천)\s*:\s*[`'\"]?([a-z0-9]+(?:-[a-z0-9]+)*)[`'\"]?\s*$/im)?.[1] ?? '';
+
 const pubDate = pubDateFromFrontmatter ?? new Date().toISOString().slice(0, 10);
-const finalSlug = slug || `post-${pubDate}`;
+const finalSlug = slug || suggestedSlug || `post-${pubDate}`;
 const outPath = resolve(getArg('out') ?? join(process.cwd(), 'src', 'content', 'posts'), `${finalSlug}.md`);
 if (existsSync(outPath)) fail(`같은 이름의 글이 이미 있습니다: ${outPath} (--slug로 다른 이름 사용)`);
 
@@ -86,6 +94,8 @@ const front = [
   `author: ${author}`,
   'sourceIds: []',
   'toolVersions: {}',
+  `manualReview: ${contentRisks.length ? 'required' : 'none'}`,
+  `manualReviewReasons: [${contentRisks.map((risk) => `"${risk.label}"`).join(', ')}]`,
   'aiAssisted: true',
   '---',
   '',
@@ -101,5 +111,6 @@ try {
 
 console.log(`[convert-post] 저장 완료: ${outPath}`);
 console.log('[convert-post] 상태: draft (사람 검토 전까지 공개되지 않습니다)');
+if (suggestedSlug && !slug) console.log(`[convert-post] AI 제안 slug 사용: ${finalSlug}`);
 warnings.forEach((w) => console.warn(`[convert-post] 경고: ${w}`));
 console.log('[convert-post] 다음 단계: 실제 테스트 → 마커 채우기 → npm run check:content → 사람 승인');

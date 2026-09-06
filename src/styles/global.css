@@ -657,6 +657,8 @@ main {
 .status-badge--draft { color: var(--site-warm); background: var(--site-warm-soft); }
 .status-badge--scheduled { color: var(--site-accent); background: var(--site-accent-soft); }
 .status-badge--published { color: var(--color-success); background: var(--color-success-bg); }
+.status-badge--review-required { color: #9a4f25; background: #f9e8dc; }
+.status-badge--review-approved { color: #23744b; background: #e5f1ea; }
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -668,6 +670,7 @@ main {
   line-height: 1;
   white-space: nowrap;
 }
+.dashboard-status-stack { display: grid; gap: var(--space-1); justify-items: start; }
 .dashboard-date-stack {
   display: grid;
   gap: var(--space-1);
