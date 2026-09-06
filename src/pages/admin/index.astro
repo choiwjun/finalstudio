@@ -35,8 +35,8 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
 ---
 
 <BaseLayout
-  title="관리 대시보드 | 업무도구 실험실"
-  description="업무도구 실험실 콘텐츠 상태와 발행 현황을 확인하는 관리자 대시보드"
+  title="관리 대시보드 | WJ Blog"
+  description="WJ Blog 콘텐츠 상태와 발행 현황을 확인하는 관리자 대시보드"
   noindex
 >
   {import.meta.env.DEV ? (
@@ -54,14 +54,17 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
       </div>
     </header>
 
-    <div class="notice notice--warning dashboard-notice" role="status">
-      <strong id="admin-server-status">관리 서버 연결 확인 중…</strong>
-      <span id="admin-server-hint">
-        편집·삭제·상태 변경(발행)·새 글 작성을 쓰려면 터미널에서 <code>npm run admin</code>을 실행하세요 —
-        개발 서버도 함께 실행·관리되며, 글 변경 후 사이트 반영까지 약 10초(자동 재시작·재동기화)가 걸립니다.
-        관리 API는 localhost 전용(127.0.0.1)이라 외부에 노출되지 않으며, 이 화면과 함께 개발 환경 전용입니다.
-        상태를 공개(published)로 바꿔도 정적 사이트 반영에는 빌드·배포가 필요합니다.
-      </span>
+    <div class="notice notice--warning dashboard-notice" role="status" aria-live="polite" data-state="checking">
+      <div class="dashboard-notice-main">
+        <span class="dashboard-status-dot" aria-hidden="true"></span>
+        <strong id="admin-server-status">관리 서버 연결 확인 중…</strong>
+      </div>
+      <p id="admin-server-hint">편집·삭제·상태 변경·새 글 작성은 <code>npm run admin</code> 실행 후 사용할 수 있습니다.</p>
+      <details class="dashboard-notice-details">
+        <summary>운영 메모</summary>
+        <p>관리 서버는 localhost 전용이며 개발 서버도 함께 관리합니다. 글 변경 후 사이트 반영까지 약 10초가 걸릴 수 있습니다.</p>
+        <p>상태를 공개로 바꿔도 정적 사이트에는 빌드·배포 후 반영됩니다.</p>
+      </details>
     </div>
 
     <section class="dashboard-section" aria-labelledby="overview-heading">
@@ -288,15 +291,15 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
       <div class="pipeline-commands">
         <h3>실행 명령 순서</h3>
         <ol class="pipeline-command-list">
-          <li><code>npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level 완전초보 --stage 도구 --topic productivity</code></li>
+          <li><code>npm run auto:write "글 주제" --level 완전초보 --stage 도구 --topic category-name</code></li>
           <li><code>npm run check:content</code> <span class="pipeline-note">(사람 검증 후)</span></li>
         </ol>
         <p class="dashboard-footnote">API 키 설정(<code>.env</code>)·수동 ChatGPT 모드·GitHub Actions 세팅은 <code>scripts/auto-publish/README.md</code>를 참고하세요.</p>
       </div>
     </section>
 
-    <div class="admin-modal" id="edit-modal" hidden>
-      <div class="admin-modal-panel">
+    <div class="admin-modal" id="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title" aria-hidden="true" hidden>
+      <div class="admin-modal-panel" tabindex="-1">
         <h3 id="edit-modal-title">글 편집</h3>
         <div class="admin-field" id="edit-name-field" hidden>
           <label for="edit-file">파일명 (src/content/posts/ 아래, .md)</label>
@@ -311,8 +314,8 @@ const testedPosts = posts.filter((post) => Boolean(post.data.testedAt));
       </div>
     </div>
 
-    <div class="admin-modal" id="status-modal" hidden>
-      <div class="admin-modal-panel">
+    <div class="admin-modal" id="status-modal" role="dialog" aria-modal="true" aria-labelledby="status-modal-title" aria-hidden="true" hidden>
+      <div class="admin-modal-panel" tabindex="-1">
         <h3 id="status-modal-title">상태 변경</h3>
         <p class="admin-modal-desc" id="status-modal-target"></p>
         <div class="admin-field">

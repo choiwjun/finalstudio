@@ -1,6 +1,7 @@
-# DESIGN_SYSTEM — canonical 디자인 시스템 v0
+# DESIGN_SYSTEM — v0 디자인 시스템 (역사 기록)
 
-- 상태: **v0 구현 완료(로컬).** 이 문서는 디자인 시스템의 single source of truth다.
+- 상태: **v0 반려·보관.** 기술적으로 구현됐지만 소유자 승인 없이 종료된 시안이며, 현재 디자인의 기준 문서가 아니다.
+- 현재 기준: `DESIGN_SYSTEM_V1.md`와 `research/blog-design-benchmark-2026-09-06.md`.
 - 작성: 2026-09-05 — design-v0-implementation 워커 (Orca `run_5318bed1d0a2` / `task_7d7d0e5e3973` / `ctx_4e99369367d1`)
 - 입력(원본 3 보고서, 수정하지 않음): `muse-brand-ux.md`, `qwen-ui-system.md`, `deepseek-a11y-qa.md`
 - 구현 파일: `src/styles/tokens.css`, `src/styles/global.css`, `src/layouts/BaseLayout.astro`, `src/pages/*`, `src/lib/format.ts`

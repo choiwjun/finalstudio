@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublicPosts } from '../lib/posts';
+import { topicBadgeClass, topicLabel } from '../lib/format';
+
+const posts = await getPublicPosts();
+const initialQuery = Astro.url.searchParams.get('q') ?? '';
+const searchIndex = posts.map((post) => ({
+  id: post.id,
+  title: post.data.title,
+  description: post.data.description,
+  topic: topicLabel(post.data.topic),
+  topicClass: topicBadgeClass(post.data.topic),
+  href: `/posts/${post.id}`,
+}));
+const searchData = JSON.stringify(searchIndex).replace(/</g, '\\u003c');
+---
+<BaseLayout title="검색 | WJ Blog" description="WJ Blog에 공개된 글을 제목과 카테고리로 검색합니다.">
+  <header class="search-page-header">
+    <p class="eyebrow">Search</p>
+    <h1>글 검색</h1>
+    <p class="lede">찾고 싶은 제목이나 키워드를 입력해 보세요. 공개된 글에서 바로 찾아봅니다.</p>
+  </header>
+
+  <form class="site-search search-page-form" action="/search" method="get" role="search">
+    <label for="site-search-input">검색어</label>
+    <div class="search-control">
+      <input id="site-search-input" name="q" type="search" value={initialQuery} placeholder="예: 새로운 글 제목이나 키워드" autocomplete="off" />
+      <button type="submit">검색</button>
+    </div>
+  </form>
+
+  <section class="search-results" aria-labelledby="search-results-heading">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">Search results</p>
+        <h2 id="search-results-heading">결과</h2>
+      </div>
+      <p id="search-status" class="search-status" aria-live="polite"></p>
+    </div>
+    <div id="search-empty" class="archive-empty" hidden>
+      <p class="empty-index" aria-hidden="true">—</p>
+      <div>
+        <p class="empty-title">검색 결과가 없습니다.</p>
+        <p>다른 단어로 다시 검색하거나 카테고리별 목록에서 글을 찾아보세요.</p>
+        <a class="text-link" href="/categories">카테고리 둘러보기 <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+    <ol id="search-results-list" class="archive-list"></ol>
+    <div id="search-no-posts" class="archive-empty" hidden>
+      <p class="empty-index" aria-hidden="true">—</p>
+      <div>
+        <p class="empty-title">검색할 공개 글을 준비하고 있습니다.</p>
+        <p>글이 공개되면 제목과 카테고리를 이곳에서 검색할 수 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="search-data" set:html={searchData}></script>
+  <script>
+    const searchData = JSON.parse(document.querySelector('#search-data')?.textContent || '[]');
+    const input = document.querySelector('#site-search-input');
+    const list = document.querySelector('#search-results-list');
+    const empty = document.querySelector('#search-empty');
+    const noPosts = document.querySelector('#search-no-posts');
+    const status = document.querySelector('#search-status');
+    const normalize = (value) => value.toLocaleLowerCase('ko-KR').trim();
+    const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+    const render = () => {
+      const query = normalize(input?.value || '');
+      const results = query
+        ? searchData.filter((post) => normalize(`${post.title} ${post.description} ${post.topic}`).includes(query))
+        : searchData;
+      if (list) {
+        list.innerHTML = results.map((post, index) => `
+          <li class="archive-item">
+            <span class="archive-item-index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
+            <div class="archive-item-main">
+              <p class="post-meta"><span class="${post.topicClass}">${escapeHtml(post.topic)}</span></p>
+              <h3><a href="${post.href}">${escapeHtml(post.title)}</a></h3>
+              <p>${escapeHtml(post.description)}</p>
+            </div>
+            <span class="archive-item-arrow" aria-hidden="true">↗</span>
+          </li>`).join('');
+      }
+      if (status) status.textContent = query ? `${results.length}개` : `${searchData.length}개`;
+      if (empty) empty.hidden = searchData.length === 0 || results.length > 0;
+      if (noPosts) noPosts.hidden = searchData.length > 0;
+    };
+    input?.addEventListener('input', render);
+    render();
+  </script>
+</BaseLayout>

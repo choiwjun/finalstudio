@@ -1,8 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { isPublicPost, type Post } from '../../lib/posts';
-import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+import { getPublicPosts, isPublicPost, type Post } from '../../lib/posts';
+import { categoryPath, formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -17,6 +17,7 @@ const { post } = Astro.props as { post: Post };
 const { Content } = await render(post);
 const data = post.data;
 const canonical = data.canonical;
+const relatedPosts = (await getPublicPosts()).filter((candidate) => candidate.id !== post.id && candidate.data.topic === data.topic).slice(0, 3);
 // pubDate가 미래인 카드는 색인 전에 배포될 수 있으므로 noindex로 보호한다.
 const noindex = data.pubDate.getTime() > Date.now();
 
@@ -37,7 +38,7 @@ const jsonLd = {
   datePublished: toIsoDate(data.pubDate),
   ...(data.testedAt ? { dateModified: toIsoDate(data.testedAt) } : {}),
   author: { '@type': 'Person', name: data.author },
-  publisher: { '@type': 'Organization', name: '업무도구 실험실', url: new URL('/', siteUrl).toString() },
+  publisher: { '@type': 'Organization', name: 'WJ Blog', url: new URL('/', siteUrl).toString() },
 };
 const breadcrumbs = {
   '@context': 'https://schema.org',
@@ -49,7 +50,7 @@ const breadcrumbs = {
 };
 ---
 <BaseLayout
-  title={`${data.title} | 업무도구 실험실`}
+  title={`${data.title} | WJ Blog`}
   description={data.description}
   canonical={canonical}
   ogType="article"
@@ -57,7 +58,11 @@ const breadcrumbs = {
   noindex={noindex}
   jsonLd={[jsonLd, breadcrumbs]}
 >
-  <article class="article">
+  <div class="post-layout">
+    <article class="article">
+    <nav class="breadcrumbs" aria-label="현재 위치">
+      <a href="/">홈</a><span aria-hidden="true">/</span><a href={categoryPath(data.topic)}>{topicLabel(data.topic)}</a><span aria-hidden="true">/</span><span>{data.title}</span>
+    </nav>
     <header class="post-header">
       <p class="post-badges">
         <span class={topicBadgeClass(data.topic)}>{topicLabel(data.topic)}</span>
@@ -77,7 +82,7 @@ const breadcrumbs = {
     {data.image && (
       <img class="post-cover" src={data.image} alt="" width="1536" height="1024" loading="eager" decoding="async" />
     )}
-    <Content />
+    <div class="post-body"><Content /></div>
     {(data.testedAt || toolVersionEntries.length > 0 || data.sourceIds.length > 0) && (
       <section class="meta-panel" aria-labelledby="post-meta-heading">
         <h2 id="post-meta-heading">테스트 정보</h2>
@@ -115,6 +120,24 @@ const breadcrumbs = {
         )}
       </section>
     )}
-    <p><a href="/">글 목록으로 돌아가기</a></p>
-  </article>
+    <p class="post-backlink"><a href={categoryPath(data.topic)}>← {topicLabel(data.topic)} 글 목록</a></p>
+    </article>
+    <aside class="post-aside" aria-label="글 보조 정보">
+      <div class="post-aside-block">
+        <p class="aside-label">이 글의 상태</p>
+        <p class="post-aside-title">{data.testedAt ? '직접 테스트한 글' : '검토 중인 글'}</p>
+        <p>{data.testedAt ? '작성 화면과 결과를 직접 확인했습니다.' : '사람 검토를 마친 뒤 공개됩니다.'}</p>
+      </div>
+      <div class="post-aside-block">
+        <p class="aside-label">다음 읽을거리</p>
+        {relatedPosts.length ? (
+          <ul class="aside-related-list">
+            {relatedPosts.map((related) => <li><a href={`/posts/${related.id}`}>{related.data.title}</a></li>)}
+          </ul>
+        ) : (
+          <p>같은 주제의 글이 더 쌓이면 이곳에서 이어집니다.</p>
+        )}
+      </div>
+    </aside>
+  </div>
 </BaseLayout>

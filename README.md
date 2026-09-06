@@ -1,14 +1,22 @@
-# 업무도구 실험실
+# WJ Blog
 
-Astro 기반의 정적 블로그 골격입니다.
+Astro 기반으로 만든 나만의 정적 블로그입니다. 카테고리와 글을 계속 추가할 수 있도록 특정 주제에 종속되지 않는 구조로 만들었습니다.
 
 ## 현재 방향
 
-- 핵심 카테고리: 업무도구 실전 (Excel·Google Sheets·Notion·Google Workspace)
-- 인접 주제: 직접 테스트한 AI 업무 활용법
+- 블로그 성격: 업무도구·공부·리뷰·여행·일상 등 원하는 주제를 담는 개인 블로그
+- 현재 첫 카테고리: 업무도구 실전 (새 카테고리는 글 frontmatter의 `topic`으로 추가)
 - 콘텐츠 원본: Git/Markdown
 - 공개 읽기 경로: 정적 HTML
 - 자동화: 사람 승인 이후에만 예약 빌드·배포
+
+## 블로그 UI/UX v1
+
+- v0 랜딩페이지형 시안은 반려하고, 티스토리·워드프레스처럼 일반적인 블로그 헤더·카테고리·최근 글 목록 중심으로 전면 재설계했습니다.
+- 카테고리 목록: `/categories`, 개별 카테고리: `/categories/<category>`
+- 공개 글 검색: `/search`
+- 조사 근거: `.planning/research/blog-design-benchmark-2026-09-06.md`
+- 현재 디자인 규격: `.planning/design/DESIGN_SYSTEM_V1.md`
 
 ## 개발
 

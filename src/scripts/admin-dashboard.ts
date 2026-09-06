@@ -32,13 +32,22 @@ statusSelect?.addEventListener('change', filterRows);
 
 const ADMIN_API = 'http://127.0.0.1:4322';
 const adminOnline = { value: false };
+let modalPreviousFocus = null;
 
 const setStatusUi = () => {
   const el = document.querySelector('#admin-server-status');
   if (!el) return;
+  const notice = document.querySelector('.dashboard-notice');
+  const hint = document.querySelector('#admin-server-hint');
+  notice?.setAttribute('data-state', adminOnline.value ? 'online' : 'offline');
   el.textContent = adminOnline.value
     ? '관리 서버 연결됨 — 편집·삭제·상태 변경을 사용할 수 있습니다.'
     : '관리 서버 미연결 — 아래 기능을 쓰려면 npm run admin 을 실행하세요.';
+  if (hint) {
+    hint.textContent = adminOnline.value
+      ? '관리 서버가 준비되었습니다. 글 편집·삭제·상태 변경·새 글 작성을 사용할 수 있습니다.'
+      : '편집·삭제·상태 변경·새 글 작성은 npm run admin 실행 후 사용할 수 있습니다.';
+  }
   document
     .querySelectorAll('.row-actions button, #new-post, #run-check')
     .forEach((btn) => btn.toggleAttribute('disabled', !adminOnline.value));
@@ -56,8 +65,25 @@ const ping = async () => {
 ping();
 setInterval(ping, 10_000);
 
-const openModal = (id) => document.querySelector(id)?.removeAttribute('hidden');
-const closeModal = (el) => el?.setAttribute('hidden', '');
+const openModal = (id) => {
+  const modal = document.querySelector(id);
+  if (!modal) return;
+  modalPreviousFocus = document.activeElement;
+  modal.removeAttribute('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => {
+    const firstControl = Array.from(modal.querySelectorAll('input, textarea, select, button'))
+      .find((element) => !element.hasAttribute('disabled') && !element.closest('[hidden]'));
+    (firstControl ?? modal.querySelector('.admin-modal-panel'))?.focus();
+  });
+};
+const closeModal = (el) => {
+  if (!el) return;
+  el.setAttribute('hidden', '');
+  el.setAttribute('aria-hidden', 'true');
+  if (modalPreviousFocus instanceof HTMLElement) modalPreviousFocus.focus();
+  modalPreviousFocus = null;
+};
 const showError = (el, message, details) => {
   if (!el) return;
   el.textContent = details?.length ? `${message}\n${details.join('\n')}` : message;
@@ -108,7 +134,7 @@ const openEdit = async (file) => {
         'description: ""',
         `pubDate: ${today}`,
         'status: draft',
-        'topic: productivity',
+        'topic: category-name',
         'angle: ""',
         'author: TBD',
         'sourceIds: []',
@@ -128,7 +154,6 @@ const openEdit = async (file) => {
     }
   }
   openModal('#edit-modal');
-  editContent?.focus();
 };
 
 const saveEdit = async () => {
@@ -244,6 +269,11 @@ document.addEventListener('click', (event) => {
   const target = event.target instanceof Element ? event.target : null;
   if (!target) return;
 
+  if (target.classList.contains('admin-modal')) {
+    closeModal(target);
+    return;
+  }
+
   const actionBtn = target.closest('[data-action]');
   if (actionBtn instanceof HTMLElement && adminOnline.value) {
     const file = rowOf(actionBtn);
@@ -259,8 +289,29 @@ document.addEventListener('click', (event) => {
   if (target.closest('#edit-save')) saveEdit();
   if (target.closest('#status-apply')) applyStatus();
   if (target.closest('[data-modal-close]')) {
-    closeModal(document.querySelector('#edit-modal'));
-    closeModal(document.querySelector('#status-modal'));
+    closeModal(target.closest('.admin-modal'));
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  const modal = document.querySelector('.admin-modal:not([hidden])');
+  if (!modal) return;
+  if (event.key === 'Escape') {
+    closeModal(modal);
+    return;
+  }
+  if (event.key !== 'Tab') return;
+  const focusable = Array.from(modal.querySelectorAll('button, input, textarea, select, [href], [tabindex]:not([tabindex="-1"])'))
+    .filter((element) => !element.hasAttribute('disabled') && !element.closest('[hidden]'));
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 });
 

@@ -52,15 +52,13 @@ const targetPath = join(IMAGES_DIR, `${slug}.png`);
 const raw = readFileSync(postPath, 'utf8');
 const { get } = parseFrontmatter(raw);
 const title = (get('title') ?? '').replace(/^["']+|["']+$/g, '');
-const topic = get('topic') ?? 'productivity';
-const scene = topic === 'ai-workflows'
-  ? 'an abstract AI assistant hologram helping a tidy desk organize documents and chat bubbles'
-  : 'a tidy office desk where a laptop shows an abstract, simplified spreadsheet and document interface';
+const topic = get('topic') ?? 'personal notes';
+const scene = 'a calm, editorial still life that suggests the post topic without showing readable screens or brand marks';
 const imagePrompt = [
-  'Flat, modern vector-style illustration for a Korean office-productivity blog cover.',
-  `Theme: "${title}" — visualize with ${scene}.`,
-  'Soft blue and white palette with one warm accent color, generous white space, minimal shapes,',
-  'subtle depth, rounded corners, professional and friendly mood.',
+  'Flat, modern vector-style illustration for a Korean personal blog cover.',
+  `Category: "${topic}". Theme: "${title}" — visualize with ${scene}.`,
+  'Warm paper-white palette with one calm accent color, generous white space, minimal shapes,',
+  'subtle depth, light texture, professional and personal mood.',
   'Strictly no letters, no words, no numbers, no logos, no readable text in the image, no people.',
   'Landscape 3:2 composition.',
 ].join(' ');

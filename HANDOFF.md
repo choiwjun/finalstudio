@@ -1,4 +1,4 @@
-# 업무도구 실험실 — 첫 글 발행 핸드오프
+# WJ Blog — 첫 글 발행·디자인 핸드오프
 
 작성일: 2026-09-05 (Asia/Seoul)
 
@@ -6,7 +6,7 @@
 
 - 저장소: <https://github.com/choiwjun/finalstudio>
 - 브랜치: `main`
-- 마지막 커밋: `09a8ad2 qa: add Excel linked picture screenshots`
+- 마지막 커밋: `944b1de docs: add first post publishing handoff`
 - 첫 글: `src/content/posts/excel-linked-picture.md`
 - 현재 상태: `status: draft`
 - Excel 사용자가 라이선스 동의 화면에서 `수락`을 직접 눌렀음.
@@ -76,6 +76,33 @@ npm run preview -- --host 127.0.0.1
 브라우저에서 첫 글의 제목, 본문 폭, 이미지 크기·대체 텍스트, 표·코드·링크, 모바일 폭을 확인한다. 수정이 있으면 다시 세 검사를 실행한다.
 
 그 다음에만 `status: published`로 변경하고, `npm run build` 결과에 첫 글 경로가 생성되는지 확인한다. 최종 발행은 사람 승인 후 진행한다.
+
+## 일반 블로그 전면 재수정 — v0 반려 / WJ Blog v1 구현 완료(로컬)
+
+v0는 기술적으로 구현됐지만 블로그 스타일과 맞지 않아 소유자가 반려했다. 이번 세션에서 상위권 블로그의 탐색 구조를 다시 조사하고, 랜딩페이지형 v0를 **티스토리·워드프레스와 같은 일반적인 개인 블로그 기본 구조**로 전면 교체했다. `업무도구`는 첫 카테고리일 뿐이며, 블로그 이름·내비게이션·콘텐츠 계약은 특정 주제에 묶이지 않는다. 근거와 규격은 `.planning/research/blog-design-benchmark-2026-09-06.md`와 `.planning/design/DESIGN_SYSTEM_V1.md`에 기록했다. 기존 `.planning/design/DESIGN_SYSTEM.md`는 v0 역사 기록이다.
+
+### 이번에 반영한 것
+
+- 헤더를 `WJ Blog · 홈 · 카테고리 · 소개 · 검색` 중심의 일반 블로그 내비게이션으로 교체하고, 편집 원칙·문의 등은 푸터 보조 링크로 이동.
+- 홈을 짧은 소개 → 최근 글 → 카테고리 → 블로그 소개 순서로 재구성.
+- 공개 글이 0건이어도 아카이브처럼 보이는 빈 상태를 적용.
+- `/categories`, `/categories/<category>` 범용 카테고리 목록 페이지 추가.
+- `/search` 정적 공개 글 검색 페이지 추가.
+- 글 상세에 브레드크럼·주제/검증 배지·읽기 레이아웃·테스트 정보·다음 읽을거리 영역 추가.
+- 색상·간격·레이아웃을 v1 일반 블로그 토큰으로 교체하고 390px 대응 스타일 추가.
+
+### 확장 기준
+
+- `src/content.config.ts`의 `topic`은 고정 enum이 아닌 문자열이다.
+- 새 글의 frontmatter에 `topic: travel`, `topic: books`처럼 카테고리를 추가하면 홈·카테고리 목록·검색·글 상세에 자동 반영된다.
+- 기존 `productivity`, `ai-workflows` 값은 첫 글과 기존 초안의 데이터 호환을 위해 남겨 둔 초기 카테고리다.
+
+### 남은 디자인 QA
+
+- 390px·768px·1440px 브라우저 실측: 메뉴, 검색, 주제 목록, 빈 상태, 글 상세.
+- 키보드 전체 순회, 200% 확대, 스크린리더와 표·코드 스크롤 확인.
+- 첫 글 발행 후 실제 글 이미지·관련 글·목록 밀도 재확인.
+- v1 디자인 승인과 첫 글 발행 승인은 별도 게이트로 유지.
 
 ## 배포·인증 메모
 

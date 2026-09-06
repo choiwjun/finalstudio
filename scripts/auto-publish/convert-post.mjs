@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * claude-blog 출력물 → 업무도구 실험실 콘텐츠 스키마 변환기
+ * AI 글 초안 → WJ Blog 콘텐츠 스키마 변환기
  *
  * 사용법:
- *   node scripts/auto-publish/convert-post.mjs <입력.md> --topic productivity --angle "관점 한 문장"
+ *   node scripts/auto-publish/convert-post.mjs <입력.md> --topic 카테고리 --angle "관점 한 문장"
  *   옵션: --slug 파일명(영어 소문자-하이픈)  --author 이름  --out 출력 경로(기본 src/content/posts)
  *
  * 규칙:
@@ -34,8 +34,8 @@ const fail = (msg) => {
   process.exit(1);
 };
 
-if (!input) fail('입력 파일 경로가 필요합니다. 예: node scripts/auto-publish/convert-post.mjs draft.md --topic productivity --angle "..."');
-if (!['productivity', 'ai-workflows'].includes(topic)) fail('--topic은 productivity 또는 ai-workflows만 허용됩니다.');
+if (!input) fail('입력 파일 경로가 필요합니다. 예: node scripts/auto-publish/convert-post.mjs draft.md --topic 카테고리 --angle "..."');
+if (!topic || topic.trim().length === 0 || topic.includes('\n')) fail('--topic에는 비어 있지 않은 카테고리 이름을 지정하세요.');
 if (!angle) fail('--angle이 필요합니다. 이 글이 기존 글과 다르게 채택한 관점을 한 문장으로 적어주세요.');
 
 const inputPath = resolve(input);

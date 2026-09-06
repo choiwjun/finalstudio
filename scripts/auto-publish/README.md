@@ -4,7 +4,7 @@
 **명령 1줄로 초안 생성 → 윤문 → 검수 → draft 저장까지 자동 실행**됩니다.
 
 ```
-npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level 완전초보 --stage 도구 --topic productivity
+npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카테고리
         │
         ├─ [자동] 1단계 초안 (BRAND.md+VOICE.md+페르소나 프롬프트)
         ├─ [자동] 2단계 윤문 — 한국어 AI 티 제거 (im-not-ai 규칙 이식)
@@ -36,7 +36,7 @@ npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level
 ### C. 수동 모드 — ChatGPT 붙여넣기 (키 없이)
 
 같은 대화에서 순서대로 붙여넣기: ① `BRAND.md`+`VOICE.md`+`content-writer-prompt.md` → ② `chatgpt-humanize-prompt.md` → ③ `chatgpt-review-prompt.md`.
-통과본을 파일로 저장한 뒤 변환만 자동화: `npm run auto:write --from-final 검수통과본.md --topic productivity`
+통과본을 파일로 저장한 뒤 변환만 자동화: `npm run auto:write --from-final 검수통과본.md --topic 카테고리`
 
 ### D. 주간 자동 초안 (GitHub Actions) — 저장소를 GitHub에 연결한 뒤
 
@@ -55,16 +55,16 @@ npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level
 
 ```bash
 # 풀 자동 (주제 직접 지정) — 엔진은 .env/키 유무로 자동 선택, 강제하려면 --engine codex|api
-npm run auto:write "주제" --topic productivity --level 완전초보 --stage 도구 [--slug my-slug] [--tone 해요체]
+npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--slug my-slug] [--tone 해요체]
 
 # 캘린더에서 다음 주제 자동 가져오기 (성공 시 해당 항목 [x] 표시)
 npm run auto:write --calendar scripts/auto-publish/calendar.md
 
 # 이미 쓴 초안에 윤문+검수만 적용
-npm run auto:write --input 초안.md --topic productivity
+npm run auto:write --input 초안.md --topic 카테고리
 
 # API 없이 변환만 (수동 ChatGPT 흐름 마무리)
-npm run auto:write --from-final 검수통과본.md --topic productivity --angle "관점"
+npm run auto:write --from-final 검수통과본.md --topic 카테고리 --angle "관점"
 
 # 썸네일 이미지 (API 키 있으면 자동 생성, 없으면 ChatGPT 수동 생성 프롬프트 출력)
 npm run image -- --slug 글슬러그
@@ -72,7 +72,7 @@ npm run image -- --slug 글슬러그 --engine manual          # ChatGPT(구독)�
 npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 파일 등록 → frontmatter image 기록
 ```
 
-- 주제 태그: `productivity` / `ai-workflows`
+- 주제 태그: 고정 목록이 없습니다. `topic`에 원하는 카테고리 이름을 사용합니다.
 - 캘린더 형식: `- [ ] 주제 | 독자수준 | 사다리단계 | 주제태그`
 - 중간 산출물(초안·윤문본·검수 리포트)은 `out/auto-publish/<실행시각>/`에 저장 (커밋되지 않음)
 

@@ -73,6 +73,10 @@ const resyncDev = async () => {
 
 const cors = (req, res) => {
   const origin = req.headers.origin;
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    send(res, 403, { error: '허용되지 않은 Origin입니다.' });
+    return false;
+  }
   if (origin && ALLOWED_ORIGINS.has(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
@@ -80,6 +84,7 @@ const cors = (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Max-Age', '600');
   }
+  return true;
 };
 
 const send = (res, code, body) => {
@@ -124,7 +129,7 @@ const listPosts = () => readdirSync(POSTS).filter((f) => f.endsWith('.md')).map(
 });
 
 const server = createServer(async (req, res) => {
-  cors(req, res);
+  if (!cors(req, res)) return;
   const url = new URL(req.url ?? '/', 'http://127.0.0.1');
   const file = url.searchParams.get('file') ?? '';
 

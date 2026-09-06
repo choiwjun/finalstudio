@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublicPosts, isPublicPost } from '../../lib/posts';
+import { formatKoDate, toIsoDate, topicBadgeClass, topicLabel } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const categories = Array.from(new Set(posts.filter((post) => isPublicPost(post)).map((post) => post.data.topic)));
+  return categories.map((category) => ({ params: { category }, props: { category } }));
+}
+
+const { category } = Astro.props as { category: string };
+const posts = (await getPublicPosts()).filter((post) => post.data.topic === category);
+---
+<BaseLayout title={`${topicLabel(category)} | WJ Blog`} description={`${topicLabel(category)} 카테고리의 글 목록`}>
+  <header class="archive-header">
+    <nav class="breadcrumbs" aria-label="현재 위치"><a href="/">홈</a><span aria-hidden="true">/</span><a href="/categories">카테고리</a><span aria-hidden="true">/</span><span>{topicLabel(category)}</span></nav>
+    <p class="eyebrow">Category</p>
+    <h1>{topicLabel(category)}</h1>
+    <p class="lede">이 카테고리에 작성한 글을 모아 봅니다.</p>
+  </header>
+
+  <div class="archive-tools"><p><strong>{posts.length}</strong>개의 글</p><a class="section-link" href="/categories">카테고리 전체 보기</a></div>
+  <section class="archive-content" aria-labelledby="category-posts-heading">
+    <div class="section-heading"><h2 id="category-posts-heading">최근 글</h2></div>
+    {posts.length ? (
+      <ol class="archive-list">
+        {posts.map((post, index) => (
+          <li class="archive-item">
+            <span class="archive-item-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <div class="archive-item-main">
+              <p class="post-meta"><span class={topicBadgeClass(post.data.topic)}>{topicLabel(post.data.topic)}</span><time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)}</time></p>
+              <h3><a href={`/posts/${post.id}`}>{post.data.title}</a></h3>
+              <p>{post.data.description}</p>
+            </div>
+            <span class="archive-item-arrow" aria-hidden="true">→</span>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <div class="empty"><p><strong>아직 공개된 글이 없습니다.</strong></p><p>글이 공개되면 이 카테고리에서 확인할 수 있습니다.</p><a href="/categories">카테고리로 돌아가기 →</a></div>
+    )}
+  </section>
+</BaseLayout>

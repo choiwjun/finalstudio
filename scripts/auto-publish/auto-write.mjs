@@ -2,7 +2,7 @@
 /**
  * 자동 글발행 코어 — ChatGPT 3단계 파이프라인을 명령 한 줄로 실행한다.
  *
- *   npm run auto:write "엑셀 VLOOKUP 다른 시트 데이터 가져오기" --level 완전초보 --stage 도구 --topic productivity
+ *   npm run auto:write "글 주제" --level 완전초보 --stage 도구 --topic 카테고리
  *
  * 동작:
  *   1단계 초안(BRAND+VOICE+writer 프롬프트) → 2단계 윤문 → 3단계 검수(90점 게이트, 미달 시 재수정)
@@ -180,7 +180,7 @@ if (finalPath) {
   const { get } = readFrontmatter(text);
   const topicTag = topicArg ?? get('topic');
   const angle = angleArg ?? get('angle');
-  if (!['productivity', 'ai-workflows'].includes(topicTag)) fail('--topic productivity|ai-workflows 를 지정하세요.');
+  if (!topicTag?.trim()) fail('--topic 카테고리이름을 지정하세요.');
   if (!angle) fail('--angle "..." 을 지정하세요.');
   console.log(convert(finalPath, topicTag, angle, slug));
   process.exit(0);
@@ -205,7 +205,7 @@ if (calendarPath) {
   levelOverride = lvl;
   stageOverride = stg;
   if (tag && !topicArg) {
-    if (!['productivity', 'ai-workflows'].includes(tag)) fail(`캘린더 주제 태그가 잘못됐습니다: ${tag}`);
+    if (!tag?.trim()) fail(`캘린더 카테고리가 비어 있습니다: ${line}`);
     calendarTopic = tag;
   }
 }
@@ -213,8 +213,8 @@ const topicTag = topicArg ?? calendarTopic;
 const level = levelOverride ?? levelArg ?? '완전초보';
 const stage = stageOverride ?? stageArg ?? '도구';
 
-if (!subject && !inputPath) fail('주제가 필요합니다. 예: npm run auto:write "주제" --topic productivity');
-if (!['productivity', 'ai-workflows'].includes(topicTag ?? '')) fail('--topic productivity|ai-workflows 를 지정하세요.');
+if (!subject && !inputPath) fail('주제가 필요합니다. 예: npm run auto:write "주제" --topic 카테고리');
+if (!topicTag?.trim()) fail('--topic 카테고리이름을 지정하세요.');
 
 /* ── 엔진 결정 + 수동 폴백 ───────────────────────────────── */
 const ENGINE = getArg('engine') ?? process.env.AUTO_ENGINE ?? (API_KEY ? 'api' : 'codex');

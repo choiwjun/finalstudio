@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublicPosts } from '../../lib/posts';
+import { categoryPath, topicLabel } from '../../lib/format';
+
+const posts = await getPublicPosts();
+const categories = Array.from(new Set(posts.map((post) => post.data.topic)));
+---
+<BaseLayout title="카테고리 | WJ Blog" description="WJ Blog의 글을 카테고리별로 찾아봅니다.">
+  <header class="archive-header">
+    <nav class="breadcrumbs" aria-label="현재 위치"><a href="/">홈</a><span aria-hidden="true">/</span><span>카테고리</span></nav>
+    <p class="eyebrow">Categories</p>
+    <h1>카테고리</h1>
+    <p class="lede">관심 있는 주제별로 글을 모아 봅니다.</p>
+  </header>
+
+  <section class="archive-content" aria-labelledby="categories-heading">
+    <div class="section-heading"><h2 id="categories-heading">전체 카테고리</h2></div>
+    {categories.length ? (
+      <ul class="category-grid">
+        {categories.map((category) => (
+          <li><a href={categoryPath(category)}><strong>{topicLabel(category)}</strong><span>{posts.filter((post) => post.data.topic === category).length}개의 글</span></a></li>
+        ))}
+      </ul>
+    ) : (
+      <div class="empty"><p><strong>아직 카테고리가 없습니다.</strong></p><p>글이 공개되면 카테고리가 자동으로 생깁니다.</p></div>
+    )}
+  </section>
+</BaseLayout>

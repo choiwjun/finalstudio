@@ -1,4 +1,4 @@
-# VOICE.md — 업무도구 실험실 문체 계약
+# VOICE.md — WJ Blog 문체 계약
 
 > 글쓰기 AI(ChatGPT 등)에 항상 함께 제공하는 문체 파일입니다. 일반 AI 문체 관용(AI 티)은
 > 이 파일의 규칙이 우선하며, 2단계 윤문 프롬프트(`chatgpt-humanize-prompt.md`)가 이를 강제합니다.

@@ -23,5 +23,9 @@ export function topicLabel(topic: string): string {
 }
 
 export function topicBadgeClass(topic: string): string {
-  return topic === 'ai-workflows' ? 'badge badge--ai' : 'badge badge--prod';
+  return topic === 'ai-workflows' ? 'badge badge--ai' : 'badge badge--topic';
+}
+
+export function categoryPath(topic: string): string {
+  return `/categories/${encodeURIComponent(topic)}`;
 }

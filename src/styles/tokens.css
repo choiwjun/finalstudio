@@ -1,6 +1,6 @@
 /* ============================================================
-   Design Tokens — 업무도구 실험실
-   canonical spec: .planning/design/DESIGN_SYSTEM.md
+   Design Tokens — WJ Blog
+   canonical spec: .planning/design/DESIGN_SYSTEM_V1.md
    규격 출처: qwen-ui-system.md §3 (토큰) / §4 (브레이크포인트)
 
    브레이크포인트 단일 출처 (CSS 변수는 @media에서 쓸 수 없어
@@ -40,7 +40,7 @@
   --color-warning:  #8a5a00;  --color-warning-bg:  #fdf3dd; /* on bg 5.4:1 */
   --color-danger:   #a52a1a;  --color-danger-bg:   #fbeae7; /* on bg 5.9:1 */
 
-  /* ---- 주제 두 개 고정 (핵심/인접) ---- */
+  /* ---- 초기 카테고리 배지 색상(새 카테고리는 기본색으로 확장) ---- */
   --color-topic-prod: #174ea6; --bg-topic-prod: #eef4ff;
   --color-topic-ai:   #5b3a8f; --bg-topic-ai:   #f1ecfa; /* on bg 7.3:1 */
 
@@ -120,6 +120,23 @@
 
   --z-header: 10;
   --z-skip: 100;
+
+  /* ---- 6) v1 editorial blog surface ---- */
+  --site-bg:             #f6f8f6;
+  --site-surface:        #ffffff;
+  --site-ink:            #17232b;
+  --site-ink-soft:       #52616a;
+  --site-muted:          #718087;
+  --site-line:           #d8e2df;
+  --site-line-strong:    #b9cbc6;
+  --site-accent:         #0f766e;
+  --site-accent-hover:   #0a5c56;
+  --site-accent-soft:    #e4f2ef;
+  --site-warm:           #bd652e;
+  --site-warm-soft:      #f7eee6;
+  --site-dark:           #183c3b;
+  --site-max:            72rem;
+  --site-prose:          46rem;
 }
 
 /* [보관] 다크 모드 — AdSense 결정 전 켜지 않는다. `html`에

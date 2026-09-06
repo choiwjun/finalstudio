@@ -1,16 +1,17 @@
-# HANDOVER.md — 업무도구 실험실 인수인계 문서
+# HANDOVER.md — WJ Blog 인수인계 문서
 
 > 작성일: 2026-09-05 · 대상: 이 프로젝트를 이어받는 사람(또는 미래의 나)
 > 이 문서가 사실과 다르면 이 문서를 고치고, `.planning/prompts/content-pipeline.md`와 함께 확인할 것.
 > 운영 원칙의 단일 근거는 `BRAND.md`(주제·금지 주제·발행 리듬)와 `VOICE.md`(문체·구조 계약).
+> 2026-09-06 제품 방향 업데이트: 이 프로젝트는 업무도구 전용 사이트가 아니라, 카테고리를 자유롭게 추가하는 일반적인 개인 블로그다. 아래의 기존 업무도구 예시는 첫 카테고리와 초기 대기열을 설명하는 예시다.
 
 ---
 
 ## 1. 프로젝트 한눈 요약
 
-- **무엇**: 애드센스 수익화가 목표인 한국어 정적 블로그 「업무도구 실험실」 (Astro 기반)
-- **누구에게**: 직장인·취준생·1인 사업자 (컴퓨터 전문가 아님 — "지금 막힌 문제"의 답을 찾으러 옴)
-- **무엇을**: 업무 생산성 소프트웨어 활용법 70% + AI 업무 활용 30%, 확장 사다리 (도구 → 노하우 → 자격증 → 커리어)
+- **무엇**: 애드센스 수익화를 고려하는 한국어 정적 개인 블로그 「WJ Blog」 (Astro 기반)
+- **누구에게**: 검색 또는 카테고리 탐색으로 정보와 경험을 읽으려는 한국어 독자
+- **무엇을**: 업무도구·공부·리뷰·여행·일상 등 운영자가 선택한 여러 주제
 - **해자(차별화)**: 모든 글을 **사람이 직접 테스트**하고 실패 지점("안 될 때")까지 기록 — AI 초안 + 사람 검증 구조
 - **절대 금지**: YMYL 조언(보험·대출·투자·세금·건강·법률), IT 뉴스, 무검토 대량 발행 (구글 "규모화 콘텐츠 악용" 정책 → 애드센스 계정 리스크)
 - **하드 제약**: 운영자는 Claude Code 구독이 아닌 **ChatGPT 구독** 사용 — 모든 자동화는 ChatGPT + 로컬 Node.js로만 동작
@@ -74,7 +75,7 @@
 
 | 경로 | 역할 |
 |---|---|
-| `src/content.config.ts` | 글 스키마(Zod). 필드: title, description, pubDate, publishAt, status(draft/scheduled/published), topic(productivity/ai-workflows), angle, author, sourceIds, testedAt, toolVersions, aiAssisted, canonical, **image**(2026-09 추가) |
+| `src/content.config.ts` | 글 스키마(Zod). 필드: title, description, pubDate, publishAt, status(draft/scheduled/published), topic(자유 문자열 카테고리), angle, author, sourceIds, testedAt, toolVersions, aiAssisted, canonical, **image**(2026-09 추가) |
 | `src/content/posts/*.md` | 글 원본 (Markdown + frontmatter). 현재: `excel-linked-picture.md`(첫 실전 초안), `sample-draft.md`(템플릿 샘플) |
 | `src/lib/posts.ts` | 공개 글 판정: `isPublicPost` — published는 publishAt≤now, scheduled는 publishAt≤now일 때 공개 |
 | `src/pages/index.astro` | 홈 (공개 글 목록) |
@@ -133,9 +134,9 @@
 ### b. 자동화 엔진 (auto-write.mjs)
 
 ```
-npm run auto:write "주제" --topic productivity --level 완전초보 --stage 도구 [--slug x] [--angle "..."]
+npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--slug x] [--angle "..."]
 npm run auto:write --calendar scripts/auto-publish/calendar.md   # 다음 미완료 주제 자동, 성공 시 [x] 표시
-npm run auto:write --input 초안.md --topic productivity           # 초안에 윤문+검수만 적용
+npm run auto:write --input 초안.md --topic 카테고리           # 초안에 윤문+검수만 적용
 npm run auto:write --from-final 검수통과본.md --topic t --angle "..."  # 엔진 없이 변환·저장만
 ```
 

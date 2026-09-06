@@ -55,7 +55,7 @@ export function validatePost(file, text) {
   const topic = front.match(/^topic:\s*([^\n]+)/m)?.[1]?.trim();
 
   if (status && !ALLOWED_STATUS.has(status)) errors.push(`${file}: invalid status ${status}`);
-  if (topic && !['productivity', 'ai-workflows'].includes(topic)) errors.push(`${file}: invalid topic ${topic}`);
+  if (topic && !topic.replace(/^['"]|['"]$/g, '').trim()) errors.push(`${file}: topic cannot be empty`);
   if (status === 'scheduled' && !/^publishAt:\s*.+$/m.test(front)) errors.push(`${file}: scheduled post needs publishAt`);
   if (status !== 'draft' && author === 'TBD') errors.push(`${file}: public posts need a real author`);
   if (status !== 'draft' && (!testedAt || testedAt === 'TBD')) errors.push(`${file}: public posts need testedAt`);
