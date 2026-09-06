@@ -13,11 +13,7 @@ export function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-const topicLabels: Record<string, string> = {
-  productivity: '업무도구 실전',
-  'ai-workflows': 'AI 업무 활용',
-};
-
+// 카테고리는 글 데이터에서 동적으로 확장한다. 주제별 고정 라벨이나 시각 강조를 두지 않는다.
 const sourceCatalog: Record<string, { label: string; url: string }> = {
   'microsoft-excel-paste-options': {
     label: 'Microsoft Excel 붙여넣기 옵션',
@@ -30,11 +26,11 @@ const sourceCatalog: Record<string, { label: string; url: string }> = {
 };
 
 export function topicLabel(topic: string): string {
-  return topicLabels[topic] ?? topic;
+  return topic;
 }
 
-export function topicBadgeClass(topic: string): string {
-  return topic === 'ai-workflows' ? 'badge badge--ai' : 'badge badge--topic';
+export function topicBadgeClass(_topic: string): string {
+  return 'badge badge--topic';
 }
 
 export function categoryPath(topic: string): string {

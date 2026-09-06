@@ -4,7 +4,13 @@ import path from 'node:path';
 const cliArgs = process.argv.slice(2);
 const targetUrl = cliArgs.find((argument) => !argument.startsWith('--')) ?? 'http://127.0.0.1:4321/admin/preview';
 const fullPage = cliArgs.includes('--full');
-const outputPath = path.join(process.env.TEMP ?? '.', `wj-blog-preview-cdp-mobile${fullPage ? '-full' : ''}.png`);
+const widthFlag = cliArgs.find((argument) => argument.startsWith('--width='));
+const viewportWidth = widthFlag ? Number.parseInt(widthFlag.split('=')[1], 10) || 390 : 390;
+const isDesktop = viewportWidth >= 1024;
+const outputPath = path.join(
+  process.env.TEMP ?? '.',
+  `wj-blog-qa-${viewportWidth}px-${new URL(targetUrl).pathname === '/' ? 'home' : new URL(targetUrl).pathname.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}${fullPage ? '-full' : ''}.png`,
+);
 const targets = await fetch('http://127.0.0.1:9223/json/list').then((response) => response.json());
 const target = targets.find((item) => item.type === 'page');
 
@@ -41,10 +47,10 @@ await waitForOpen;
 await command('Page.enable');
 await command('Runtime.enable');
 await command('Emulation.setDeviceMetricsOverride', {
-  width: 390,
-  height: 844,
+  width: viewportWidth,
+  height: isDesktop ? 900 : 844,
   deviceScaleFactor: 1,
-  mobile: true,
+  mobile: !isDesktop,
 });
 await command('Page.navigate', { url: targetUrl });
 await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -56,7 +62,7 @@ const metricsResult = await command('Runtime.evaluate', {
     clientWidth: document.documentElement.clientWidth,
     bodyScrollWidth: document.body.scrollWidth,
     bodyClientWidth: document.body.clientWidth,
-    keyRects: ['.draft-preview-page', '.draft-preview-article', '.post-quick-answer', '.post-facts']
+    keyRects: ['.home-intro', '.post-card', '.post-list-item', '.category-chip-list', '.draft-preview-page', '.draft-preview-article', '.post-quick-answer', '.post-facts']
       .flatMap((selector) => [...document.querySelectorAll(selector)].map((element) => {
         const rect = element.getBoundingClientRect();
         return { selector, left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width) };

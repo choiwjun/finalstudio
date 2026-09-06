@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublicPosts } from '../lib/posts';
-import { categoryPath, formatKoDate, toIsoDate, topicLabel } from '../lib/format';
+import { categoryPath, formatKoDate, toIsoDate } from '../lib/format';
 
 const posts = await getPublicPosts();
 const categories = Array.from(new Set(posts.map((post) => post.data.topic)));
 const featuredPost = posts[0];
-const queuePosts = posts.slice(1, 9);
+const latestPosts = featuredPost ? posts.slice(1, 7) : posts.slice(0, 7);
 const readMinutes = (post: (typeof posts)[number]) => Math.max(1, Math.ceil((post.body ?? '').replace(/\s/g, '').length / 700));
 const siteUrl = import.meta.env.SITE ?? Astro.site?.toString() ?? 'http://localhost:4321';
 const jsonLd = {
@@ -23,94 +23,91 @@ const jsonLd = {
   description="관심 있는 주제를 기록하고 나누는 개인 블로그입니다."
   jsonLd={jsonLd}
 >
-  <section class="home-hero" aria-labelledby="home-title">
-    <div class="home-hero-intro">
-      <p class="home-kicker">실무 지식 아카이브 <span>WJ / 01</span></p>
-      <h1 id="home-title">막막할 때,<br /><strong>검색부터.</strong></h1>
-      <p class="home-hero-copy">업무에 바로 쓰는 방법과 직접 확인한 결과를 짧고 분명하게 기록합니다.</p>
-      <form class="home-search" action="/search" method="get" role="search">
-        <label class="visually-hidden" for="home-search-input">필요한 내용 검색</label>
-        <input id="home-search-input" name="q" type="search" placeholder="예: VLOOKUP 오류, 연결된 그림" autocomplete="off" />
-        <button type="submit">검색하기 <span aria-hidden="true">→</span></button>
-      </form>
-      <div class="home-quick-links" aria-label="빠른 이동">
-        <span>바로가기</span>
-        <a href="/categories">주제 찾아보기</a>
-        <a href="/about">기록 원칙</a>
-      </div>
+  <section class="home-intro" aria-labelledby="home-title">
+    <h1 id="home-title">WJ Blog</h1>
+    <p class="home-intro-copy">
+      관심 있는 주제를 기록하고 나누는 개인 블로그입니다.
+      그때그때 배우고 경험한 것들을 주제 제한 없이 남깁니다.
+    </p>
+    <div class="home-intro-links">
+      <a href="/categories">카테고리 둘러보기</a>
+      <a href="/about">소개</a>
+      <a href="/search">검색</a>
     </div>
+  </section>
 
-    {featuredPost ? (
-      <a class="home-featured" href={`/posts/${featuredPost.id}`}>
-        <div class="home-featured-copy">
-          <p class="home-featured-label">오늘의 읽을 글</p>
-          <h2>{featuredPost.data.title}</h2>
+  {featuredPost && (
+    <section class="home-featured-section" aria-labelledby="featured-heading">
+      <div class="section-heading">
+        <h2 id="featured-heading">최근 글</h2>
+        <a class="section-link" href="/categories">카테고리별로 보기 <span aria-hidden="true">→</span></a>
+      </div>
+      <article class="post-card post-card--featured">
+        {featuredPost.data.image && (
+          <a class="post-card-image" href={`/posts/${featuredPost.id}`} tabIndex={-1} aria-hidden="true">
+            <img src={featuredPost.data.image} alt="" width="720" height="480" loading="eager" />
+          </a>
+        )}
+        <div class="post-card-body">
+          <p class="post-card-meta">
+            <a class="badge badge--topic" href={categoryPath(featuredPost.data.topic)}>{featuredPost.data.topic}</a>
+            <time datetime={toIsoDate(featuredPost.data.pubDate)}>{formatKoDate(featuredPost.data.pubDate)}</time>
+            <span>{readMinutes(featuredPost)}분 읽기</span>
+          </p>
+          <h3><a href={`/posts/${featuredPost.id}`}>{featuredPost.data.title}</a></h3>
           <p>{featuredPost.data.description}</p>
-          <span class="home-featured-action">본문 읽기 <span aria-hidden="true">→</span></span>
         </div>
-        {featuredPost.data.image && <img src={featuredPost.data.image} alt="" width="720" height="480" loading="eager" />}
-      </a>
+      </article>
+    </section>
+  )}
+
+  <section class="home-latest" aria-labelledby="latest-heading">
+    <div class="section-heading">
+      <h2 id="latest-heading">글 목록</h2>
+      <a class="section-link" href="/search">전체 글 검색 <span aria-hidden="true">→</span></a>
+    </div>
+    {latestPosts.length ? (
+      <ul class="post-list">
+        {latestPosts.map((post) => (
+          <li class="post-list-item">
+            <p class="post-card-meta">
+              <a class="badge badge--topic" href={categoryPath(post.data.topic)}>{post.data.topic}</a>
+              <time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)}</time>
+              <span>{readMinutes(post)}분 읽기</span>
+            </p>
+            <h3><a href={`/posts/${post.id}`}>{post.data.title}</a></h3>
+            <p>{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
     ) : (
-      <div class="home-featured home-featured--empty">
-        <p class="home-featured-label">첫 번째 기록을 준비 중입니다</p>
-        <h2>검증한 글이 공개되면<br />이곳에서 바로 읽을 수 있습니다.</h2>
-        <p>현재는 초안 검토와 실제 사용 확인을 진행하고 있습니다.</p>
-        <a href="/about">블로그 운영 원칙 보기 <span aria-hidden="true">→</span></a>
+      <div class="archive-empty archive-empty--home">
+        <span class="empty-index" aria-hidden="true">—</span>
+        <div><p class="empty-title">아직 공개된 글이 없습니다.</p><p>글이 공개되면 이 목록에서 확인할 수 있습니다.</p></div>
       </div>
     )}
   </section>
 
-  <section class="home-archive" aria-labelledby="latest-heading">
-    <div class="home-archive-main">
-      <div class="section-heading section-heading--archive">
-        <div>
-          <p class="section-kicker">Reading queue</p>
-          <h2 id="latest-heading">최근 읽기 큐</h2>
-        </div>
-        <a class="section-link" href="/search">전체 글 검색 <span aria-hidden="true">→</span></a>
-      </div>
-      {queuePosts.length ? (
-        <ol class="reading-queue">
-          {queuePosts.map((post, index) => (
-            <li>
-              <span class="reading-queue-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              <div class="reading-queue-copy">
-                <p class="reading-queue-meta"><a href={categoryPath(post.data.topic)}>{topicLabel(post.data.topic)}</a>{post.data.testedAt && <span>검증됨</span>}</p>
-                <h3><a href={`/posts/${post.id}`}>{post.data.title}</a></h3>
-                <p>{post.data.description}</p>
-              </div>
-              <div class="reading-queue-time"><time datetime={toIsoDate(post.data.pubDate)}>{formatKoDate(post.data.pubDate)}</time><span>{readMinutes(post)}분 읽기</span></div>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <div class="archive-empty archive-empty--home">
-          <span class="empty-index" aria-hidden="true">—</span>
-          <div><p class="empty-title">공개된 글을 준비하고 있습니다.</p><p>사람이 직접 확인한 글만 이 목록에 추가합니다.</p></div>
-        </div>
-      )}
+  <section class="home-categories" aria-labelledby="categories-heading">
+    <div class="section-heading">
+      <h2 id="categories-heading">카테고리</h2>
+      <a class="section-link" href="/categories">모든 카테고리 <span aria-hidden="true">→</span></a>
     </div>
-
-    <aside class="home-index" aria-label="주제 인덱스">
-      <div class="home-index-section">
-        <p class="section-kicker">Topic index</p>
-        <h2>주제 지도</h2>
-        {categories.length ? (
-          <ul>
-            {categories.map((category) => (
-              <li><a href={categoryPath(category)}><span>{topicLabel(category)}</span><small>{posts.filter((post) => post.data.topic === category).length}</small></a></li>
-            ))}
-          </ul>
-        ) : (
-          <p class="home-index-empty">공개 글이 생기면<br />주제별로 정리됩니다.</p>
-        )}
-        <a class="index-link" href="/categories">모든 주제 보기 <span aria-hidden="true">→</span></a>
-      </div>
-      <div class="home-index-section home-index-section--note">
-        <p class="section-kicker">About the archive</p>
-        <p>빠른 답보다 다시 따라 할 수 있는 설명을 남깁니다.</p>
-        <a class="index-link" href="/about">기록 원칙 읽기 <span aria-hidden="true">→</span></a>
-      </div>
-    </aside>
+    {categories.length ? (
+      <ul class="category-chip-list">
+        {categories.map((category) => (
+          <li>
+            <a class="category-chip" href={categoryPath(category)}>
+              {category}<small>{posts.filter((post) => post.data.topic === category).length}</small>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="home-categories-empty">글이 공개되면 카테고리가 자동으로 만들어집니다.</p>
+    )}
+    <p class="home-about-note">
+      이 블로그에 대해 궁금하다면 <a href="/about">소개 페이지</a>에서 기록 방식을 읽어 볼 수 있습니다.
+    </p>
   </section>
 </BaseLayout>

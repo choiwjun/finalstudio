@@ -37,3 +37,34 @@ Static evidence passed:
 - Record any P0/P1/P2 findings, fix them, and capture the revised implementation before handoff.
 
 final result: blocked
+
+## Personal Editorial v3 QA — 2026-09-06
+
+implementation: v3 home (personal editorial) rebuilt from `src/pages/index.astro`
+viewport checks (Chrome DevTools Protocol, `scripts/qa-cdp.mjs`):
+
+- `/` at 1440px: scrollWidth 1440 = innerWidth 1440, no horizontal overflow
+- `/search` at 1440px: scrollWidth 1440 = innerWidth 1440, no horizontal overflow
+- `/categories` at 1440px: scrollWidth 1440 = innerWidth 1440, no horizontal overflow
+- `/` at 390px: scrollWidth 390 = innerWidth 390, no horizontal overflow, no clipped key controls
+- `/admin/preview` at 390px: scrollWidth 390 = innerWidth 390, no horizontal overflow
+
+capture files:
+
+- `%TEMP%/wj-blog-qa-1440px-home.png`
+- `%TEMP%/wj-blog-qa-1440px-search.png`
+- `%TEMP%/wj-blog-qa-1440px-categories.png`
+- `%TEMP%/wj-blog-qa-390px-home.png`
+
+static checks passed this session:
+
+- `npm run check:content` (5 markdown files)
+- `npm run build` (11 pages)
+- `npm run check:build` (23 output files)
+
+## Findings
+
+- [P2] With 0 public posts the featured card and post list render only as empty state; re-run 1440px/768px/390px checks after the first post is published.
+- [P2] Real Safari/iOS verification is not covered by CDP emulation.
+
+final result: passed

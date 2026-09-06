@@ -93,11 +93,14 @@ const breadcrumbs = {
       </p>
       <p class="lede">{data.description}</p>
     </header>
-    <section class="post-quick-answer" aria-labelledby="quick-answer-heading">
-      <p class="eyebrow">빠른 답변</p>
-      <h2 id="quick-answer-heading">이 글에서 바로 확인할 내용</h2>
-      <p>{data.description}</p>
-    </section>
+    {/* 검증 정보(빠른 답변·테스트 메타)는 직접 테스트한 사용법 글에만 표시한다. */}
+    {data.testedAt && (
+      <section class="post-quick-answer" aria-labelledby="quick-answer-heading">
+        <p class="eyebrow">빠른 답변</p>
+        <h2 id="quick-answer-heading">이 글에서 바로 확인할 내용</h2>
+        <p>{data.description}</p>
+      </section>
+    )}
     <PostFacts data={data} readMinutes={readMinutes} toolVersionEntries={toolVersionEntries} />
     <PostToc headings={headings} mobile />
     {data.image && (
@@ -148,11 +151,13 @@ const breadcrumbs = {
     </article>
     <aside class="post-aside" aria-label="글 보조 정보">
       <PostToc headings={headings} />
-      <div class="post-aside-block">
-        <p class="aside-label">이 글의 상태</p>
-        <p class="post-aside-title">{data.testedAt ? '직접 테스트한 글' : '검토 중인 글'}</p>
-        <p>{data.testedAt ? '작성 화면과 결과를 직접 확인했습니다.' : '사람 검토를 마친 뒤 공개됩니다.'}</p>
-      </div>
+      {data.testedAt && (
+        <div class="post-aside-block">
+          <p class="aside-label">이 글의 상태</p>
+          <p class="post-aside-title">직접 테스트한 글</p>
+          <p>작성 화면과 결과를 직접 확인했습니다.</p>
+        </div>
+      )}
       <div class="post-aside-block">
         <p class="aside-label">{data.series ? `${data.series} 시리즈` : '다음 읽을거리'}</p>
         {relatedPosts.length ? (
