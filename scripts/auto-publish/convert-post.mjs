@@ -79,9 +79,17 @@ if (contentRisks.length) {
 const suggestedSlug = body.match(/^슬러그\s*(?:제안|추천)\s*:\s*[`'\"]?([a-z0-9]+(?:-[a-z0-9]+)*)[`'\"]?\s*$/im)?.[1] ?? '';
 
 const pubDate = pubDateFromFrontmatter ?? new Date().toISOString().slice(0, 10);
-const finalSlug = slug || suggestedSlug || `post-${pubDate}`;
-const outPath = resolve(getArg('out') ?? join(process.cwd(), 'src', 'content', 'posts'), `${finalSlug}.md`);
-if (existsSync(outPath)) fail(`같은 이름의 글이 이미 있습니다: ${outPath} (--slug로 다른 이름 사용)`);
+let finalSlug = slug || suggestedSlug || `post-${pubDate}`;
+const outDir = getArg('out') ?? join(process.cwd(), 'src', 'content', 'posts');
+let outPath = resolve(outDir, `${finalSlug}.md`);
+// 같은 날 여러 번 생성해도 덮어쓰지 않는다 — 숫자 접미사로 자동 분리한다.
+let suffix = 2;
+while (existsSync(outPath)) {
+  if (slug) fail(`같은 이름의 글이 이미 있습니다: ${outPath} (--slug로 다른 이름 사용)`);
+  finalSlug = `${suggestedSlug || `post-${pubDate}`}-${suffix}`;
+  outPath = resolve(outDir, `${finalSlug}.md`);
+  suffix += 1;
+}
 
 const front = [
   '---',
