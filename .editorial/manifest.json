@@ -33,6 +33,8 @@
   "generationGate": {
     "mechanicalCheck": "scripts/check-writing.mjs",
     "independentJudgeMinScore": 90,
+    "defaultBestOf": 2,
+    "enhancePasses": 2,
     "notesRequiredFormats": ["experience", "place-log", "book-memo", "photo-log"]
   },
   "selfImprovement": {

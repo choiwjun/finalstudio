@@ -64,8 +64,12 @@ if (description.length < 50 || description.length > 110)
 
 const body = raw.slice(fmMatch[0].length).trimStart();
 const warnings = [];
-if (!/안\s*될\s*때/.test(body)) warnings.push('"안 될 때"(오류 해결) 섹션이 없습니다. 발행 전 반드시 추가하세요.');
-if (!/FAQ|자주.{0,4}질문/.test(body)) warnings.push('FAQ 섹션이 없습니다. AEO 규칙상 필수입니다 (3~5개 질문).');
+// "안 될 때"·FAQ는 how-to(사용법) 형식의 필수 구조다. 다른 형식에는 억지로 요구하지 않는다.
+const format = (getArg('format') ?? 'how-to').toLowerCase();
+if (format === 'how-to') {
+  if (!/안\s*될\s*때/.test(body)) warnings.push('"안 될 때"(오류 해결) 섹션이 없습니다. 발행 전 반드시 추가하세요.');
+  if (!/FAQ|자주.{0,4}질문/.test(body)) warnings.push('FAQ 섹션이 없습니다. AEO 규칙상 필수입니다 (3~5개 질문).');
+}
 if (/Key Takeaways/.test(body)) warnings.push('요약 박스 라벨이 영어(Key Takeaways)입니다. "핵심 요약"으로 교체하세요.');
 if (/\[(?:스크린샷|직접 확인 필요|테스트 필요|출처 URL 확인 필요)/.test(body)) {
   console.log('[convert-post] 확인: 검증 마커가 있습니다 — 사람 테스트 후 모두 채워야 합니다.');

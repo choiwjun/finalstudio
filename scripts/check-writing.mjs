@@ -101,8 +101,17 @@ const isVerification = (s) =>
   || /(세|셔|시)요[.!?]?$/.test(s.trim())
   || /십시오[.!?]?$/.test(s.trim());
 
+/** 주장의 수치가 원자료(notes)에 모두 있으면 출처 없음 경고에서 제외한다 — 원자료가 출처다. */
+const claimCoveredByNotes = (sentence, notes) => {
+  if (!notes) return false;
+  const numbers = sentence.match(/\d+(?:[.,]\d+)?/g) ?? [];
+  if (numbers.length === 0) return false;
+  const flat = notes.replace(/[,\s]/g, '');
+  return numbers.every((n) => flat.includes(n.replace(/,/g, '')));
+};
+
 /** 출처 없는 수치·사양 주장 추출 — 링크 없는 산문 문단의 수치 문장만. 헤딩·목록·캡션·검증 문장 제외. */
-export const extractUnsourcedClaims = (body) => {
+export const extractUnsourcedClaims = (body, notes = '') => {
   const claims = [];
   let inFence = false;
   for (const para of body.split(/\n\s*\n/)) {
@@ -113,11 +122,25 @@ export const extractUnsourcedClaims = (body) => {
     if (lines.length === 0) continue;
     const hasLink = /\[[^\]]*\]\(https?:\/\//.test(para);
     if (hasLink) continue;
-    const sentences = splitSentences(lines.join('\n').replace(MARKER_RE, ' '));
-    for (const s of sentences) {
+    // A verification marker is the explicit contract for an unverified numeric claim.
+    // Keep raw sentences long enough to associate the marker with that claim only.
+    const rawSentences = splitSentences(lines.join('\n'));
+    const sentences = rawSentences.map((s) => s.replace(MARKER_RE, ' '));
+    const hasMarker = (s) => {
+      MARKER_RE.lastIndex = 0;
+      return MARKER_RE.test(s);
+    };
+    const markerOnly = (s) => {
+      MARKER_RE.lastIndex = 0;
+      return s.replace(MARKER_RE, '').trim() === '';
+    };
+    for (const [index, s] of sentences.entries()) {
+      // A marker may be emitted as its own sentence after the claim it qualifies.
+      if (hasMarker(rawSentences[index]) || (rawSentences[index + 1] && markerOnly(rawSentences[index + 1]))) continue;
       if (!/[0-9]/.test(s)) continue;
-      if (!/(버전|빌드|지원|요금|가격|무료|유료|배터리|용량|스펙|GB|MB|TB|cm|mm|km|kg|%|\d+\s*(개|명|일|시간|분|초|배|개월|년))/i.test(s)) continue;
+      if (!/(버전|빌드|지원|요금|가격|무료|유료|배터리|용량|스펙|GB|MB|TB|cm|mm|km|kg|%|\d+\s*(?:개|명|일|시간|분|초|배|개월|년)(?![가-힣]))/i.test(s)) continue;
       if (isVerification(s)) continue;
+      if (claimCoveredByNotes(s, notes)) continue;
       claims.push(s.slice(0, 120));
     }
   }
@@ -126,7 +149,7 @@ export const extractUnsourcedClaims = (body) => {
 
 /**
  * @param {string} md - frontmatter 포함 전체 마크다운
- * @param {object} options - { format, expectedMarkers: string[] }
+ * @param {object} options - { format, expectedMarkers: string[], notes: string }
  */
 export function analyzePost(md, options = {}) {
   const format = options.format ?? 'how-to';
@@ -166,7 +189,7 @@ export function analyzePost(md, options = {}) {
     passiveHits: countPassive(sentences),
     markers: (body.match(MARKER_RE) ?? []).length,
     images: (body.match(/!\[[^\]]*\]\([^)]+\)/g) ?? []).length,
-    unsourcedClaims: extractUnsourcedClaims(body).length,
+    unsourcedClaims: extractUnsourcedClaims(body, options.notes ?? '').length,
   };
 
   if (chars < rules.minChars) {
@@ -215,7 +238,7 @@ export function analyzePost(md, options = {}) {
   }
 
   const claimSeverity = ['how-to', 'review'].includes(format) ? FAIL : WARN;
-  for (const claim of extractUnsourcedClaims(body).slice(0, 10)) {
+  for (const claim of extractUnsourcedClaims(body, options.notes ?? '').slice(0, 10)) {
     add(claimSeverity, 'unsourced-claim', `출처 없는 수치 주장: "${claim}…" — 출처 링크 또는 [출처 확인 필요] 마커 필요`);
   }
 
@@ -262,7 +285,11 @@ const main = () => {
   const expectedMarkers = markersFrom && existsSync(resolve(process.cwd(), markersFrom))
     ? extractMarkers(readFileSync(resolve(process.cwd(), markersFrom), 'utf8'))
     : undefined;
-  const result = analyzePost(md, { format: getOpt('format'), expectedMarkers });
+  const notesFile = getOpt('notes');
+  const notes = notesFile && existsSync(resolve(process.cwd(), notesFile))
+    ? readFileSync(resolve(process.cwd(), notesFile), 'utf8')
+    : undefined;
+  const result = analyzePost(md, { format: getOpt('format'), expectedMarkers, notes });
   const out = getOpt('json');
   if (out) writeFileSync(resolve(process.cwd(), out), JSON.stringify(result, null, 2), 'utf8');
 

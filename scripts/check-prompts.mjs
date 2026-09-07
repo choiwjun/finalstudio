@@ -75,6 +75,13 @@ for (const [index, line] of evalLines.entries()) {
   if (item.format && blueprintFormats.size && !blueprintFormats.has(item.format)) {
     failures.push(`writing-cases.jsonl:${index + 1}: 블루프린트에 없는 형식 "${item.format}"`);
   }
+  const notesFormats = manifest.generationGate?.notesRequiredFormats ?? [];
+  if (item.format && notesFormats.includes(item.format)) {
+    const fixture = `.editorial/evals/fixtures/${item.id}.md`;
+    if (!existsSync(resolve(ROOT, fixture))) {
+      failures.push(`writing-cases.jsonl:${index + 1}: 원자료 필수 형식 "${item.format}" 케이스의 fixture가 필요합니다 (${fixture})`);
+    }
+  }
 }
 
 if (failures.length) {

@@ -228,7 +228,7 @@ const callCodex = async (system, user) => {
 };
 
 const convert = (inputFile, topicTag, angle, fileSlug) => {
-  const cmdArgs = [join(ROOT, 'scripts', 'auto-publish', 'convert-post.mjs'), inputFile, '--topic', topicTag, '--angle', angle];
+  const cmdArgs = [join(ROOT, 'scripts', 'auto-publish', 'convert-post.mjs'), inputFile, '--topic', topicTag, '--angle', angle, '--format', format];
   if (fileSlug) cmdArgs.push('--slug', fileSlug);
   return execFileSync('node', cmdArgs, { encoding: 'utf8', cwd: ROOT });
 };
@@ -300,7 +300,8 @@ console.log('[auto-write] 엔진: codex — ChatGPT OAuth 세션으로 실행');
 
 /* ── 게이트 상수와 작성자 입력 ───────────────────────────── */
 const JUDGE_THRESHOLD = 90;
-const BEST_OF = Math.max(1, Number(bestOfArg ?? process.env.AUTO_BEST_OF ?? 1));
+const BEST_OF = Math.max(1, Number(bestOfArg ?? process.env.AUTO_BEST_OF ?? editorialManifest.generationGate?.defaultBestOf ?? 1));
+const ENHANCE_PASSES = Math.max(0, Number(process.env.AUTO_ENHANCE_PASSES ?? editorialManifest.generationGate?.enhancePasses ?? 2));
 const writerInput = [
   `주제/키워드: ${subject}`,
   `대상 독자 수준: ${level}`,
@@ -368,10 +369,13 @@ if (inputPath) {
 }
 
 console.log('[auto-write] 2단계 윤문 중... (AI 티 제거, 구조·마커 보존)');
-const humanized = await callModel(
+const rawHumanized = await callModel(
   humanizeSystem,
   `${draft}\n\n(윤문 대상은 위 전체입니다. 프론트매터(--- 블록)와 검증 마커, 마크다운 구조는 그대로 유지하세요. SELECTED_FORMAT: ${format})`,
 );
+// 윤문 모델이 리포트(--- 윤문 리포트 --- 또는 ## 윤문 리포트 이하)를 본문 뒤에 붙이는 경우를 제거한다.
+const humanized = rawHumanized.replace(/\n*(?:-{3,}\s*윤문 리포트\s*-{3,}|#{1,4}\s*윤문 리포트)[\s\S]*$/, '').trim();
+if (humanized !== rawHumanized.trim()) console.log('[auto-write] 윤문 리포트 잔여물을 본문에서 분리했습니다.');
 writeFileSync(join(runDir, '02-humanized.md'), humanized, 'utf8');
 const expectedMarkers = extractMarkers(humanized);
 
@@ -383,18 +387,20 @@ const parseScore = (text) => {
 let candidate = humanized;
 let finalText = humanized;
 let judgeScore = NaN;
-let analysis = analyzePost(candidate, { format, expectedMarkers });
+let judgeOutputText = '';
+let analysis = analyzePost(candidate, { format, expectedMarkers, notes: notesContent });
 const MAX_PASSES = Number(process.env.AUTO_MAX_PASSES ?? 2);
 let passes = 0;
 
 while (passes < MAX_PASSES) {
   passes += 1;
   console.log(`[auto-write] 3단계 판정 중... 기계 검사 + 독립 심사 (${passes}/${MAX_PASSES})`);
-  analysis = analyzePost(candidate, { format, expectedMarkers });
+  analysis = analyzePost(candidate, { format, expectedMarkers, notes: notesContent });
   writeFileSync(join(runDir, `05-writing-check-${passes}.json`), JSON.stringify(analysis, null, 2), 'utf8');
   for (const f of analysis.failures) console.log(`  [기계 실패] [${f.check}] ${f.message}`);
   const judgeOutput = await callCodex(judgeSystem, `SELECTED_FORMAT: ${format}\n\n${candidate}`);
   judgeScore = parseScore(judgeOutput);
+  judgeOutputText = judgeOutput;
   writeFileSync(join(runDir, `03-judge-${passes}.md`), judgeOutput, 'utf8');
   console.log(`  [독립 심사] ${Number.isNaN(judgeScore) ? '점수 파싱 실패' : `${judgeScore}점`} / 기계 실패 ${analysis.failures.length}건`);
   if (analysis.pass && judgeScore >= JUDGE_THRESHOLD) {
@@ -412,17 +418,72 @@ while (passes < MAX_PASSES) {
       judgeOutput,
     ].join('\n');
     const corrected = await callModel(reviewSystem, fixInput);
-    candidate = extractArticle(corrected, candidate);
-    finalText = candidate;
+    const correctedText = extractArticle(corrected, candidate);
+    const correctedAnalysis = analyzePost(correctedText, { format, expectedMarkers, notes: notesContent });
+    // 수정이 악화면 채택하지 않는다 — 유지되는 항목을 고치다 나머지를 망치는 회귀를 막는다.
+    const better = correctedAnalysis.failures.length < analysis.failures.length
+      || (correctedAnalysis.failures.length === analysis.failures.length && correctedAnalysis.pass && !analysis.pass);
+    if (better) {
+      candidate = correctedText;
+      finalText = candidate;
+      console.log(`  [수정 채택] 기계 실패 ${analysis.failures.length}건 → ${correctedAnalysis.failures.length}건`);
+    } else {
+      finalText = candidate;
+      console.log(`  [수정 기각] 기계 실패 ${correctedAnalysis.failures.length}건 — 악화 또는 동률이라 이전 본문을 유지합니다.`);
+      break;
+    }
   }
 }
 
-const finalCheck = analyzePost(finalText, { format, expectedMarkers });
+const finalCheck = analyzePost(finalText, { format, expectedMarkers, notes: notesContent });
 writeFileSync(join(runDir, '05-writing-check-final.json'), JSON.stringify(finalCheck, null, 2), 'utf8');
 if (!(finalCheck.pass && judgeScore >= JUDGE_THRESHOLD)) {
   fail(`게이트 미통과 — 기계 실패 ${finalCheck.failures.length}건, 독립 심사 ${Number.isNaN(judgeScore) ? '점수 없음' : `${judgeScore}점`}. out/auto-publish/${runId}/ 리포트를 확인하세요.`);
 }
 console.log(`[auto-write] 게이트 통과 — 기계 검사 실패 0건 / 독립 심사 ${judgeScore}점 — 중간 산출물: out/auto-publish/${runDir.split('/').pop()}/`);
+
+/* ── 강화 루프: 게이트 통과본을 심사 최고점까지 밀어올린다 ── */
+let bestText = finalText;
+let bestScore = judgeScore;
+let bestAnalysis = finalCheck;
+for (let enhance = 1; enhance <= ENHANCE_PASSES; enhance++) {
+  console.log(`[auto-write] 강화 루프 ${enhance}/${ENHANCE_PASSES} — 심사 지적을 반영해 점수를 올립니다.`);
+  const enhanceInput = [
+    bestText,
+    '\n(아래 심사 지적을 반영해 더 나은 본문만 출력하세요. 프론트매터·검증 마커·마크다운 구조는 유지합니다. 이미 충분한 부분은 건드리지 마세요.)',
+    '\n--- 독립 심사자 지적 ---',
+    judgeOutputText,
+  ].join('\n');
+  const enhanced = await callModel(writerSystem, enhanceInput);
+  const enhancedText = extractArticle(enhanced, bestText);
+  const enhancedAnalysis = analyzePost(enhancedText, { format, expectedMarkers, notes: notesContent });
+  if (!enhancedAnalysis.pass) {
+    console.log('  [강화] 기계 실패 발생 — 채택하지 않고 강화를 종료합니다.');
+    writeFileSync(join(runDir, `06-enhance-${enhance}-rejected.md`), enhancedText, 'utf8');
+    break;
+  }
+  const enhancedJudge = await callCodex(judgeSystem, `SELECTED_FORMAT: ${format}\n\n${enhancedText}`);
+  const enhancedScore = parseScore(enhancedJudge);
+  writeFileSync(join(runDir, `06-enhance-${enhance}-judge.md`), enhancedJudge, 'utf8');
+  console.log(`  [강화] 심사 ${Number.isNaN(enhancedScore) ? '점수 파싱 실패' : `${enhancedScore}점`} (이전 ${bestScore}점)`);
+  if (Number.isNaN(enhancedScore) || enhancedScore <= bestScore) {
+    console.log('  [강화] 점수 향상 없음 — 이전 본문을 유지합니다.');
+    break;
+  }
+  bestText = enhancedText;
+  bestScore = enhancedScore;
+  bestAnalysis = enhancedAnalysis;
+  judgeOutputText = enhancedJudge;
+}
+finalText = bestText;
+judgeScore = bestScore;
+const lastCheck = analyzePost(finalText, { format, expectedMarkers, notes: notesContent });
+writeFileSync(join(runDir, '06-enhance-summary.json'), JSON.stringify({
+  enhancePasses: ENHANCE_PASSES,
+  finalJudgeScore: judgeScore,
+  finalMechanicalFailures: lastCheck.failures.length,
+  finalMechanicalWarnings: lastCheck.warnings.length,
+}, null, 2), 'utf8');
 
 /* ── 4단계: 변환·저장 ───────────────────────────────────── */
 const saved = join(runDir, '04-final.md');
