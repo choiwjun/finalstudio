@@ -1,0 +1,20 @@
+{
+  "lastBuildDate": "Wed, 09 Sep 2026 00:00:00 +0900",
+  "total": 2,
+  "start": 1,
+  "display": 2,
+  "items": [
+    {
+      "title": "<b>엑셀 자동화</b>로 <b>업무</b> 줄이기",
+      "link": "https://blog.example.test/excel-automation",
+      "description": "반복 업무를 <b>엑셀</b> 기능으로 줄이는 방법입니다.",
+      "postdate": "20260909"
+    },
+    {
+      "title": "엑셀 매크로 시작하기",
+      "link": "https://blog.example.test/excel-macro",
+      "description": "작은 자동화부터 확인하는 순서입니다.",
+      "postdate": "20260908"
+    }
+  ]
+}

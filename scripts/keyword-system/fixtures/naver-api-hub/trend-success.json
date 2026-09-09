@@ -1,0 +1,22 @@
+{
+  "startDate": "2026-09-01",
+  "endDate": "2026-09-09",
+  "timeUnit": "date",
+  "results": [
+    {
+      "title": "업무 자동화",
+      "keywords": ["엑셀 자동화", "엑셀 매크로"],
+      "data": [
+        { "period": "2026-09-08", "ratio": 61.23 },
+        { "period": "2026-09-09", "ratio": 100 }
+      ]
+    },
+    {
+      "title": "개발 생산성",
+      "keywords": ["Node.js"],
+      "data": [
+        { "period": "2026-09-09", "ratio": 42.5 }
+      ]
+    }
+  ]
+}

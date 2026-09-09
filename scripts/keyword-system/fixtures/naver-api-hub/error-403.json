@@ -1,0 +1,7 @@
+{
+  "error": {
+    "errorCode": "GW_FORBIDDEN",
+    "message": "The request is not permitted",
+    "details": "The caller is not allowed to use this API."
+  }
+}
