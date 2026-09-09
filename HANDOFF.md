@@ -1036,7 +1036,7 @@ Task 1 독립 리뷰는 **미승인 / REQUEST_CHANGES**다. 다음 수정 없이
 
 리뷰 근거:
 
-- `.omo/evidence/keyword-system-task-1-manual-qa.md`
+- `docs/superpowers/reviews/keyword-system-task-1-manual-qa.md`
 - 리뷰 dispatch: `ctx_3ec173d9158d`
 - 리뷰 task: `task_d7302933055b`
 
