@@ -1,0 +1,5 @@
+{
+  "errMsg": "Invalid keyword group",
+  "errId": "TREND_VALIDATION_ERROR",
+  "body": "keywordGroups must contain between 1 and 5 groups"
+}

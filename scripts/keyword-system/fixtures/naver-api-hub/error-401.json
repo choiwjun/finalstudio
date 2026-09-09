@@ -1,0 +1,7 @@
+{
+  "error": {
+    "errorCode": "GW_AUTHENTICATION_FAILED",
+    "message": "Authentication failed",
+    "details": "The request could not be authenticated."
+  }
+}

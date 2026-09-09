@@ -1012,3 +1012,45 @@ npm run check:build
 **첫 행동:** 사용자와 키워드 입력 제공처·seed 목록·저장 형식을 확정하고, 실제 입력 한 묶음을 확보한다. 그 뒤 1 → 2 순서로 구현한다. 호스팅 선택·계정 설정은 별도로 준비할 수 있다. 코드 변경 전 구체적인 구현 계획을 승인받는다.
 
 후순위는 프롬프트 버전 비교 UI, 추가 형식 검증, 제휴·광고 계정 설정이다. 첫 발행 필수 작업과 섞지 않는다. 미추적 제휴·카테고리 조사 초안은 이번 커밋 대상이 아니며, 거기에 있는 제안을 확정 전략으로 간주하지 않는다.
+
+
+## 2026-09-09 NAVER API HUB 키워드 시스템 진행 핸드오프
+
+### 현재 상태
+
+- 작업 worktree: `/home/hunter8891/orca/workspaces/blog/keyword-system-plan-retry`
+- Orca Run: `run_a5514b5a64cf`
+- Task 1 구현은 완료되어 커밋 `46e798e`에 반영됐다.
+- 구현 범위: `scripts/keyword-system/lib/contracts.mjs`, Node `node:test` harness, NAVER API HUB fixture, `data/keywords/seeds.json`, `data/keywords/README.md`.
+- 기존 `src/`와 `scripts/auto-publish/`는 수정하지 않았다.
+- Task 1 구현 테스트: 12/12 통과, `node --check` 통과. Node 24.16.0에서도 계약 테스트 통과가 확인됐다.
+
+### 리뷰 결과와 차단 사항
+
+Task 1 독립 리뷰는 **미승인 / REQUEST_CHANGES**다. 다음 수정 없이는 후속 provider·store 작업을 완료 상태로 판정하지 않는다.
+
+1. `scripts/keyword-system/lib/contracts.mjs:188-220`의 raw evidence redaction이 임의의 benign field 안에 있는 credential-like 값과 assignment 형태의 secret 값을 보존할 수 있다. 재귀 redaction 또는 source-specific allowlist로 고치고, benign field와 nested value를 포함한 sentinel 테스트를 추가한다.
+2. 같은 계약이 `500 + ok: true`, `200 + ok: false`, 실패 응답의 response 보존 같은 모순된 HTTP 상태를 허용한다. `status`·`ok`·`response` 불변식을 강제한다.
+3. `malformed_response` risk flag와 malformed/empty evidence 동작 테스트가 부족하다.
+4. 리뷰 환경에서는 `npm run build`/`npm run check:build`를 실행할 수 없었다. worktree에 의존성과 `dist/`가 없어 `astro: not found` 및 `dist does not exist`가 발생했다. 최종 통합 전에 정상 프로젝트 환경에서 다시 실행한다.
+
+리뷰 근거:
+
+- `.omo/evidence/keyword-system-task-1-manual-qa.md`
+- 리뷰 dispatch: `ctx_3ec173d9158d`
+- 리뷰 task: `task_d7302933055b`
+
+### 다음 재개 순서
+
+1. Task 1 수정 task를 별도 worker로 dispatch한다. 리뷰의 세 가지 계약·테스트 blocker를 먼저 해결한다.
+2. 수정 후 동일 worktree에서 Task 1 재리뷰를 실행하고 APPROVED를 받는다.
+3. 승인 뒤 Task 2 provider, Task 3 raw evidence store, Task 4 deterministic discovery를 병렬로 시작한다.
+4. Task 5 analysis는 앞선 계약 및 discovery 결과가 안정된 뒤 진행한다.
+5. Task 6 CLI/records/handoff, Task 7 문서·npm·build boundary를 순서대로 통합한다.
+6. 마지막에 fixture-only 테스트, `node --check`, `npm run build`, `npm run check:build`, secret redaction 및 `data/keywords`의 `dist` 제외를 검증한다.
+
+### 범위 보호
+
+- NAVER API HUB 공식 API만 사용한다. 비공식 자동완성 endpoint와 Google은 초기 범위에서 제외한다.
+- API Secret은 코드·문서·로그·fixture에 저장하거나 출력하지 않는다. 제공된 Secret은 노출된 것으로 간주하고 실제 사용 전 재발급한다.
+- 자동 글 생성·자동 발행·calendar 수정은 이번 시스템의 범위가 아니다.

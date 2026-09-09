@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "category": "ai-it",
+      "seeds": ["엑셀 자동화", "업무 자동화"],
+      "title": "엑셀 자동화로 반복 업무 줄이는 방법",
+      "description": "공식 문서와 실제 확인 항목을 기준으로 작은 자동화부터 설명합니다.",
+      "intent": "방법"
+    },
+    {
+      "category": "economy",
+      "seeds": ["생활 물가"],
+      "title": "생활 물가 변화를 읽는 방법",
+      "description": "공공 통계의 기준과 일상에서 확인할 지점을 정리합니다."
+    },
+    {
+      "category": "health",
+      "seeds": ["수면 습관"],
+      "title": "수면 습관과 건강 정보 확인하기",
+      "description": "공식 보건 자료를 바탕으로 생활에서 확인할 수 있는 범위를 설명합니다."
+    }
+  ]
+}
