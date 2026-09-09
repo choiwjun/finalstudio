@@ -123,6 +123,23 @@ function tokenCount(text) {
   return String(text).normalize('NFC').trim().split(/\s+/u).filter((token) => token !== '').length;
 }
 
+// Related keywords are deduped by first occurrence using a NFC lower-case
+// keyword key, matching discovery semantics, before any promotion gate runs.
+const keywordKey = (text) => String(text).normalize('NFC').toLowerCase().trim();
+
+function dedupeFirstOccurrence(values) {
+  const seen = new Set();
+  const result = [];
+  for (const value of values) {
+    const key = keywordKey(value);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(value);
+    }
+  }
+  return result;
+}
+
 export function isSensitiveTopic(text) {
   const haystack = String(text ?? '').normalize('NFC').toLowerCase();
   const matched = [];
@@ -293,6 +310,7 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
   }
   if (!SEARCH_INTENTS.includes(search_intent)) fail('candidate.search_intent must be an allowed search intent');
   if (typeof content_angle !== 'string' || content_angle.trim() === '') fail('candidate.content_angle must be a non-empty string');
+  const relatedKeywords = dedupeFirstOccurrence(related_keywords);
 
   const priorStatus = candidate.status;
   if (priorStatus !== undefined && !STATUS_VALUES.includes(priorStatus)) fail(`candidate.status must be one of ${STATUS_VALUES.join(', ')}`);
@@ -335,10 +353,10 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
 
   // --- risk flags ---------------------------------------------------------
   const risks = new Set();
-  const textSource = [head_keyword, ...related_keywords, content_angle].join('\n');
+  const textSource = [head_keyword, ...relatedKeywords, content_angle].join('\n');
   if (tokenCount(head_keyword) < 2) risks.add('broad_keyword');
   if (isSensitiveTopic(textSource).length > 0) risks.add('sensitive_topic');
-  if (related_keywords.length < 2) risks.add('insufficient_related_keywords');
+  if (relatedKeywords.length < 2) risks.add('insufficient_related_keywords');
   for (const item of classified) {
     if (item.kind === 'empty') risks.add('empty_evidence');
     if (item.kind === 'malformed') risks.add('malformed_response');
@@ -348,7 +366,7 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
 
   const riskFlags = [...risks].sort();
   const evidenceAvailable = usable.length > 0;
-  const canPromote = evidenceAvailable && related_keywords.length >= 2 && related_keywords.length <= 5 && riskFlags.length === 0;
+  const canPromote = evidenceAvailable && relatedKeywords.length >= 2 && relatedKeywords.length <= 5 && riskFlags.length === 0;
 
   // --- status resolution --------------------------------------------------
   const status = canPromote ? 'ready-to-write' : 'candidate';
@@ -369,7 +387,7 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
     record = normalizeWjKeywordRecord({
       category,
       head_keyword,
-      related_keywords,
+      related_keywords: relatedKeywords,
       search_intent,
       content_angle,
       source: sources,

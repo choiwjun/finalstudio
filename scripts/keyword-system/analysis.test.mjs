@@ -432,6 +432,39 @@ test('Given a single-token head keyword, when analyzed, then broad_keyword block
   assert.equal(record.status, 'candidate');
 });
 
+test('Given duplicate-only related keywords, when analyzed, then the record cannot promote to ready-to-write', () => {
+  const record = analyzeCandidate(
+    makeCandidate({ related_keywords: ['엑셀 매크로', '엑셀 매크로'] }),
+    [makeBlogEnvelope(), makeTrendEnvelope()],
+    { now: fixedClock },
+  );
+  assert.equal(record.evidence_available, true);
+  assert.deepEqual(record.related_keywords, ['엑셀 매크로'], 'duplicates collapse to the first occurrence');
+  assert.equal(record.risk_flags.includes('insufficient_related_keywords'), true);
+  assert.equal(record.status, 'candidate');
+});
+
+test('Given related keywords duplicated across casing and Unicode, when analyzed, then first-occurrence dedupe keeps the unique set', () => {
+  const record = analyzeCandidate(
+    makeCandidate({ related_keywords: ['AI', 'ai', '업무 자동화', 'AI'] }),
+    [makeBlogEnvelope(), makeTrendEnvelope()],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.related_keywords, ['AI', '업무 자동화'], 'first occurrence wins and order is preserved');
+  assert.equal(record.risk_flags.includes('insufficient_related_keywords'), false);
+  assert.equal(record.status, 'ready-to-write');
+});
+
+test('Given duplicates plus enough unique related keywords, when analyzed, then dedupe preserves promotion', () => {
+  const record = analyzeCandidate(
+    makeCandidate({ related_keywords: ['업무 자동화', '엑셀 매크로', '엑셀 매크로'] }),
+    [makeBlogEnvelope(), makeTrendEnvelope()],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.related_keywords, ['업무 자동화', '엑셀 매크로']);
+  assert.equal(record.status, 'ready-to-write');
+});
+
 test('Given fewer than two related keywords, when analyzed, then insufficient_related_keywords blocks promotion', () => {
   for (const related of [[], ['엑셀 매크로']]) {
     const record = analyzeCandidate(makeCandidate({ related_keywords: related }), [makeBlogEnvelope(), makeTrendEnvelope()], { now: fixedClock });
