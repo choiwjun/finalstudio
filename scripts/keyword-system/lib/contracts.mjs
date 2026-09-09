@@ -10,7 +10,8 @@ export const RISK_FLAGS = Object.freeze([
 ]);
 export const API_FAILURE_KINDS = Object.freeze([
   'auth_missing', 'forbidden', 'rate_limited', 'server_error', 'gateway_error',
-  'search_error', 'trend_error', 'validation_error', 'malformed_json', 'network_error', 'api_error',
+  'search_error', 'trend_error', 'validation_error', 'malformed_json', 'malformed_response',
+  'network_error', 'api_error',
 ]);
 
 const SAFE_SOURCES = new Set(['naver-api-hub-blog', 'naver-api-hub-trend']);
@@ -48,6 +49,9 @@ const date = (value, path) => {
 const isoDateTime = (value, path) => {
   string(value, path);
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u.test(value) || Number.isNaN(Date.parse(value))) fail(path, 'must be an ISO UTC date-time');
+  const canonical = new Date(value).toISOString();
+  const expected = value.includes('.') ? canonical : canonical.replace('.000Z', 'Z');
+  if (expected !== value) fail(path, 'must be a real UTC date-time');
   return value;
 };
 const enumValue = (value, values, path) => values.includes(value) ? value : fail(path, 'must be an allowed value');
@@ -118,8 +122,14 @@ export function normalizeBlogSearchResponse(input) {
   }
   const result = { total: value.total, items };
   for (const field of ['lastBuildDate', 'start', 'display']) {
-    if (value[field] !== undefined) result[field] = field === 'lastBuildDate' ? string(value[field], `response.${field}`) : integer(value[field], `response.${field}`, 0, Number.MAX_SAFE_INTEGER);
+    if (value[field] !== undefined) {
+      result[field] = field === 'lastBuildDate'
+        ? string(value[field], `response.${field}`)
+        : integer(value[field], `response.${field}`, field === 'start' ? 1 : 1, field === 'start' ? 1000 : 100);
+    }
   }
+  if (items.length > value.total) fail('response.items', 'must not contain more items than total');
+  if (result.display !== undefined && items.length > result.display) fail('response.items', 'must not exceed response.display');
   return result;
 }
 
@@ -128,10 +138,11 @@ export const isValidBlogSearchResponse = (value) => { try { normalizeBlogSearchR
 
 function normalizeTrendData(data, resultIndex) {
   if (!Array.isArray(data)) fail(`response.results[${resultIndex}].data`, 'must be an array');
+  if (data.length === 0) fail(`response.results[${resultIndex}].data`, 'must not be empty');
   return data.map((item, index) => {
     const value = object(item, `response.results[${resultIndex}].data[${index}]`);
     const period = date(value.period, `response.results[${resultIndex}].data[${index}].period`);
-    if (typeof value.ratio !== 'number' || !Number.isFinite(value.ratio) || value.ratio < 0) fail(`response.results[${resultIndex}].data[${index}].ratio`, 'must be a non-negative number');
+    if (typeof value.ratio !== 'number' || !Number.isFinite(value.ratio) || value.ratio < 0 || value.ratio > 100) fail(`response.results[${resultIndex}].data[${index}].ratio`, 'must be a number in range 0..100');
     return { period, ratio: value.ratio };
   });
 }
@@ -144,6 +155,7 @@ export function normalizeTrendResponse(input) {
   const results = Array.isArray(value.results) ? value.results.map((result, index) => {
     const item = object(result, `response.results[${index}]`);
     const keywords = Array.isArray(item.keywords) ? item.keywords.map((keyword, keywordIndex) => normalizedText(keyword, `response.results[${index}].keywords[${keywordIndex}]`)) : fail(`response.results[${index}].keywords`, 'must be an array');
+    if (keywords.length === 0) fail(`response.results[${index}].keywords`, 'must not be empty');
     return { title: normalizedText(item.title, `response.results[${index}].title`), keywords, data: normalizeTrendData(item.data, index) };
   }) : fail('response.results', 'must be an array');
   return { startDate, endDate, timeUnit: enumValue(value.timeUnit, TREND_TIME_UNITS, 'response.timeUnit'), results };
@@ -152,7 +164,11 @@ export function normalizeTrendResponse(input) {
 export const validateTrendResponse = normalizeTrendResponse;
 export const isValidTrendResponse = (value) => { try { normalizeTrendResponse(value); return true; } catch { return false; } };
 
-const redact = (value) => String(value).replace(/[A-Za-z0-9_-]*SECRET[A-Za-z0-9_-]*/giu, '[redacted]').replace(/(?:authorization|x-ncp-[^\s:=]+|api[-_ ]?key)[\s:=]+[^\s,;]+/giu, '[redacted]');
+const redactText = (value) => String(value)
+  .replace(/((?:authorization|proxy-authorization|x-ncp-[^\s:=]+|api[-_ ]?key|client[-_ ]?(?:id|secret)|access[-_]?token|refresh[-_]?token|password|credential|secret|token)\s*[:=]\s*)(?:(?:bearer|basic)\s+[^\s,;&]+|"[^"]*"|'[^']*'|[^\s,;&]+)/giu, '$1[redacted]')
+  .replace(/\b(?:bearer|basic)\s+[^\s,;&]+/giu, '[redacted]')
+  .replace(/[A-Za-z0-9_-]*SECRET[A-Za-z0-9_-]*/giu, '[redacted]');
+const redact = (value) => redactText(value);
 
 export function normalizeApiFailure(input) {
   const value = object(input, 'failure');
@@ -186,12 +202,18 @@ export function normalizeApiFailure(input) {
 export const validateApiFailure = normalizeApiFailure;
 
 function safeValue(value, path = 'value', seen = new Set()) {
-  if (value === null || typeof value !== 'object') return value;
+  if (value === null) return value;
+  if (typeof value === 'string') return redactText(value);
+  if (typeof value !== 'object') {
+    if (typeof value === 'number' || typeof value === 'boolean') return value;
+    fail(path, 'must contain only JSON values');
+  }
   if (seen.has(value)) fail(path, 'must not contain circular values');
   seen.add(value);
   if (Array.isArray(value)) return value.map((item, index) => safeValue(item, `${path}[${index}]`, seen));
   const result = {};
   for (const [key, item] of Object.entries(value)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') fail(`${path}.${key}`, 'prototype-control keys are not allowed');
     if (/headers|authorization|secret|credential|client[_-]?id|api[-_]?key|token/iu.test(key)) fail(`${path}.${key}`, 'credential-bearing fields are not allowed');
     result[key] = safeValue(item, `${path}.${key}`, seen);
   }
@@ -199,28 +221,64 @@ function safeValue(value, path = 'value', seen = new Set()) {
   return result;
 }
 
+const EVIDENCE_CONTRACTS = Object.freeze({
+  'naver-api-hub-blog': Object.freeze({
+    endpoint: '/search/v1/blog',
+    method: 'GET',
+    requestFields: ['query', 'display', 'start', 'sort', 'format'],
+    request: normalizeBlogSearchRequest,
+    response: normalizeBlogSearchResponse,
+    isEmpty: (value) => value.items.length === 0,
+  }),
+  'naver-api-hub-trend': Object.freeze({
+    endpoint: '/search-trend/v1/search',
+    method: 'POST',
+    requestFields: ['startDate', 'endDate', 'timeUnit', 'keywordGroups', 'device', 'gender', 'ages'],
+    request: normalizeTrendRequest,
+    response: normalizeTrendResponse,
+    isEmpty: (value) => value.results.length === 0,
+  }),
+});
+
 export function normalizeRawEvidenceEnvelope(input) {
   const value = object(input, 'evidence');
   if (value.schema_version !== 1) fail('evidence.schema_version', 'must be 1');
   const source = enumValue(value.source, [...SAFE_SOURCES], 'evidence.source');
+  const contract = EVIDENCE_CONTRACTS[source];
   const method = enumValue(value.method, [...SAFE_METHODS], 'evidence.method');
+  if (value.endpoint !== contract.endpoint) fail('evidence.endpoint', `must be ${contract.endpoint}`);
+  if (method !== contract.method) fail('evidence.method', `must be ${contract.method} for ${source}`);
   const http = object(value.http, 'evidence.http');
   integer(http.status, 'evidence.http.status', 0, 599);
   if (typeof http.ok !== 'boolean') fail('evidence.http.ok', 'must be boolean');
+  const requestInput = safeValue(object(value.request, 'evidence.request'), 'evidence.request');
+  contract.request(requestInput);
+  const request = Object.fromEntries(contract.requestFields.filter((field) => requestInput[field] !== undefined).map((field) => [field, requestInput[field]]));
   const result = {
     schema_version: 1,
     provider: enumValue(value.provider, ['naver-api-hub'], 'evidence.provider'),
     source,
-    endpoint: normalizedText(value.endpoint, 'evidence.endpoint'),
+    endpoint: contract.endpoint,
     method,
-    request: safeValue(object(value.request, 'evidence.request'), 'evidence.request'),
+    request,
     collected_at: isoDateTime(value.collected_at, 'evidence.collected_at'),
     http: { status: http.status, ok: http.ok },
   };
-  if (value.response !== undefined) result.response = safeValue(value.response, 'evidence.response');
-  if (value.error !== undefined) result.error = normalizeApiFailure({ ...value.error, status: value.error.status ?? http.status });
-  if (result.http.ok && result.response === undefined) fail('evidence.response', 'is required for successful evidence');
-  if (!result.http.ok && result.error === undefined) fail('evidence.error', 'is required for failed evidence');
+  if (result.http.ok) {
+    if (http.status !== 200) fail('evidence.http.status', 'successful evidence must use HTTP 200');
+    if (value.error !== undefined) fail('evidence.error', 'must be absent for successful evidence');
+    if (value.response === undefined) fail('evidence.response', 'is required for successful evidence');
+    const response = contract.response(safeValue(value.response, 'evidence.response'));
+    if (contract.isEmpty(response)) fail('evidence.response', 'empty response is not usable evidence');
+    result.response = response;
+  } else {
+    if (http.status !== 0 && http.status < 400) fail('evidence.http.status', 'failed evidence must use HTTP 0 or a 4xx/5xx status');
+    if (value.response !== undefined) fail('evidence.response', 'must be absent for failed evidence');
+    if (value.error === undefined) fail('evidence.error', 'is required for failed evidence');
+    const error = normalizeApiFailure({ ...safeValue(value.error, 'evidence.error'), status: http.status });
+    if (http.status === 0 && error.kind !== 'network_error') fail('evidence.error.kind', 'HTTP 0 failures must be network_error');
+    result.error = error;
+  }
   return result;
 }
 
@@ -241,7 +299,7 @@ export function normalizeWjKeywordRecord(input) {
     evidence_available: value.evidence_available,
     status: enumValue(value.status, STATUS_VALUES, 'record.status'),
   };
-  if (!/^[-a-z0-9]+$/u.test(result.category)) fail('record.category', 'must be a lowercase kebab-case category');
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(result.category)) fail('record.category', 'must be a lowercase kebab-case category');
   if (result.source.length === 0) fail('record.source', 'must not be empty');
   if (typeof result.evidence_available !== 'boolean') fail('record.evidence_available', 'must be boolean');
   if (result.status === 'ready-to-write' && (!result.evidence_available || result.related_keywords.length < 2 || result.related_keywords.length > 5)) fail('record', 'ready-to-write requires evidence and 2 to 5 related keywords');

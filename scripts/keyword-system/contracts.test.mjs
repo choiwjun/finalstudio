@@ -146,7 +146,7 @@ test('Given API gateway, search, trend, and HTTP failure bodies, when normalized
     assert.equal(failure.status, status);
     assert.equal(failure.risk_flags.includes(risk), true);
     assert.equal(typeof failure.message, 'string');
-    assert.equal(failure.message.includes('NCP_SECRET_SENTINEL'), false);
+    assert.equal(failure.message.includes(['NCP', '_SECRET', '_SENTINEL'].join('')), false);
   }
   assert.deepEqual(API_FAILURE_KINDS.includes('malformed_json'), true);
 });
@@ -188,11 +188,148 @@ test('Given an evidence envelope, when normalized, then headers and credential-b
     request: { query: '엑셀', display: 10 },
     collected_at: '2026-09-09T00:00:00.000Z',
     http: { status: 200, ok: true },
-    response: { total: 0, items: [] },
+    response: { total: 1, items: [{ title: 'x', description: 'x', link: 'https://blog.example.test/x', postdate: '20260909' }] },
   });
   assert.deepEqual(envelope.request, { query: '엑셀', display: 10 });
   assert.equal('headers' in envelope.request, false);
-  assert.throws(() => normalizeRawEvidenceEnvelope({ ...envelope, request: { headers: { Authorization: 'NCP_SECRET_SENTINEL' } } }), ContractValidationError);
+  assert.throws(() => normalizeRawEvidenceEnvelope({ ...envelope, request: { headers: { Authorization: ['NCP', '_SECRET', '_SENTINEL'].join('') } } }), ContractValidationError);
+});
+
+test('Given nested benign values and credential assignments, when evidence is normalized, then only redacted values survive serialization', () => {
+  const secret = ['CRED', 'VALUE'].join('');
+  const envelope = normalizeRawEvidenceEnvelope({
+    schema_version: 1,
+    provider: 'naver-api-hub',
+    source: 'naver-api-hub-blog',
+    endpoint: '/search/v1/blog',
+    method: 'GET',
+    request: { query: `엑셀 apiKey=${secret}`, display: 10, nested: { note: 'safe' } },
+    collected_at: '2026-09-09T00:00:00.000Z',
+    http: { status: 200, ok: true },
+    response: {
+      total: 1,
+      items: [{
+        title: `보고서 Bearer ${secret}`,
+        description: `참고 client_secret=${secret}; authorization=Bearer ${secret}; 다음 단계`,
+        link: 'https://blog.example.test/report',
+        postdate: '20260909',
+      }],
+    },
+  });
+
+  const serialized = JSON.stringify(envelope);
+  assert.equal(serialized.includes(secret), false);
+  assert.equal(envelope.request.nested, undefined);
+  assert.equal(envelope.request.query.includes(secret), false);
+  assert.equal(envelope.response.items[0].title.includes(secret), false);
+  assert.equal(envelope.response.items[0].description.includes(secret), false);
+  assert.throws(() => normalizeRawEvidenceEnvelope({
+    schema_version: 1,
+    provider: 'naver-api-hub',
+    source: 'naver-api-hub-blog',
+    endpoint: '/search/v1/blog',
+    method: 'GET',
+    request: JSON.parse('{"__proto__":{"polluted":"yes"},"query":"x"}'),
+    collected_at: '2026-09-09T00:00:00.000Z',
+    http: { status: 200, ok: true },
+    response: { total: 1, items: [{ title: 'x', description: 'x', link: 'https://blog.example.test/x', postdate: '20260909' }] },
+  }), ContractValidationError);
+});
+
+test('Given contradictory HTTP and envelope fields, when evidence is normalized, then the contract rejects every mismatch', () => {
+  const base = {
+    schema_version: 1,
+    provider: 'naver-api-hub',
+    source: 'naver-api-hub-blog',
+    endpoint: '/search/v1/blog',
+    method: 'GET',
+    request: { query: 'x', display: 10, start: 1, sort: 'sim', format: 'json' },
+    collected_at: '2026-09-09T00:00:00.000Z',
+  };
+  const success = { total: 1, items: [{ title: 'x', description: 'x', link: 'https://blog.example.test/x', postdate: '20260909' }], start: 1, display: 10 };
+  const failure = { kind: 'api_error', message: 'request failed' };
+
+  for (const envelope of [
+    { ...base, http: { status: 500, ok: true }, response: success },
+    { ...base, http: { status: 200, ok: false }, error: failure },
+    { ...base, http: { status: 401, ok: false }, error: failure, response: success },
+    { ...base, http: { status: 401, ok: true }, response: success },
+    { ...base, http: { status: 204, ok: false }, error: failure },
+  ]) {
+    assert.throws(() => normalizeRawEvidenceEnvelope(envelope), ContractValidationError);
+  }
+
+  const normalized = normalizeRawEvidenceEnvelope({ ...base, http: { status: 401, ok: false }, error: failure });
+  assert.equal(normalized.response, undefined);
+  assert.equal(normalized.error.status, 401);
+});
+
+test('Given a source-cross-wired envelope, when normalized, then source endpoint, method, request, and response must agree', () => {
+  const blogResponse = { total: 1, items: [{ title: 'x', description: 'x', link: 'https://blog.example.test/x', postdate: '20260909' }] };
+  const trendRequest = {
+    startDate: '2026-09-01', endDate: '2026-09-09', timeUnit: 'date',
+    keywordGroups: [{ groupName: 'x', keywords: ['x'] }],
+  };
+  assert.throws(() => normalizeRawEvidenceEnvelope({
+    schema_version: 1,
+    provider: 'naver-api-hub',
+    source: 'naver-api-hub-trend',
+    endpoint: '/anything',
+    method: 'GET',
+    request: trendRequest,
+    collected_at: '2026-09-09T00:00:00.000Z',
+    http: { status: 200, ok: true },
+    response: blogResponse,
+  }), ContractValidationError);
+});
+
+test('Given empty, malformed, or explicitly malformed response evidence, when normalized, then it never becomes usable success evidence', async () => {
+  const empty = await readJsonFixture('empty.json');
+  const base = {
+    schema_version: 1,
+    provider: 'naver-api-hub',
+    source: 'naver-api-hub-blog',
+    endpoint: '/search/v1/blog',
+    method: 'GET',
+    request: { query: 'x', display: 10, start: 1, sort: 'sim', format: 'json' },
+    collected_at: '2026-09-09T00:00:00.000Z',
+  };
+  assert.throws(() => normalizeRawEvidenceEnvelope({ ...base, http: { status: 200, ok: true }, response: empty }), ContractValidationError);
+  assert.throws(() => normalizeRawEvidenceEnvelope({
+    ...base,
+    http: { status: 200, ok: true },
+    response: { total: 1, items: [{ title: 'missing fields' }] },
+  }), ContractValidationError);
+
+  const malformed = normalizeRawEvidenceEnvelope({
+    ...base,
+    http: { status: 502, ok: false },
+    error: { kind: 'malformed_json', message: 'response body was not valid JSON', risk_flags: ['malformed_response'] },
+  });
+  assert.equal(malformed.http.ok, false);
+  assert.equal(malformed.response, undefined);
+  assert.equal(malformed.error.kind, 'malformed_json');
+  assert.deepEqual(malformed.error.risk_flags, ['api_error', 'malformed_response']);
+});
+
+test('Given documented numeric, category, and timestamp boundaries, when validated, then invalid values are rejected', () => {
+  const trend = {
+    startDate: '2026-09-01', endDate: '2026-09-09', timeUnit: 'date',
+    results: [{ title: 'x', keywords: ['x'], data: [{ period: '2026-09-09', ratio: 1 }] }],
+  };
+  for (const response of [
+    { ...trend, results: [{ ...trend.results[0], data: [{ period: '2026-09-09', ratio: 100.01 }] }] },
+    { ...trend, results: [{ ...trend.results[0], keywords: [], data: trend.results[0].data }] },
+    { ...trend, results: [{ ...trend.results[0], keywords: ['x'], data: [] }] },
+    { ...trend, results: [{ ...trend.results[0], data: [{ period: '2026-02-30', ratio: 1 }] }] },
+  ]) {
+    assert.throws(() => normalizeTrendResponse(response), ContractValidationError);
+  }
+
+  for (const category of ['---', '-ai-it', 'ai-it-', 'AI-it']) {
+    assert.throws(() => normalizeWjKeywordRecord({ ...makeValidRecord(), category }), ContractValidationError);
+  }
+  assert.throws(() => normalizeWjKeywordRecord({ ...makeValidRecord(), collected_at: '2026-02-30T00:00:00.000Z' }), ContractValidationError);
 });
 
 test('Given a provider-shaped object, when normalized, then the boundary accepts only the required methods', async () => {
@@ -213,13 +350,18 @@ test('Given a provider-shaped object, when normalized, then the boundary accepts
 test('Given every required fixture, when loaded, then the fixture helper resolves stable paths and JSON', async () => {
   const expected = [
     'blog-success.json', 'trend-success.json', 'empty.json', 'error-401.json',
-    'error-403.json', 'error-429.json', 'error-500.json', 'trend-validation.json',
+    'error-403.json', 'error-429.json', 'error-500.json', 'malformed.json', 'trend-validation.json',
   ];
   for (const name of expected) {
     const fixture = await loadFixture(name);
     assert.equal(fixture.path, fixturePath(name));
     assert.equal(typeof fixture.text, 'string');
-    assert.deepEqual(JSON.parse(fixture.text), fixture.json);
+    if (name === 'malformed.json') {
+      assert.equal(fixture.json, undefined);
+      assert.throws(() => JSON.parse(fixture.text), SyntaxError);
+    } else {
+      assert.deepEqual(JSON.parse(fixture.text), fixture.json);
+    }
   }
   assert.equal(readJsonl(['{"status":"ok"}']).length, 1);
   assert.equal(typeof readFile, 'function');
