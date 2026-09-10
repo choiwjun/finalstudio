@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { makeValidRecord } from './test-helpers.mjs';
+import { main as collectMain } from './collect.mjs';
+import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname, '..');
 const SCRIPT = (name) => join(ROOT, 'scripts/keyword-system', name);
@@ -104,4 +106,64 @@ test('CLI refuses a terminal written record without a persisted writer handoff a
   const result = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', paths.seeds, '--raw', join(paths.out, 'missing'), '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
   assert.notEqual(result.code, 0);
   assert.equal(await readFile(join(paths.out, 'records.json'), 'utf8'), before);
+});
+
+
+test('output boundary accepts only a data/keywords mapping and rejects arbitrary escapes and symlinks before IO', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'wj-boundary-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const out = join(root, 'data/keywords');
+  await mkdir(out, { recursive: true });
+  await assert.doesNotReject(() => assertSafeOutputDir(out));
+  await assert.rejects(() => assertSafeOutputDir(join(root, 'escape')), /data\/keywords|output/iu);
+  const outside = join(root, 'outside'); await mkdir(outside);
+  const link = join(root, 'link'); await (await import('node:fs/promises')).symlink(outside, link, 'dir');
+  await assert.rejects(() => assertSafeOutputDir(join(link, 'data/keywords')), /symlink|realpath/iu);
+  await assert.rejects(() => assertContainedPath(join(root, 'escape.txt'), out), /contained|output/iu);
+});
+
+test('explicit raw evidence path is authoritative over a stale collection manifest', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  const collected = await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR]);
+  assert.equal(collected.code, 0, collected.stderr);
+  const alternate = join(paths.out, 'alternate-raw'); await mkdir(alternate);
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--raw-evidence', alternate, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0);
+  assert.equal(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8').catch(() => '[]'), '[]\n');
+});
+
+test('malformed collection manifests and malformed raw files fail closed and invalidate stale ready output', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  assert.equal((await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--raw', join(paths.out, 'raw'), '--records', join(paths.out, 'records.json'), '--out-dir', paths.out])).code, 0);
+  assert.notEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')).length, 0);
+  await writeFile(join(paths.out, 'collection.json'), '{malformed');
+  const rawFiles = [];
+  async function find(dir) { for (const entry of await (await import('node:fs/promises')).readdir(dir, { withFileTypes: true })) { const child = join(dir, entry.name); if (entry.isDirectory()) await find(child); else rawFiles.push(child); } }
+  await find(join(paths.out, 'raw'));
+  await writeFile(rawFiles[0], '{malformed');
+  const rerun = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(rerun.code, 0);
+  assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8').catch(() => '[]\n')), []);
+});
+
+
+test('collect dry-run never invokes provider or network, even when credentials are configured', async (t) => {
+  const paths = await setup(t);
+  const oldFetch = globalThis.fetch;
+  const oldId = process.env.NCP_NAVER_API_HUB_CLIENT_ID;
+  const oldSecret = process.env.NCP_NAVER_API_HUB_CLIENT_SECRET;
+  globalThis.fetch = async () => { throw new Error('dry-run network call'); };
+  process.env.NCP_NAVER_API_HUB_CLIENT_ID = 'dry-run-client';
+  process.env.NCP_NAVER_API_HUB_CLIENT_SECRET = 'dry-run-secret';
+  t.after(() => {
+    globalThis.fetch = oldFetch;
+    if (oldId === undefined) delete process.env.NCP_NAVER_API_HUB_CLIENT_ID; else process.env.NCP_NAVER_API_HUB_CLIENT_ID = oldId;
+    if (oldSecret === undefined) delete process.env.NCP_NAVER_API_HUB_CLIENT_SECRET; else process.env.NCP_NAVER_API_HUB_CLIENT_SECRET = oldSecret;
+  });
+  await assert.doesNotReject(() => collectMain(['--seed-file', paths.seeds, '--out-dir', paths.out, '--dry-run']));
 });

@@ -1,7 +1,8 @@
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { link, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { basename, dirname, join, resolve } from 'node:path';
 import { normalizeRawEvidenceEnvelope } from './contracts.mjs';
+import { withExclusiveFileLock } from './file-lock.mjs';
 
 export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/iu;
 
@@ -119,14 +120,21 @@ export function stableSerialize(value) {
  * temporary file, then renames it over the target. On any failure the partial
  * temporary file is removed before the error is rethrown.
  */
-export async function writeStableJson(filePath, value) {
+export async function writeStableJson(filePath, value, options = {}) {
   const file = resolve(filePath);
   const text = stableSerialize(value);
   await mkdir(dirname(file), { recursive: true });
   const temporary = join(dirname(file), `.${basename(file)}.${randomBytes(6).toString('hex')}.tmp`);
   try {
     await writeFile(temporary, text, 'utf8');
-    await rename(temporary, file);
+    if (options.exclusive === true) {
+      // A hard-link install is atomic and, unlike rename, never replaces an
+      // existing target. Both files are in the same directory/filesystem.
+      await link(temporary, file);
+      await rm(temporary, { force: true });
+    } else {
+      await rename(temporary, file);
+    }
   } catch (error) {
     await rm(temporary, { force: true }).catch(() => {});
     throw error;
@@ -158,7 +166,7 @@ export function evidenceRelativePath({ collectedAt, runId, source, safeKey }) {
  * contract normalizer rejects credential-bearing keys, redacts credential
  * values, and enforces the failure variant (ok:false, error, no response).
  */
-export function buildFailureEnvelope({ source, endpoint, method, request, http, error, collectedAt }) {
+export function buildFailureEnvelope({ source, endpoint, method, request, http, error, collectedAt, redactValues }) {
   const requestedStatus = Number.isInteger(http?.status) ? http.status : KIND_STATUS[error?.kind] ?? 0;
   return normalizeRawEvidenceEnvelope({
     schema_version: 1,
@@ -170,7 +178,7 @@ export function buildFailureEnvelope({ source, endpoint, method, request, http, 
     collected_at: collectedAt,
     http: { status: requestedStatus, ok: false },
     error,
-  });
+  }, { redactValues });
 }
 
 /** Evidence index entry linking a persisted envelope to its traceable path. */
@@ -191,7 +199,7 @@ export function makeEvidenceIndexEntry({ envelope, path, runId }) {
   return entry;
 }
 
-async function persist({ source, endpoint, method, request, response, error, http, collectedAt, runId, rootDir }) {
+async function persist({ source, endpoint, method, request, response, error, http, collectedAt, runId, rootDir, redactValues }) {
   assertRunId(runId);
   const envelopeInput = {
     schema_version: 1,
@@ -210,7 +218,7 @@ async function persist({ source, endpoint, method, request, response, error, htt
   }
   // Normalizing first means invalid, empty, malformed, or secret-bearing
   // evidence throws before any directory or file is created.
-  const envelope = normalizeRawEvidenceEnvelope(envelopeInput);
+  const envelope = normalizeRawEvidenceEnvelope(envelopeInput, { redactValues });
   const root = resolveRawRoot(rootDir);
   const safeKey = deriveSafeKey(envelope.source, envelope.request);
   const relativePath = evidenceRelativePath({
@@ -220,7 +228,7 @@ async function persist({ source, endpoint, method, request, response, error, htt
     safeKey,
   });
   const filePath = resolve(root, relativePath);
-  await writeStableJson(filePath, envelope);
+  await writeStableJson(filePath, envelope, { exclusive: true });
   const indexEntry = makeEvidenceIndexEntry({ envelope, path: filePath, runId });
   return { path: filePath, envelope, indexEntry };
 }
@@ -237,12 +245,13 @@ export async function writeEvidence(input) {
 }
 
 /** Persist a failed call envelope; http.ok is forced false when omitted. */
-export async function writeFailureEvidence({ http, ...rest }) {
+export async function writeFailureEvidence({ http, redactValues, ...rest }) {
   const status = http?.status;
   const errorKind = rest?.error?.kind;
   const resolvedStatus = status !== undefined ? status : KIND_STATUS[errorKind] ?? 0;
   return persist({
     ...rest,
     http: { status: resolvedStatus, ok: false },
+    redactValues,
   });
 }

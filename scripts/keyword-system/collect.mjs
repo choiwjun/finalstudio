@@ -13,6 +13,7 @@ import {
   resolveRawRoot,
 } from './lib/evidence-store.mjs';
 import { appendEvidenceIndexEntry } from './lib/records-store.mjs';
+import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 import { readSeedFile, parseArgs } from './discover.mjs';
 
 const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
@@ -138,7 +139,7 @@ function assertUniqueCandidates(candidates) {
   }
 }
 
-async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, outDir, dryRun, seenTargets }) {
+async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, outDir, dryRun, seenTargets, redactionValues = [] }) {
   const requests = [
     { source: 'naver-api-hub-blog', endpoint: '/search/v1/blog', method: 'GET', request: { query: candidate.head_keyword, display: 10, start: 1, sort: 'date', format: 'json' }, call: () => provider.searchBlogs({ query: candidate.head_keyword, display: 10, start: 1, sort: 'date', format: 'json' }) },
     { source: 'naver-api-hub-trend', endpoint: '/search-trend/v1/search', method: 'POST', request: dateRequest(new Date(collectedAt), candidate), call: () => provider.searchTrends(dateRequest(new Date(collectedAt), candidate)) },
@@ -175,10 +176,12 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
           collectedAt,
           runId,
           rootDir: rawRoot,
+          redactValues: redactionValues,
         })
-        : await writeEvidence({ source: item.source, endpoint: item.endpoint, method: item.method, request: item.request, response: result, http: { status: 200, ok: true }, collectedAt, runId, rootDir: rawRoot });
+        : await writeEvidence({ source: item.source, endpoint: item.endpoint, method: item.method, request: item.request, response: result, http: { status: 200, ok: true }, collectedAt, runId, rootDir: rawRoot, redactValues: redactionValues });
       const indexEntry = { ...persisted.indexEntry, path: repositoryRelativePath(persisted.path, outDir) };
-      await appendEvidenceIndexEntry({ path: resolve(outDir, 'evidence-index.jsonl'), entry: indexEntry });
+      const indexPath = await assertContainedPath(resolve(outDir, 'evidence-index.jsonl'), outDir);
+      await appendEvidenceIndexEntry({ path: indexPath, entry: indexEntry });
       traces.push({ source: item.source, outcome: empty ? 'empty' : indexEntry.outcome, path: indexEntry.path });
     } catch {
       failures += 1;
@@ -191,29 +194,47 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
 /** Collect raw provider evidence. A failure is persisted but makes the CLI non-zero. */
 export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
+  await assertSafeOutputDir(args.outDir);
   const seed = await readSeedFile(args.seedFile);
   const candidates = discoverCandidates(seed);
   assertUniqueCandidates(candidates);
+  if (args.dryRun) {
+    // Dry runs are planning-only. They may inspect fixture paths but must not
+    // construct a provider or invoke fetch, including in credentialed mode.
+    if (args.fixture) {
+      await selectFixtureFile(args.fixture, 'blog');
+      await selectFixtureFile(args.fixture, 'trend');
+    }
+    console.log(`collected ${candidates.length} candidate(s), 0 successful evidence call(s) (dry-run)`);
+    return { ...args, candidates, traces: candidates.map((candidate) => ({ candidate: { category: candidate.category, head_keyword: candidate.head_keyword }, evidence: [{ source: 'naver-api-hub-blog', outcome: 'planned' }, { source: 'naver-api-hub-trend', outcome: 'planned' }] })) };
+  }
   const now = new Date();
   const collectedAt = now.toISOString();
   const runId = makeRunId({ clock: () => now });
+  const providerEnv = args.fixture
+    ? { NCP_NAVER_API_HUB_CLIENT_ID: 'fixture-client', NCP_NAVER_API_HUB_CLIENT_SECRET: 'fixture-secret' }
+    : process.env;
+  const redactionValues = [providerEnv.NCP_NAVER_API_HUB_CLIENT_ID, providerEnv.NCP_NAVER_API_HUB_CLIENT_SECRET].filter((value) => typeof value === 'string' && value.length > 0);
   const provider = args.fixture
-    ? createNaverApiHubProvider({ fetchImpl: createFixtureFetch(args.fixture), env: { NCP_NAVER_API_HUB_CLIENT_ID: 'fixture-client', NCP_NAVER_API_HUB_CLIENT_SECRET: 'fixture-secret' } })
-    : createNaverApiHubProvider({ env: process.env });
-  const rawRoot = resolveRawRoot(resolve(args.outDir, 'raw'));
+    ? createNaverApiHubProvider({ fetchImpl: createFixtureFetch(args.fixture), env: providerEnv })
+    : createNaverApiHubProvider({ env: providerEnv });
+  const rawPath = resolve(args.outDir, 'raw');
+  await assertContainedPath(rawPath, args.outDir);
+  const rawRoot = resolveRawRoot(rawPath);
   const seenTargets = new Set();
   const traces = [];
   let failures = 0;
   for (const candidate of candidates) {
-    const result = await collectOne({ provider, candidate, collectedAt, runId, rawRoot, outDir: args.outDir, dryRun: args.dryRun, seenTargets });
+    const result = await collectOne({ provider, candidate, collectedAt, runId, rawRoot, outDir: args.outDir, dryRun: false, seenTargets, redactionValues });
     traces.push({ candidate: { category: candidate.category, head_keyword: candidate.head_keyword }, evidence: result.traces });
     failures += result.failures;
   }
-  if (!args.dryRun) {
-    await writeStableJson(resolve(args.outDir, 'candidates.json'), candidates);
-    await writeStableJson(resolve(args.outDir, 'collection.json'), { schema_version: 1, run_id: runId, collected_at: collectedAt, candidates: traces });
-  }
-  console.log(`collected ${candidates.length} candidate(s), ${traces.reduce((sum, item) => sum + item.evidence.filter((evidence) => evidence.outcome === 'success').length, 0)} successful evidence call(s)${args.dryRun ? ' (dry-run)' : ''}`);
+  const candidatesPath = await assertContainedPath(resolve(args.outDir, 'candidates.json'), args.outDir);
+  const collectionPath = await assertContainedPath(resolve(args.outDir, 'collection.json'), args.outDir);
+  await assertContainedPath(resolve(args.outDir, 'evidence-index.jsonl'), args.outDir);
+  await writeStableJson(candidatesPath, candidates);
+  await writeStableJson(collectionPath, { schema_version: 1, run_id: runId, collected_at: collectedAt, candidates: traces });
+  console.log(`collected ${candidates.length} candidate(s), ${traces.reduce((sum, item) => sum + item.evidence.filter((evidence) => evidence.outcome === 'success').length, 0)} successful evidence call(s)`);
   if (failures > 0) fail('one or more provider/evidence operations failed');
   return { ...args, candidates, runId, collectedAt, traces };
 }

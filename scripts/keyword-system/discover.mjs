@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { discoverCandidates, parseSeedInput } from './lib/discovery.mjs';
 import { writeStableJson } from './lib/evidence-store.mjs';
+import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
 const DEFAULT_SEED_FILE = resolve(process.cwd(), 'data/keywords/seeds.json');
 const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
@@ -42,9 +43,13 @@ export async function readSeedFile(seedFile) {
 /** Discover deterministic candidates and write only the human-reviewable input artifact. */
 export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
+  await assertSafeOutputDir(args.outDir);
   const seed = await readSeedFile(args.seedFile);
   const candidates = discoverCandidates(seed);
-  if (!args.dryRun) await writeStableJson(resolve(args.outDir, 'candidates.json'), candidates);
+  if (!args.dryRun) {
+    const outputPath = await assertContainedPath(resolve(args.outDir, 'candidates.json'), args.outDir);
+    await writeStableJson(outputPath, candidates);
+  }
   console.log(`discovered ${candidates.length} candidate(s)${args.dryRun ? ' (dry-run)' : ''}`);
   return { ...args, candidates };
 }

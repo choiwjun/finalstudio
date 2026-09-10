@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdir, mkdtemp, readFile, access, readdir, rm } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, access, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { makeValidRecord, readJsonl } from './test-helpers.mjs';
 import {
   readRecords,
@@ -31,7 +32,7 @@ test('upsert replaces one category/head key without duplicates and ready export 
   const candidate = makeValidRecord({ status: 'candidate', evidence_available: false, freshness: 'unknown', risk_flags: [], source: ['naver-api-hub-blog'] });
   const ready = makeValidRecord({ status: 'ready-to-write' });
   await upsertRecords([candidate], { path: paths.records });
-  const records = await upsertRecords([ready], { path: paths.records });
+  const records = await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
   assert.equal(records.length, 1);
   assert.equal(records[0].status, 'ready-to-write');
   const exported = await writeReadyToWriteExport(records, { path: paths.ready });
@@ -43,12 +44,13 @@ test('written records require an explicit writer handoff decision with both refe
   const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
   const ready = makeValidRecord({ status: 'ready-to-write' });
   const written = makeValidRecord({ status: 'written' });
-  await upsertRecords([ready], { path: paths.records });
-  await assert.rejects(() => upsertRecords([written], { path: paths.records, decisionsPath: paths.decisions }), /writer handoff|decision/iu);
+  await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
+  await assert.rejects(() => upsertRecords([written], { path: paths.records, decisionsPath: paths.decisions }), /writer handoff|decision|transition/iu);
   await appendDecision({ path: paths.decisions, decision: { type: 'writer_handoff', category: written.category, head_keyword: written.head_keyword, reference: 'drafts/excel.md', reason: 'human selected' } });
-  const persisted = await upsertRecords([written], { path: paths.records, decisionsPath: paths.decisions });
+  const persisted = await upsertRecords([written], { path: paths.records, decisionsPath: paths.decisions, event: { type: 'writer_handoff', reference: 'drafts/excel.md', reason: 'human selected' } });
   assert.equal(persisted[0].status, 'written');
   const lines = readJsonl((await readFile(paths.decisions, 'utf8')).split('\n'));
+  assert.equal(lines[0].type, 'writer_handoff');
   assert.equal(lines[0].reference, 'drafts/excel.md');
   assert.equal(lines[0].reason, 'human selected');
 });
@@ -71,4 +73,51 @@ test('upsert uses an atomic replacement and does not leave temporary files after
   await mkdir(paths.records, { recursive: true });
   await assert.rejects(() => upsertRecords([makeValidRecord()], { path: paths.records }));
   assert.deepEqual(await readdir(paths.records), []);
+});
+
+
+test('records store rejects illegal status pairs unless the matching transition event is explicit', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const candidate = makeValidRecord({ evidence_available: false, freshness: 'unknown', source: ['naver-api-hub-blog'], status: 'candidate' });
+  const ready = makeValidRecord({ status: 'ready-to-write' });
+  await upsertRecords([candidate], { path: paths.records });
+  await assert.rejects(() => upsertRecords([ready], { path: paths.records }), /transition|analysis_success/iu);
+  await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
+  const failed = makeValidRecord({ status: 'candidate', evidence_available: false, freshness: 'unknown', source: ['naver-api-hub-blog'], risk_flags: ['api_error'] });
+  await assert.rejects(() => upsertRecords([failed], { path: paths.records }), /transition|analysis_failure/iu);
+  const output = await upsertRecords([failed], { path: paths.records, event: { type: 'analysis_failure' } });
+  assert.equal(output[0].status, 'candidate');
+});
+
+test('concurrent upserts preserve both records under the canonical store lock', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const records = Array.from({ length: 8 }, (_, index) => makeValidRecord({
+    category: 'ai-it', head_keyword: `키워드 ${index}`, related_keywords: ['관련어 하나', '관련어 둘'],
+  }));
+  const workers = await Promise.all(records.map((record) => new Promise((resolvePromise, reject) => {
+    const child = spawn(process.execPath, ['--input-type=module', '-e', "import {upsertRecords} from './scripts/keyword-system/lib/records-store.mjs'; await upsertRecords([JSON.parse(process.argv[1])], {path: process.argv[2]});", JSON.stringify(record), paths.records], { cwd: resolve(new URL('..', import.meta.url).pathname, '..') });
+    let stderr = ''; child.stderr.on('data', (chunk) => { stderr += chunk; });
+    child.on('close', (code) => code === 0 ? resolvePromise() : reject(new Error(stderr)));
+  })));
+  assert.equal(workers.length, records.length);
+  assert.equal((await readRecords(paths.records)).length, records.length);
+});
+
+
+test('records store rejects every illegal status pair without the matching Task 5 event', async (t) => {
+  const pairs = [
+    ['candidate', 'written'], ['candidate', 'rejected'],
+    ['researching', 'written'], ['ready-to-write', 'researching'], ['ready-to-write', 'written'],
+    ['rejected', 'candidate'], ['written', 'candidate'],
+  ];
+  for (const [from, to] of pairs) {
+    const paths = await temp();
+    t.after(() => rm(paths.root, { recursive: true, force: true }));
+    const base = makeValidRecord({ status: from, evidence_available: from !== 'candidate', freshness: 'fresh' });
+    // Seed terminal/active states directly for this matrix probe.
+    await (await import('node:fs/promises')).mkdir(join(paths.root, 'data/keywords'), { recursive: true });
+    await writeFile(paths.records, JSON.stringify([base]));
+    const next = makeValidRecord({ status: to, evidence_available: to !== 'candidate', freshness: to === 'candidate' ? 'unknown' : 'fresh' });
+    await assert.rejects(() => upsertRecords([next], { path: paths.records }), /transition|event|decision|written|rejected/iu, `${from} -> ${to}`);
+  }
 });
