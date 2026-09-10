@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, access, readdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, access, readdir, rm, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { makeValidRecord, readJsonl } from './test-helpers.mjs';
@@ -9,8 +9,10 @@ import {
   readRecords,
   upsertRecords,
   writeReadyToWriteExport,
+  readReadyToWriteExport,
   appendDecision,
 } from './lib/records-store.mjs';
+import { withExclusiveFileLock } from './lib/file-lock.mjs';
 
 async function temp() {
   const root = await mkdtemp(join(tmpdir(), 'wj-records-'));
@@ -120,4 +122,68 @@ test('records store rejects every illegal status pair without the matching Task 
     const next = makeValidRecord({ status: to, evidence_available: to !== 'candidate', freshness: to === 'candidate' ? 'unknown' : 'fresh' });
     await assert.rejects(() => upsertRecords([next], { path: paths.records }), /transition|event|decision|written|rejected/iu, `${from} -> ${to}`);
   }
+});
+
+
+test('supplied events cannot contradict unchanged records or create a mismatched new record', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const candidate = makeValidRecord({ status: 'candidate', evidence_available: false, freshness: 'unknown', source: ['naver-api-hub-blog'] });
+  await upsertRecords([candidate], { path: paths.records });
+  await assert.rejects(() => upsertRecords([candidate], { path: paths.records, event: { type: 'reject', reason: 'not this event' } }), /event|transition|status/iu);
+  await assert.rejects(() => upsertRecords([candidate], { path: paths.records, event: { type: 'collection_started' } }), /status|transition/iu);
+  await assert.rejects(() => upsertRecords([makeValidRecord({ status: 'candidate' })], { path: paths.records, event: { type: 'reject', reason: 'new reject does not produce candidate' } }), /status|transition/iu);
+  const ready = makeValidRecord({ status: 'ready-to-write' });
+  await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
+  await assert.doesNotReject(() => upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } }));
+  assert.deepEqual(readJsonl((await readFile(paths.decisions, 'utf8').catch(() => '')).split('\n')), []);
+});
+
+test('a live stale lock is never reclaimed and concurrent entrants do not overlap', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const lockPath = join(paths.root, 'data/keywords/live.lock');
+  let active = 0; let maxActive = 0;
+  const owner = withExclusiveFileLock(lockPath, async () => {
+    active += 1; maxActive = Math.max(maxActive, active);
+    await utimes(lockPath, new Date(0), new Date(0));
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));
+    active -= 1;
+  }, { staleMs: 0 });
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 20));
+  const contender = withExclusiveFileLock(lockPath, async () => { active += 1; maxActive = Math.max(maxActive, active); active -= 1; }, { timeoutMs: 40, staleMs: 0 }).catch((error) => error);
+  const result = await contender; await owner;
+  assert.equal(result.code, 'FILE_LOCK'); assert.equal(maxActive, 1);
+});
+
+test('ready projection failure removes both the projection and its commit marker', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const marker = `${paths.ready}.commit.json`; await mkdir(marker, { recursive: true });
+  await assert.rejects(() => writeReadyToWriteExport([makeValidRecord({ status: 'ready-to-write' })], { path: paths.ready }), /EISDIR|directory|commit|output/iu);
+  await assert.rejects(() => access(paths.ready));
+  await assert.rejects(() => access(marker));
+});
+
+
+test('ready consumers reject a projection whose records generation no longer matches', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const ready = makeValidRecord({ status: 'ready-to-write' });
+  await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
+  await writeReadyToWriteExport([ready], { path: paths.ready, recordsPath: paths.records });
+  assert.deepEqual(await readReadyToWriteExport(paths.ready, { recordsPath: paths.records }), [ready]);
+  await writeFile(paths.records, '[]\n');
+  await assert.rejects(() => readReadyToWriteExport(paths.ready, { recordsPath: paths.records }), /stale|match|committed/iu);
+});
+
+
+test('dead stale owner recovery lets B enter while C cannot overlap B', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const lockPath = join(paths.root, 'data/keywords/dead.lock');
+  await mkdir(join(paths.root, 'data/keywords'), { recursive: true });
+  await writeFile(lockPath, JSON.stringify({ token: 'owner-A', pid: 99999999 }) + '\n'); await utimes(lockPath, new Date(0), new Date(0));
+  let active = 0; let maxActive = 0; let entered;
+  const enteredPromise = new Promise((resolvePromise) => { entered = resolvePromise; });
+  const b = withExclusiveFileLock(lockPath, async () => { active += 1; maxActive = Math.max(maxActive, active); entered(); await new Promise((resolvePromise) => setTimeout(resolvePromise, 100)); active -= 1; }, { staleMs: 0 });
+  await enteredPromise;
+  const c = await withExclusiveFileLock(lockPath, async () => { active += 1; maxActive = Math.max(maxActive, active); active -= 1; }, { timeoutMs: 35, staleMs: 0 }).catch((error) => error);
+  await b;
+  assert.equal(c.code, 'FILE_LOCK'); assert.equal(maxActive, 1);
 });

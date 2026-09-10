@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { discoverCandidates, parseSeedInput } from './lib/discovery.mjs';
 import { writeStableJson } from './lib/evidence-store.mjs';
+import { directoryFdPath, withExclusiveFileLock } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
 const DEFAULT_SEED_FILE = resolve(process.cwd(), 'data/keywords/seeds.json');
@@ -48,9 +49,9 @@ export async function main(argv = process.argv.slice(2)) {
   const candidates = discoverCandidates(seed);
   if (!args.dryRun) {
     const outputPath = await assertContainedPath(resolve(args.outDir, 'candidates.json'), args.outDir);
-    await writeStableJson(outputPath, candidates);
+    await withExclusiveFileLock(`${outputPath}.lock`, async ({ directoryHandle }) => writeStableJson(outputPath, candidates, { installPath: join(directoryFdPath(directoryHandle), basename(outputPath)) }));
   }
-  console.log(`discovered ${candidates.length} candidate(s)${args.dryRun ? ' (dry-run)' : ''}`);
+  console.log(`discovered ${candidates.length} candidate(s)${args.dryRun ? ' (dry-run)' : ''}${args.dryRun ? '' : '; output data/keywords/candidates.json'}`);
   return { ...args, candidates };
 }
 

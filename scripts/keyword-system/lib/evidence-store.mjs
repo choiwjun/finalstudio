@@ -2,7 +2,7 @@ import { link, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { basename, dirname, join, resolve } from 'node:path';
 import { normalizeRawEvidenceEnvelope } from './contracts.mjs';
-import { withExclusiveFileLock } from './file-lock.mjs';
+import { directoryFdPath, openVerifiedDirectory, openVerifiedNestedDirectory, withExclusiveFileLock } from './file-lock.mjs';
 
 export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/iu;
 
@@ -122,18 +122,19 @@ export function stableSerialize(value) {
  */
 export async function writeStableJson(filePath, value, options = {}) {
   const file = resolve(filePath);
+  const installFile = typeof options.installPath === 'string' ? options.installPath : file;
   const text = stableSerialize(value);
-  await mkdir(dirname(file), { recursive: true });
-  const temporary = join(dirname(file), `.${basename(file)}.${randomBytes(6).toString('hex')}.tmp`);
+  await mkdir(dirname(installFile), { recursive: true });
+  const temporary = join(dirname(installFile), `.${basename(installFile)}.${randomBytes(6).toString('hex')}.tmp`);
   try {
     await writeFile(temporary, text, 'utf8');
     if (options.exclusive === true) {
       // A hard-link install is atomic and, unlike rename, never replaces an
       // existing target. Both files are in the same directory/filesystem.
-      await link(temporary, file);
+      await link(temporary, installFile);
       await rm(temporary, { force: true });
     } else {
-      await rename(temporary, file);
+      await rename(temporary, installFile);
     }
   } catch (error) {
     await rm(temporary, { force: true }).catch(() => {});
@@ -228,7 +229,15 @@ async function persist({ source, endpoint, method, request, response, error, htt
     safeKey,
   });
   const filePath = resolve(root, relativePath);
-  await writeStableJson(filePath, envelope, { exclusive: true });
+  const rootHandle = await openVerifiedDirectory(root);
+  let nested;
+  try {
+    nested = await openVerifiedNestedDirectory(rootHandle, dirname(relativePath));
+    await writeStableJson(filePath, envelope, { exclusive: true, installPath: join(directoryFdPath(nested.handle), basename(relativePath)) });
+  } finally {
+    for (const handle of nested?.owned ?? []) await handle.close().catch(() => {});
+    await rootHandle.close().catch(() => {});
+  }
   const indexEntry = makeEvidenceIndexEntry({ envelope, path: filePath, runId });
   return { path: filePath, envelope, indexEntry };
 }

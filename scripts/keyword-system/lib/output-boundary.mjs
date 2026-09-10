@@ -5,11 +5,23 @@ export class OutputBoundaryError extends Error {
   constructor(message) { super(message); this.name = 'OutputBoundaryError'; this.code = 'OUTPUT_BOUNDARY'; }
 }
 const fail = (message) => { throw new OutputBoundaryError(message); };
+const verifiedDirectories = new Map();
 
 function parts(path) { return resolve(path).split(sep).filter(Boolean); }
 function hasDataKeywordsSuffix(path) {
   const values = parts(path);
   return values.length >= 2 && values.at(-2) === 'data' && values.at(-1) === 'keywords';
+}
+
+/** Return the identity captured by the latest output-boundary preflight. */
+export function expectedDirectoryIdentity(value) {
+  const path = resolve(value);
+  let best;
+  for (const [root, identity] of verifiedDirectories) {
+    const suffix = relative(root, path);
+    if (suffix === '' || (!suffix.startsWith('..') && !isAbsolute(suffix)) && (!best || root.length > best.root.length)) best = { root, identity };
+  }
+  return best;
 }
 
 /**
@@ -28,6 +40,7 @@ export async function assertSafeOutputDir(value) {
     throw error;
   }
   if (!info.isDirectory()) fail('output directory is not a directory');
+  verifiedDirectories.set(output, { dev: info.dev, ino: info.ino });
   return output;
 }
 
@@ -39,6 +52,10 @@ export async function assertContainedPath(value, rootDir) {
   const suffix = relative(root, target);
   if (suffix === '..' || suffix.startsWith(`..${sep}`) || isAbsolute(suffix)) fail('path must remain contained by output directory');
   await assertNoSymlink(target, false);
+  try {
+    const info = await lstat(target);
+    if (info.isDirectory() && !info.isSymbolicLink()) verifiedDirectories.set(target, { dev: info.dev, ino: info.ino });
+  } catch (error) { if (error?.code !== 'ENOENT') throw error; }
   return target;
 }
 

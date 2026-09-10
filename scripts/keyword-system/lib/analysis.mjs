@@ -25,6 +25,7 @@
 
 import {
   normalizeApiFailure,
+  normalizeKeywordKey,
   normalizeBlogSearchResponse,
   normalizeTrendResponse,
   normalizeWjKeywordRecord,
@@ -125,7 +126,7 @@ function tokenCount(text) {
 
 // Related keywords are deduped by first occurrence using a NFC lower-case
 // keyword key, matching discovery semantics, before any promotion gate runs.
-const keywordKey = (text) => String(text).normalize('NFC').toLowerCase().trim();
+const keywordKey = normalizeKeywordKey;
 
 function dedupeFirstOccurrence(values) {
   const seen = new Set();

@@ -7,6 +7,8 @@ import { spawn } from 'node:child_process';
 import { makeValidRecord } from './test-helpers.mjs';
 import { main as collectMain } from './collect.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
+import { writeEvidence } from './lib/evidence-store.mjs';
+import { appendDecision, appendEvidenceIndexEntry, upsertRecords, writeReadyToWriteExport } from './lib/records-store.mjs';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname, '..');
 const SCRIPT = (name) => join(ROOT, 'scripts/keyword-system', name);
@@ -166,4 +168,89 @@ test('collect dry-run never invokes provider or network, even when credentials a
     if (oldSecret === undefined) delete process.env.NCP_NAVER_API_HUB_CLIENT_SECRET; else process.env.NCP_NAVER_API_HUB_CLIENT_SECRET = oldSecret;
   });
   await assert.doesNotReject(() => collectMain(['--seed-file', paths.seeds, '--out-dir', paths.out, '--dry-run']));
+});
+
+
+test('all output classes stay bound when a validated root is swapped before the write', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'wj-swap-'));
+  const out = join(root, 'data/keywords');
+  const outside = join(root, 'outside');
+  await mkdir(out, { recursive: true }); await mkdir(outside);
+  t.after(() => rm(root, { recursive: true, force: true }));
+  async function swapAndReject(path, operation) {
+    await assertContainedPath(path, out);
+    const held = `${out}.held`;
+    await (await import('node:fs/promises')).rename(out, held);
+    await (await import('node:fs/promises')).symlink(outside, out, 'dir');
+    try { await assert.rejects(operation, /symlink|directory|store|output|lock/iu); }
+    finally { await rm(out, { recursive: true, force: true }); await (await import('node:fs/promises')).rename(held, out); }
+    assert.deepEqual(await readdir(outside), []);
+  }
+  const record = makeValidRecord({ status: 'candidate' });
+  await swapAndReject(join(out, 'records.json'), () => upsertRecords([record], { path: join(out, 'records.json') }));
+  await swapAndReject(join(out, 'ready-to-write.json'), () => writeReadyToWriteExport([], { path: join(out, 'ready-to-write.json') }));
+  await swapAndReject(join(out, 'decisions.jsonl'), () => appendDecision({ path: join(out, 'decisions.jsonl'), decision: { type: 'reject', category: 'ai-it', head_keyword: 'x', reason: 'manual' } }));
+  await swapAndReject(join(out, 'evidence-index.jsonl'), () => appendEvidenceIndexEntry({ path: join(out, 'evidence-index.jsonl'), entry: { schema_version: 1, source: 'naver-api-hub-blog', outcome: 'success', path: 'data/keywords/raw/x.json', run_id: '20260910T000000Z-abcdef12', collected_at: '2026-09-10T00:00:00.000Z' } }));
+  const raw = join(out, 'raw'); await mkdir(raw);
+  const rawHeld = `${raw}.held`; await assertContainedPath(raw, out); await (await import('node:fs/promises')).rename(raw, rawHeld); await (await import('node:fs/promises')).symlink(outside, raw, 'dir');
+  try {
+    await assert.rejects(() => writeEvidence({ source: 'naver-api-hub-blog', endpoint: '/search/v1/blog', method: 'GET', request: { query: 'x', display: 10, start: 1, sort: 'date', format: 'json' }, response: { total: 1, start: 1, display: 1, items: [{ title: 'x', description: 'x', link: 'https://example.com/x', postdate: '20260101' }] }, http: { status: 200, ok: true }, collectedAt: '2026-09-10T00:00:00.000Z', runId: '20260910T000000Z-abcdef12', rootDir: raw }), /symlink|directory|store|output/iu);
+  } finally { await rm(raw, { recursive: true, force: true }); await (await import('node:fs/promises')).rename(rawHeld, raw); }
+  assert.deepEqual(await readdir(outside), []);
+});
+
+test('index failure removes raw evidence and explicit analysis cannot promote an orphan', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  await mkdir(join(paths.out, 'evidence-index.jsonl'));
+  const collected = await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR]);
+  assert.notEqual(collected.code, 0);
+  const rawFiles = [];
+  async function find(dir) { for (const entry of await readdir(dir, { withFileTypes: true }).catch(() => [])) { const child = join(dir, entry.name); if (entry.isDirectory()) await find(child); else if (entry.name.endsWith('.json')) rawFiles.push(child); } }
+  await find(join(paths.out, 'raw')); assert.deepEqual(rawFiles, []);
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--raw-evidence', join(paths.out, 'raw'), '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
+
+test('collected analysis requires complete manifest and explicit raw requires both sources', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  await rm(join(paths.out, 'collection.json'));
+  const missingManifest = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(missingManifest.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+  const rawFiles = [];
+  async function find(dir) { for (const entry of await readdir(dir, { withFileTypes: true })) { const child = join(dir, entry.name); if (entry.isDirectory()) await find(child); else if (entry.name.endsWith('.json')) rawFiles.push(child); } }
+  await find(join(paths.out, 'raw')); await rm(rawFiles.find((file) => file.includes('trend')), { force: true });
+  const incomplete = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--raw-evidence', join(paths.out, 'raw'), '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(incomplete.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
+
+test('canonical key merges mixed-case and composed/decomposed Unicode candidates', async (t) => {
+  const paths = await setup(t);
+  const decomposed = join(paths.root, 'decomposed.json');
+  const composed = join(paths.root, 'composed.json');
+  await writeFile(decomposed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['Cafe\u0301 Auto'], title: 'Cafe\u0301 Auto 방법' }] }));
+  await writeFile(composed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['CAFÉ AUTO'], title: 'CAFÉ AUTO 방법' }] }));
+  for (const seed of [decomposed, composed]) {
+    assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', seed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+    assert.equal((await runNode(SCRIPT('analyze.mjs'), ['--seed-file', seed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out])).code, 0);
+  }
+  const records = JSON.parse(await readFile(join(paths.out, 'records.json'), 'utf8'));
+  assert.equal(records.length, 1); assert.equal(records[0].head_keyword.normalize('NFC').toLowerCase(), 'café auto');
+});
+
+
+test('manifest mappings are candidate-bound and conflicting raw requests cannot become ready', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  const manifest = JSON.parse(await readFile(join(paths.out, 'collection.json'), 'utf8'));
+  const blog = resolve(paths.out, manifest.candidates[0].evidence.find((entry) => entry.source === 'naver-api-hub-blog').path.slice('data/keywords/'.length));
+  const envelope = JSON.parse(await readFile(blog, 'utf8')); envelope.request.query = 'unrelated keyword'; await writeFile(blog, JSON.stringify(envelope));
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
 });

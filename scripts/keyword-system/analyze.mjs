@@ -1,11 +1,12 @@
-import { access, mkdir, readdir, readFile, rm, stat as statPath, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { mkdir, readdir, readFile, stat as statPath } from 'node:fs/promises';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { analyzeCandidate } from './lib/analysis.mjs';
 import { discoverCandidates } from './lib/discovery.mjs';
-import { normalizeRawEvidenceEnvelope } from './lib/contracts.mjs';
+import { normalizeKeywordKey, normalizeRawEvidenceEnvelope } from './lib/contracts.mjs';
 import { readRecords, upsertRecords, writeReadyToWriteExport } from './lib/records-store.mjs';
 import { readSeedFile } from './discover.mjs';
+import { appendFileAtDirectory, openVerifiedDirectory, removeVerifiedFile } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
 const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
@@ -79,7 +80,7 @@ async function filesUnder(path) {
   return result.sort();
 }
 
-function candidateKey(candidate) { return `${candidate.category}\u0000${candidate.head_keyword.normalize('NFC').toLowerCase()}`; }
+function candidateKey(candidate) { return `${normalizeKeywordKey(candidate.category)}\u0000${normalizeKeywordKey(candidate.head_keyword)}`; }
 function isObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 
 async function loadCandidates(args) {
@@ -87,21 +88,35 @@ async function loadCandidates(args) {
   const parsed = await readOptionalJson(artifactPath, 'candidates artifact');
   if (parsed !== undefined) {
     if (!Array.isArray(parsed) || parsed.some((candidate) => !isObject(candidate) || typeof candidate.category !== 'string' || typeof candidate.head_keyword !== 'string')) fail('candidates artifact is malformed');
+    const keys = new Set();
+    for (const candidate of parsed) { const key = candidateKey(candidate); if (keys.has(key)) fail('candidates artifact contains duplicate candidates'); keys.add(key); }
     return parsed;
   }
   const seed = await readSeedFile(args.seedFile);
   return discoverCandidates(seed);
 }
 
+function runIdFromPath(path) {
+  const match = path.match(/(?:^|[/\\])([0-9]{8}T[0-9]{6}Z-[0-9a-f]{8})(?:[/\\]|$)/iu);
+  return match?.[1];
+}
+
 async function loadCollectionManifest(outDir) {
   const parsed = await readOptionalJson(join(outDir, 'collection.json'), 'collection manifest');
-  if (parsed === undefined) return undefined;
-  if (!isObject(parsed) || parsed.schema_version !== 1 || !Array.isArray(parsed.candidates)) fail('collection manifest is malformed');
+  if (parsed === undefined) fail('collection manifest is required for collected analysis');
+  if (!isObject(parsed) || parsed.schema_version !== 1 || typeof parsed.run_id !== 'string' || runIdFromPath(parsed.run_id) !== parsed.run_id || typeof parsed.collected_at !== 'string' || !Array.isArray(parsed.candidates)) fail('collection manifest is malformed');
+  const keys = new Set();
   for (const entry of parsed.candidates) {
-    if (!isObject(entry) || !isObject(entry.candidate) || typeof entry.candidate.category !== 'string' || typeof entry.candidate.head_keyword !== 'string' || !Array.isArray(entry.evidence) || entry.evidence.length === 0) fail('collection manifest contains an invalid evidence mapping');
+    if (!isObject(entry) || !isObject(entry.candidate) || typeof entry.candidate.category !== 'string' || typeof entry.candidate.head_keyword !== 'string' || !Array.isArray(entry.evidence) || entry.evidence.length !== 2) fail('collection manifest contains an invalid evidence mapping');
+    const key = candidateKey(entry.candidate);
+    if (keys.has(key)) fail('collection manifest contains duplicate candidate mappings');
+    keys.add(key);
+    const sources = new Set();
     for (const evidence of entry.evidence) {
-      if (!isObject(evidence) || typeof evidence.path !== 'string' || evidence.path.trim() === '' || evidence.path.startsWith('/') || evidence.path.includes('\\') || evidence.path.includes('/../') || evidence.path.startsWith('../')) fail('collection manifest contains an unsafe evidence path');
+      if (!isObject(evidence) || typeof evidence.path !== 'string' || evidence.path.trim() === '' || isAbsolute(evidence.path) || evidence.path.includes('\\') || evidence.path.includes('/../') || evidence.path.startsWith('../') || !['success', 'failure'].includes(evidence.outcome) || evidence.run_id !== parsed.run_id || evidence.collected_at !== parsed.collected_at || !['naver-api-hub-blog', 'naver-api-hub-trend'].includes(evidence.source) || sources.has(evidence.source)) fail('collection manifest contains an invalid evidence mapping');
+      sources.add(evidence.source);
     }
+    if (sources.size !== 2) fail('collection manifest is missing a required collection source');
   }
   return parsed;
 }
@@ -119,32 +134,83 @@ async function loadRawEnvelopes(paths) {
     try { parsed = JSON.parse(await readFile(path, 'utf8')); } catch { fail('raw evidence contains malformed JSON'); }
     let envelope;
     try { envelope = normalizeRawEvidenceEnvelope(parsed); } catch { fail('raw evidence contains an invalid envelope'); }
-    result.set(resolve(path), envelope);
+    result.set(resolve(path), { envelope, path: resolve(path), runId: runIdFromPath(resolve(path)) });
   }
   return result;
 }
 
 function matchesEnvelope(envelope, candidate) {
-  if (envelope.source === 'naver-api-hub-blog') return envelope.request?.query === candidate.head_keyword;
-  return Array.isArray(envelope.request?.keywordGroups) && envelope.request.keywordGroups.some((group) => group.groupName === candidate.head_keyword || group.keywords?.includes(candidate.head_keyword));
+  if (envelope.source === 'naver-api-hub-blog') return normalizeKeywordKey(envelope.request?.query) === normalizeKeywordKey(candidate.head_keyword);
+  return Array.isArray(envelope.request?.keywordGroups) && envelope.request.keywordGroups.some((group) => normalizeKeywordKey(group.groupName) === normalizeKeywordKey(candidate.head_keyword) || group.keywords?.some((keyword) => normalizeKeywordKey(keyword) === normalizeKeywordKey(candidate.head_keyword)));
+}
+
+function outcomeForEnvelope(envelope) { return envelope.http.ok ? 'success' : 'failure'; }
+
+function assertEvidencePathUnderRaw(path, raw) {
+  const suffix = relative(resolve(raw), resolve(path));
+  if (suffix === '..' || suffix.startsWith(`..${requireSep()}`) || isAbsolute(suffix)) fail('collection evidence path is outside raw evidence');
+}
+function requireSep() { return process.platform === 'win32' ? '\\' : '/'; }
+
+function validateRawSet(candidates, rawEnvelopes, { requireRunId = false } = {}) {
+  if (rawEnvelopes.size === 0) fail('raw evidence set is empty');
+  for (const item of rawEnvelopes.values()) {
+    if (requireRunId && !item.runId) fail('raw evidence path is missing a valid run id');
+    const matches = candidates.filter((candidate) => matchesEnvelope(item.envelope, candidate));
+    if (matches.length !== 1) fail('raw evidence is not bound to exactly one candidate');
+  }
+}
+
+async function loadEvidenceIndex(path) {
+  let text;
+  try { text = await readFile(path, 'utf8'); } catch { fail('evidence index is required for collected analysis'); }
+  const entries = [];
+  for (const [index, line] of text.split(/\r?\n/u).entries()) {
+    if (line.trim() === '') continue;
+    try { const entry = JSON.parse(line); if (!isObject(entry)) throw new Error(); entries.push(entry); }
+    catch { fail(`evidence index line ${index + 1} is not valid JSON`); }
+  }
+  return entries;
+}
+
+function validateManifestIndex(manifest, entries) {
+  const byPath = new Map();
+  for (const entry of entries) {
+    if (typeof entry.path !== 'string' || isAbsolute(entry.path) || entry.path.includes('\\') || entry.path.startsWith('../') || entry.path.includes('/../') || byPath.has(entry.path)) fail('evidence index contains duplicate or invalid paths');
+    byPath.set(entry.path, entry);
+  }
+  for (const mapping of manifest.candidates) for (const evidence of mapping.evidence) {
+    const indexed = byPath.get(evidence.path);
+    if (!indexed || indexed.source !== evidence.source || indexed.outcome !== evidence.outcome || indexed.run_id !== evidence.run_id || indexed.collected_at !== evidence.collected_at) fail('collection manifest evidence is not backed by a consistent evidence index');
+  }
 }
 
 async function evidenceForCandidate(candidate, manifest, args, rawEnvelopes) {
+  const mapping = manifest?.candidates.find((entry) => candidateKey(entry.candidate) === candidateKey(candidate));
   if (manifest !== undefined) {
-    const mapping = manifest.candidates.find((entry) => candidateKey(entry.candidate) === candidateKey(candidate));
     if (!mapping) fail('collection manifest is missing a candidate evidence mapping');
     const envelopes = [];
+    const seenPaths = new Set();
+    const sources = new Set();
     for (const entry of mapping.evidence) {
       const path = await assertContainedPath(resolveManifestPath(entry.path, args.outDir, args.raw), args.outDir);
-      const envelope = rawEnvelopes.get(resolve(path));
-      if (envelope === undefined) fail('collection manifest references missing raw evidence');
-      envelopes.push(envelope);
+      assertEvidencePathUnderRaw(path, args.raw);
+      if (seenPaths.has(path)) fail('collection manifest references duplicate raw evidence');
+      seenPaths.add(path);
+      const item = rawEnvelopes.get(resolve(path));
+      if (item === undefined || item.runId !== manifest.run_id) fail('collection manifest references missing raw evidence');
+      if (item.envelope.source !== entry.source || outcomeForEnvelope(item.envelope) !== entry.outcome || item.envelope.collected_at !== manifest.collected_at || !matchesEnvelope(item.envelope, candidate)) fail('collection manifest evidence does not match its candidate');
+      sources.add(item.envelope.source);
+      envelopes.push(item.envelope);
     }
+    if (sources.size !== 2) fail('collection manifest evidence is incomplete');
     return envelopes;
   }
-  const matched = [...rawEnvelopes.values()].filter((envelope) => matchesEnvelope(envelope, candidate));
-  if (matched.length === 0) fail('missing raw evidence for candidate');
-  return matched;
+  const matched = [...rawEnvelopes.values()].filter((item) => matchesEnvelope(item.envelope, candidate));
+  const sources = new Set(matched.map((item) => item.envelope.source));
+  const runs = new Set(matched.map((item) => item.runId));
+  if (matched.length !== 2 || sources.size !== 2 || runs.size > 1) fail('raw evidence set is incomplete for candidate');
+  return matched.map((item) => item.envelope);
 }
 
 function buildAnalysisEvents(analysed, existingMap) {
@@ -172,14 +238,28 @@ export async function main(argv = process.argv.slice(2)) {
   const rawPath = await assertContainedPath(args.raw, args.outDir);
   const readyPath = await assertContainedPath(join(args.outDir, 'ready-to-write.json'), args.outDir);
   const decisionsPath = await assertContainedPath(join(args.outDir, 'decisions.jsonl'), args.outDir);
+  const indexPath = await assertContainedPath(join(args.outDir, 'evidence-index.jsonl'), args.outDir);
   if (!args.dryRun) {
-    await rm(readyPath, { force: true });
-    try { await access(decisionsPath); } catch { await mkdir(args.outDir, { recursive: true }); await writeFile(decisionsPath, '', 'utf8'); }
+    await removeVerifiedFile(readyPath).catch((error) => { if (error?.code !== 'ENOENT') throw error; });
+    await removeVerifiedFile(`${readyPath}.commit.json`).catch((error) => { if (error?.code !== 'ENOENT') throw error; });
+    // Invalidate stale actionable state immediately, including validation
+    // failures before raw/manifest loading has begun.
+    await writeReadyToWriteExport([], { path: readyPath });
+    const outputHandle = await openVerifiedDirectory(args.outDir);
+    try { await appendFileAtDirectory(outputHandle, 'decisions.jsonl', ''); }
+    finally { await outputHandle.close().catch(() => {}); }
   }
   const candidates = await loadCandidates(args);
   const manifest = args.rawExplicit ? undefined : await loadCollectionManifest(args.outDir);
+  if (manifest !== undefined) {
+    const candidateKeys = new Set(candidates.map(candidateKey));
+    const manifestKeys = new Set(manifest.candidates.map((entry) => candidateKey(entry.candidate)));
+    if (candidateKeys.size !== manifestKeys.size || [...candidateKeys].some((key) => !manifestKeys.has(key))) fail('collection manifest does not cover the complete candidate set');
+  }
   const rawFiles = await filesUnder(rawPath);
   const rawEnvelopes = await loadRawEnvelopes(rawFiles);
+  if (manifest === undefined) validateRawSet(candidates, rawEnvelopes);
+  if (manifest !== undefined) validateManifestIndex(manifest, await loadEvidenceIndex(indexPath));
   const existing = await readRecords(recordsPath);
   const existingMap = new Map(existing.map((record) => [candidateKey(record), record]));
   for (const candidate of candidates) {
@@ -206,7 +286,7 @@ export async function main(argv = process.argv.slice(2)) {
     if (failures > 0) await writeReadyToWriteExport([], { path: readyPath });
     else await writeReadyToWriteExport(records, { path: readyPath, recordsPath });
   }
-  console.log(`analyzed ${analysed.length} candidate(s), ${analysed.filter((record) => record.status === 'ready-to-write').length} ready-to-write candidate(s)${args.dryRun ? ' (dry-run)' : ''}`);
+  console.log(`analyzed ${analysed.length} candidate(s), ${analysed.filter((record) => record.status === 'ready-to-write').length} ready-to-write candidate(s)${args.dryRun ? ' (dry-run)' : '; outputs data/keywords/records.json, data/keywords/ready-to-write.json'}`);
   if (failures > 0) fail('one or more candidates lacked clean evidence or had an invalid transition');
   return { ...args, records, analysed };
 }
