@@ -15,7 +15,27 @@ export class FileLockError extends Error {
 
 function fail(message) { throw new FileLockError(message); }
 
-/** Open a real directory and bind subsequent work to its inode. */
+/** Open one directory child without following any intermediate symlink. */
+async function openDirectoryChild(parentHandle, segment, { create = true } = {}) {
+  if (!segment || segment === '.' || segment === '..' || segment.includes('/') || segment.includes('\\')) fail('invalid directory component');
+  const childPath = join(directoryFdPath(parentHandle), segment);
+  let info;
+  try { info = await lstat(childPath); }
+  catch (error) {
+    if (error?.code !== 'ENOENT' || !create) throw error;
+    try { await mkdir(childPath); } catch (mkdirError) { if (mkdirError?.code !== 'EEXIST') throw mkdirError; }
+    info = await lstat(childPath);
+  }
+  if (info.isSymbolicLink() || !info.isDirectory()) fail('store directory must be a real directory');
+  let child;
+  try { child = await open(childPath, constants.O_RDONLY | O_DIRECTORY | O_NOFOLLOW); }
+  catch { fail('store directory could not be opened without following symlinks'); }
+  const after = await child.stat();
+  if (after.dev !== info.dev || after.ino !== info.ino) { await child.close().catch(() => {}); fail('store directory changed during validation'); }
+  return child;
+}
+
+/** Open a real directory and bind every path component to stable directory FDs. */
 export async function openVerifiedDirectory(directory, { create = true } = {}) {
   const path = resolve(directory);
   const expected = expectedDirectoryIdentity(path);
@@ -26,21 +46,19 @@ export async function openVerifiedDirectory(directory, { create = true } = {}) {
     if (root.dev !== expected.identity.dev || root.ino !== expected.identity.ino || root.isSymbolicLink()) fail('validated output root changed during write');
   };
   await assertExpectedRoot();
-  if (create) await mkdir(path, { recursive: true });
-  await assertExpectedRoot();
-  let before;
-  try { before = await lstat(path); } catch (error) { throw error; }
-  if (!before.isDirectory() || before.isSymbolicLink()) fail('store directory must be a real directory');
-  await assertExpectedRoot();
-  let handle;
-  try { handle = await open(path, constants.O_RDONLY | O_DIRECTORY | O_NOFOLLOW); } catch { fail('store directory could not be opened without following symlinks'); }
+  const segments = path.split(/[\/]+/u).filter(Boolean);
+  let current;
   try {
-    const after = await handle.stat();
-    if (after.dev !== before.dev || after.ino !== before.ino) fail('store directory changed during validation');
+    current = await open('/', constants.O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
+    for (const segment of segments) {
+      const child = await openDirectoryChild(current, segment, { create });
+      await current.close().catch(() => {});
+      current = child;
+    }
     await assertExpectedRoot();
-    return handle;
+    return current;
   } catch (error) {
-    await handle.close().catch(() => {});
+    await current?.close().catch(() => {});
     throw error;
   }
 }
@@ -62,9 +80,7 @@ export async function openVerifiedNestedDirectory(rootHandle, relativeDirectory)
   try {
     for (const part of parts) {
       if (part === '..') fail('nested directory escapes its verified root');
-      const childPath = join(directoryFdPath(current), part);
-      await mkdir(childPath, { recursive: true });
-      const child = await openVerifiedDirectory(childPath, { create: false });
+      const child = await openDirectoryChild(current, part, { create: true });
       owned.push(child);
       current = child;
     }
@@ -109,7 +125,7 @@ function parseOwner(text) {
   try {
     const owner = JSON.parse(text);
     if (typeof owner?.token === 'string' && Number.isInteger(owner.pid)) return owner;
-  } catch { /* invalid/stale lock is handled by mtime and is not trusted as live */ }
+  } catch { /* invalid lock metadata is not trusted as live */ }
   return undefined;
 }
 async function readLockOwner(path) {
@@ -123,18 +139,58 @@ async function readLockOwner(path) {
   }
 }
 
+/** Serialize all lock-path inspection/removal/installation operations. */
+async function acquireGuard(parentHandle, lockInstallPath, timeoutMs, staleMs) {
+  const guardPath = `${lockInstallPath}.guard`;
+  const token = randomBytes(16).toString('hex');
+  const started = Date.now();
+  while (true) {
+    let handle;
+    try {
+      handle = await open(guardPath, 'wx', 0o600);
+      await handle.writeFile(JSON.stringify({ token, pid: process.pid }) + '\n', 'utf8');
+      return { handle, token, path: guardPath };
+    } catch (error) {
+      await handle?.close().catch(() => {});
+      if (error?.code !== 'EEXIST') throw error;
+      try {
+        const info = await lstat(guardPath);
+        const owner = await readLockOwner(guardPath);
+        if (owner?.state === 'released' || owner !== undefined && !processAlive(owner.pid) && Date.now() - info.mtimeMs > staleMs) await rm(guardPath, { force: true });
+      } catch (inspectError) { if (inspectError?.code !== 'ENOENT') throw inspectError; }
+      if (Date.now() - started >= timeoutMs) throw new FileLockError('timed out waiting for exclusive lock guard');
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, RETRY_MS));
+    }
+  }
+}
+
+async function markReleased(handle, token) {
+  try {
+    const text = Buffer.from(JSON.stringify({ token, pid: process.pid, state: 'released' }) + '\n', 'utf8');
+    await handle.truncate(0);
+    await handle.write(text, 0, text.length, 0);
+  } catch { /* a crashed/failed owner leaves active metadata for stale recovery */ }
+}
+
+async function releaseGuard(guard) {
+  if (!guard) return;
+  const identity = await guard.handle.stat().catch(() => undefined);
+  await markReleased(guard.handle, guard.token);
+  const current = await lstat(guard.path).catch(() => undefined);
+  const owner = await readLockOwner(guard.path);
+  if (identity && current && owner?.token === guard.token && current.dev === identity.dev && current.ino === identity.ino) await rm(guard.path, { force: true }).catch(() => {});
+  await guard.handle.close().catch(() => {});
+}
+
 /**
- * Acquire an exclusive lock. The lock path is opened through a verified parent
- * directory handle, so replacing the lexical parent with a symlink cannot
- * redirect the critical section. Stale recovery only removes locks whose PID
- * is demonstrably dead; release removes a lock only when its owner token still
- * matches, so an old owner cannot unlink a replacement owner's lock.
+ * Acquire an exclusive lock. Inspection and removal of the canonical lock are
+ * serialized by a guard in the same verified parent directory. This closes the
+ * read-then-unlink window where an old owner could remove a replacement owner.
  */
 export async function withExclusiveFileLock(filePath, task, options = {}) {
   if (typeof task !== 'function') throw new TypeError('withExclusiveFileLock requires a task function');
   const lockPath = resolve(filePath);
-  const parentPath = dirname(lockPath);
-  const parentHandle = await openVerifiedDirectory(parentPath);
+  const parentHandle = await openVerifiedDirectory(dirname(lockPath));
   const lockInstallPath = join(directoryFdPath(parentHandle), basename(lockPath));
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const staleMs = options.staleMs ?? STALE_MS;
@@ -144,30 +200,25 @@ export async function withExclusiveFileLock(filePath, task, options = {}) {
   let handle;
   try {
     while (handle === undefined) {
-      let created = false;
+      const remaining = Math.max(1, timeoutMs - (Date.now() - started));
+      const guard = await acquireGuard(parentHandle, lockInstallPath, remaining, staleMs);
       try {
-        handle = await open(lockInstallPath, 'wx', 0o600);
-        created = true;
-        await handle.writeFile(JSON.stringify({ token, pid: process.pid }) + '\n', 'utf8');
-      } catch (error) {
-        if (handle !== undefined) await handle.close().catch(() => {});
-        handle = undefined;
-        if (created) await rm(lockInstallPath, { force: true }).catch(() => {});
-        if (error?.code !== 'EEXIST') throw error;
-        let owner;
+        let created = false;
         try {
-          const info = await lstat(lockInstallPath);
-          if (info.isSymbolicLink() || !info.isFile()) throw new FileLockError('lock path must not be a symlink or directory');
-          owner = await readLockOwner(lockInstallPath);
-          if (owner === undefined && Date.now() - info.mtimeMs > staleMs) await rm(lockInstallPath, { force: true });
-          else if (owner !== undefined && !processAlive(owner.pid) && Date.now() - info.mtimeMs > staleMs) {
-            // A dead owner cannot release later. The PID check is the safety
-            // gate; a live owner is never reclaimed merely because it is old.
-            await rm(lockInstallPath, { force: true });
-          }
-        } catch (statError) {
-          if (statError?.code !== 'ENOENT') throw statError;
+          handle = await open(lockInstallPath, 'wx', 0o600);
+          created = true;
+          await handle.writeFile(JSON.stringify({ token, pid: process.pid }) + '\n', 'utf8');
+        } catch (error) {
+          await handle?.close().catch(() => {}); handle = undefined;
+          if (created) await rm(lockInstallPath, { force: true }).catch(() => {});
+          if (error?.code !== 'EEXIST') throw error;
+          const info = await lstat(lockInstallPath).catch((inspectError) => { if (inspectError?.code === 'ENOENT') return undefined; throw inspectError; });
+          if (info?.isSymbolicLink() || info && !info.isFile()) throw new FileLockError('lock path must not be a symlink or directory');
+          const owner = info ? await readLockOwner(lockInstallPath) : undefined;
+          if (owner?.state === 'released' || owner !== undefined && !processAlive(owner.pid) && Date.now() - info.mtimeMs > staleMs) await rm(lockInstallPath, { force: true });
         }
+      } finally { await releaseGuard(guard); }
+      if (handle === undefined) {
         if (Date.now() - started >= timeoutMs) throw new FileLockError('timed out waiting for exclusive store lock');
         await new Promise((resolvePromise) => setTimeout(resolvePromise, RETRY_MS));
       }
@@ -175,9 +226,18 @@ export async function withExclusiveFileLock(filePath, task, options = {}) {
     return await task({ directoryHandle: parentHandle, ownerToken: token });
   } finally {
     if (handle !== undefined) {
+      // Mark the original inode through its FD, then remove the pathname only
+      // while a guard confirms that the same token/inode is still installed.
+      // A replacement owner is therefore never unlinked by this owner.
+      const identity = await handle.stat().catch(() => undefined);
+      await markReleased(handle, token);
+      const guard = await acquireGuard(parentHandle, lockInstallPath, timeoutMs, staleMs).catch(() => undefined);
+      try {
+        const current = await lstat(lockInstallPath).catch(() => undefined);
+        const owner = await readLockOwner(lockInstallPath);
+        if (guard && identity && current && owner?.token === token && owner.state === 'released' && current.dev === identity.dev && current.ino === identity.ino) await rm(lockInstallPath, { force: true });
+      } finally { await releaseGuard(guard); }
       await handle.close().catch(() => {});
-      const owner = await readLockOwner(lockInstallPath);
-      if (owner?.token === token && owner.pid === process.pid) await rm(lockInstallPath, { force: true }).catch(() => {});
     }
     await parentHandle.close().catch(() => {});
   }

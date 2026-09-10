@@ -9,7 +9,9 @@ import { readSeedFile } from './discover.mjs';
 import { appendFileAtDirectory, openVerifiedDirectory, removeVerifiedFile } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
-const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
+const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const DEFAULT_SEED_FILE = resolve(REPOSITORY_ROOT, 'data/keywords/seeds.json');
+const DEFAULT_OUT_DIR = resolve(REPOSITORY_ROOT, 'data/keywords');
 const DEFAULT_RECORDS = resolve(DEFAULT_OUT_DIR, 'records.json');
 const DEFAULT_RAW = resolve(DEFAULT_OUT_DIR, 'raw');
 
@@ -19,7 +21,7 @@ export class AnalyzeCliError extends Error {
 const fail = (message) => { throw new AnalyzeCliError(message); };
 
 export function parseAnalyzeArgs(argv = []) {
-  const result = { seedFile: resolve(process.cwd(), 'data/keywords/seeds.json'), outDir: DEFAULT_OUT_DIR, raw: DEFAULT_RAW, records: DEFAULT_RECORDS, rawExplicit: false, dryRun: false };
+  const result = { seedFile: DEFAULT_SEED_FILE, outDir: DEFAULT_OUT_DIR, raw: DEFAULT_RAW, records: DEFAULT_RECORDS, rawExplicit: false, dryRun: false };
   const aliases = new Map([
     ['--seed-file', 'seedFile'], ['--out-dir', 'outDir'], ['--raw', 'raw'], ['--raw-dir', 'raw'],
     ['--evidence', 'raw'], ['--evidence-path', 'raw'], ['--raw-evidence', 'raw'],
@@ -282,7 +284,10 @@ export async function main(argv = process.argv.slice(2)) {
   let records = existing;
   if (!args.dryRun) {
     await mkdir(args.outDir, { recursive: true });
-    if (analysed.length > 0) records = await upsertRecords(analysed, { path: recordsPath, decisionsPath, events: buildAnalysisEvents(analysed, existingMap) });
+    // A run is one provenance unit. Never persist clean siblings when another
+    // candidate failed; leave canonical records untouched and invalidate the
+    // actionable projection instead.
+    if (failures === 0 && analysed.length > 0) records = await upsertRecords(analysed, { path: recordsPath, decisionsPath, events: buildAnalysisEvents(analysed, existingMap) });
     if (failures > 0) await writeReadyToWriteExport([], { path: readyPath });
     else await writeReadyToWriteExport(records, { path: readyPath, recordsPath });
   }
