@@ -4,7 +4,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { normalizeKeywordKey, normalizeWjKeywordRecord } from './contracts.mjs';
 import { stableSortRecords, transitionStatus } from './analysis.mjs';
 import { writeStableJson } from './evidence-store.mjs';
-import { appendFileAtDirectory, directoryFdPath, readFileAtDirectory, removeFileAtDirectory, withExclusiveFileLock } from './file-lock.mjs';
+import { appendFileAtDirectory, directoryFdPath, openVerifiedDirectory, readFileAtDirectory, removeFileAtDirectory, withExclusiveFileLock, writeStableTextAtDirectory } from './file-lock.mjs';
 
 /** Errors raised by the canonical records and human-decision stores. */
 export class RecordsStoreError extends Error {
@@ -55,7 +55,7 @@ async function readJsonl(path) {
     try {
       const value = JSON.parse(line);
       if (!isObject(value)) fail(`decision line ${index + 1} must be an object`);
-      return value;
+      return normalizeDecision(value);
     } catch (error) {
       if (error instanceof RecordsStoreError) throw error;
       fail(`decision line ${index + 1} is not valid JSON`);
@@ -234,9 +234,16 @@ export async function writeReadyToWriteExport(input, options = {}) {
   const commitPath = `${path}.commit.json`;
   const workflowPath = typeof config.recordsPath === 'string' ? `${resolve(config.recordsPath)}.workflow.lock` : `${path}.workflow.lock`;
   return withExclusiveFileLock(workflowPath, async () => withExclusiveFileLock(`${path}.lock`, async ({ directoryHandle }) => {
-    const source = typeof config.recordsPath === 'string' ? await readFileAtDirectory(directoryHandle, basename(config.recordsPath), 'utf8').then((text) => {
-      try { return JSON.parse(text); } catch { fail('records source is not valid JSON'); }
-    }) : records;
+    let source = records;
+    if (typeof config.recordsPath === 'string') {
+      const recordsDirectory = dirname(resolve(config.recordsPath));
+      const sourceHandle = recordsDirectory === dirname(path) ? directoryHandle : await openVerifiedDirectory(recordsDirectory, { create: false });
+      try {
+        source = await readFileAtDirectory(sourceHandle, basename(config.recordsPath), 'utf8').then((text) => {
+          try { return JSON.parse(text); } catch { fail('records source is not valid JSON'); }
+        });
+      } finally { if (sourceHandle !== directoryHandle) await sourceHandle.close().catch(() => {}); }
+    }
     const normalized = stableSortRecords(source.map((record) => normalizeWjKeywordRecord(record)));
     const ready = normalized.filter((record) => record.status === 'ready-to-write');
     const digest = createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
@@ -265,11 +272,14 @@ export async function readReadyToWriteExport(input, options = {}) {
     let ready;
     let marker;
     let records;
+    let recordsHandle;
     try {
       ready = JSON.parse(await readFileAtDirectory(directoryHandle, basename(path), 'utf8'));
       marker = JSON.parse(await readFileAtDirectory(directoryHandle, basename(`${path}.commit.json`), 'utf8'));
-      records = JSON.parse(await readFileAtDirectory(directoryHandle, basename(recordsPath), 'utf8'));
+      recordsHandle = dirname(recordsPath) === dirname(path) ? directoryHandle : await openVerifiedDirectory(dirname(recordsPath), { create: false });
+      records = JSON.parse(await readFileAtDirectory(recordsHandle, basename(recordsPath), 'utf8'));
     } catch { fail('ready-to-write export is not committed'); }
+    finally { if (recordsHandle && recordsHandle !== directoryHandle) await recordsHandle.close().catch(() => {}); }
     if (!Array.isArray(ready) || !isObject(marker) || marker.schema_version !== 1 || typeof marker.records_sha256 !== 'string' || !Array.isArray(records)) fail('ready-to-write export is not committed');
     const normalizedRecords = stableSortRecords(records.map((record) => normalizeWjKeywordRecord(record)));
     const digest = createHash('sha256').update(JSON.stringify(normalizedRecords)).digest('hex');

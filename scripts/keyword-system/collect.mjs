@@ -13,12 +13,12 @@ import {
   writeStableJson,
   resolveRawRoot,
 } from './lib/evidence-store.mjs';
-import { appendEvidenceIndexEntry } from './lib/records-store.mjs';
+import { appendEvidenceIndexEntry, readRecords, upsertRecords } from './lib/records-store.mjs';
 import { directoryFdPath, removeVerifiedFile, withExclusiveFileLock } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 import { readSeedFile, parseArgs } from './discover.mjs';
 
-const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
+const DEFAULT_OUT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../..', 'data/keywords');
 const FIXTURES = resolve(dirname(fileURLToPath(import.meta.url)), 'fixtures/naver-api-hub');
 const ISO_DAY = (date) => date.toISOString().slice(0, 10);
 
@@ -28,7 +28,7 @@ export class CollectCliError extends Error {
 
 function fail(message) { throw new CollectCliError(message); }
 
-async function writeBoundedJson(path, value) {
+export async function writeBoundedJson(path, value) {
   return withExclusiveFileLock(`${path}.lock`, async ({ directoryHandle }) => writeStableJson(path, value, { installPath: join(directoryFdPath(directoryHandle), basename(path)) }));
 }
 
@@ -145,6 +145,29 @@ function assertUniqueCandidates(candidates) {
   }
 }
 
+function candidateIdentity(candidate) { return `${normalizeKeywordKey(candidate.category)}\u0000${normalizeKeywordKey(candidate.head_keyword)}`; }
+
+async function markCandidatesResearching(candidates, outDir, collectedAt) {
+  const recordsPath = join(outDir, 'records.json');
+  const decisionsPath = join(outDir, 'decisions.jsonl');
+  const existing = await readRecords(recordsPath);
+  const existingMap = new Map(existing.map((record) => [candidateIdentity(record), record]));
+  for (const candidate of candidates) {
+    const previous = existingMap.get(candidateIdentity(candidate));
+    if (previous?.status === 'researching' || ['written', 'rejected', 'ready-to-write'].includes(previous?.status)) continue;
+    const researching = {
+      ...candidate,
+      source: ['naver-api-hub-blog', 'naver-api-hub-trend'],
+      collected_at: collectedAt,
+      freshness: 'unknown',
+      risk_flags: candidate.risk_flags ?? [],
+      evidence_available: false,
+      status: 'researching',
+    };
+    await upsertRecords([researching], { path: recordsPath, decisionsPath, event: { type: 'collection_started' } });
+  }
+}
+
 async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, outDir, dryRun, seenTargets, redactionValues = [] }) {
   const requests = [
     { source: 'naver-api-hub-blog', endpoint: '/search/v1/blog', method: 'GET', request: { query: candidate.head_keyword, display: 10, start: 1, sort: 'date', format: 'json' }, call: () => provider.searchBlogs({ query: candidate.head_keyword, display: 10, start: 1, sort: 'date', format: 'json' }) },
@@ -221,6 +244,7 @@ export async function main(argv = process.argv.slice(2)) {
   const now = new Date();
   const collectedAt = now.toISOString();
   const runId = makeRunId({ clock: () => now });
+  await markCandidatesResearching(candidates, args.outDir, collectedAt);
   const providerEnv = args.fixture
     ? { NCP_NAVER_API_HUB_CLIENT_ID: 'fixture-client', NCP_NAVER_API_HUB_CLIENT_SECRET: 'fixture-secret' }
     : process.env;

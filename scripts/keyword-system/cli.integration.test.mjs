@@ -8,6 +8,7 @@ import { makeValidRecord } from './test-helpers.mjs';
 import { main as collectMain } from './collect.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 import { writeEvidence } from './lib/evidence-store.mjs';
+import { writeBoundedJson } from './collect.mjs';
 import { appendDecision, appendEvidenceIndexEntry, upsertRecords, writeReadyToWriteExport } from './lib/records-store.mjs';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname, '..');
@@ -253,4 +254,69 @@ test('manifest mappings are candidate-bound and conflicting raw requests cannot 
   const envelope = JSON.parse(await readFile(blog, 'utf8')); envelope.request.query = 'unrelated keyword'; await writeFile(blog, JSON.stringify(envelope));
   const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
   assert.notEqual(analyzed.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
+
+
+test('explicit multi-candidate analysis is all-or-nothing on a partial raw set', async (t) => {
+  const paths = await setup(t);
+  const seeds = join(paths.root, 'two-seeds.json');
+  await writeFile(seeds, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }, { category: 'economy', seeds: ['생활 물가'], title: '생활 물가 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', seeds, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  const rawFiles = [];
+  async function find(dir) { for (const entry of await readdir(dir, { withFileTypes: true })) { const child = join(dir, entry.name); if (entry.isDirectory()) await find(child); else if (entry.name.endsWith('.json')) rawFiles.push(child); } }
+  await find(join(paths.out, 'raw')); await rm(rawFiles.find((file) => file.includes('생활-물가') && file.includes('trend')), { force: true });
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', seeds, '--raw-evidence', join(paths.out, 'raw'), '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0);
+  const persisted = JSON.parse(await readFile(join(paths.out, 'records.json'), 'utf8'));
+  assert.equal(persisted.length, 2); assert.equal(persisted.every((record) => record.status === 'researching'), true);
+  assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
+
+
+test('collection records the candidate to researching before provider evidence', async (t) => {
+  const paths = await setup(t);
+  const seed = join(paths.root, 'one-seed.json');
+  await writeFile(seed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  const collected = await runNode(SCRIPT('collect.mjs'), ['--seed-file', seed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR]);
+  assert.equal(collected.code, 0);
+  const records = JSON.parse(await readFile(join(paths.out, 'records.json'), 'utf8'));
+  assert.equal(records.length, 1); assert.equal(records[0].status, 'researching');
+  assert.equal((await readFile(join(paths.out, 'decisions.jsonl'), 'utf8').catch(() => '')).trim(), '');
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', seed, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.equal(analyzed.code, 0, analyzed.stderr);
+  assert.equal(JSON.parse(await readFile(join(paths.out, 'records.json'), 'utf8'))[0].status, 'ready-to-write');
+});
+
+
+test('nested intermediate directory swaps reject every bounded artifact write', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'wj-nested-race-')); const out = join(root, 'data/keywords'); const outside = join(root, 'outside');
+  await mkdir(out, { recursive: true }); await mkdir(outside); t.after(() => rm(root, { recursive: true, force: true }));
+  const record = makeValidRecord({ status: 'candidate' });
+  async function rejectAfterSwap(target, operation) {
+    const parent = join(out, 'a/b'); await mkdir(parent, { recursive: true }); await assertContainedPath(target, out);
+    const held = join(out, 'a-held'); await (await import('node:fs/promises')).rename(join(out, 'a'), held); await (await import('node:fs/promises')).symlink(outside, join(out, 'a'), 'dir');
+    try { await assert.rejects(operation, /symlink|directory|changed|lock|output/iu); }
+    finally { await rm(join(out, 'a'), { recursive: true, force: true }); await (await import('node:fs/promises')).rename(held, join(out, 'a')); }
+    assert.deepEqual(await readdir(outside), []);
+  }
+  await rejectAfterSwap(join(out, 'a/b/candidates.json'), () => writeBoundedJson(join(out, 'a/b/candidates.json'), []));
+  await rejectAfterSwap(join(out, 'a/b/collection.json'), () => writeBoundedJson(join(out, 'a/b/collection.json'), { schema_version: 1 }));
+  await rejectAfterSwap(join(out, 'a/b/records.json'), () => upsertRecords([record], { path: join(out, 'a/b/records.json') }));
+  await rejectAfterSwap(join(out, 'a/b/ready-to-write.json'), () => writeReadyToWriteExport([], { path: join(out, 'a/b/ready-to-write.json') }));
+  await rejectAfterSwap(join(out, 'a/b/decisions.jsonl'), () => appendDecision({ path: join(out, 'a/b/decisions.jsonl'), decision: { type: 'reject', category: 'ai-it', head_keyword: 'x', reason: 'manual' } }));
+  await rejectAfterSwap(join(out, 'a/b/evidence-index.jsonl'), () => appendEvidenceIndexEntry({ path: join(out, 'a/b/evidence-index.jsonl'), entry: { schema_version: 1, source: 'naver-api-hub-blog', outcome: 'success', path: 'data/keywords/raw/x.json', run_id: '20260910T000000Z-abcdef12', collected_at: '2026-09-10T00:00:00.000Z' } }));
+  const raw = join(out, 'a/b/raw'); await mkdir(raw, { recursive: true });
+  await rejectAfterSwap(raw, () => writeEvidence({ source: 'naver-api-hub-blog', endpoint: '/search/v1/blog', method: 'GET', request: { query: 'x', display: 10, start: 1, sort: 'date', format: 'json' }, response: { total: 1, start: 1, display: 1, items: [{ title: 'x', description: 'x', link: 'https://example.com/x', postdate: '20260101' }] }, http: { status: 200, ok: true }, collectedAt: '2026-01-01T00:00:00.000Z', runId: '20260101T000000Z-abcdef12', rootDir: raw }));
+});
+
+
+test('CLI supports a nested --records path while keeping projection under data/keywords', async (t) => {
+  const paths = await setup(t);
+  const nested = join(paths.out, 'archive/records.json'); await mkdir(join(paths.out, 'archive'), { recursive: true });
+  const collected = await runNode(SCRIPT('collect.mjs'), ['--seed-file', paths.seeds, '--out-dir', paths.out, '--fixture', FIXTURE_DIR]);
+  assert.equal(collected.code, 0, collected.stderr);
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', paths.seeds, '--records', nested, '--out-dir', paths.out]);
+  assert.equal(analyzed.code, 0, analyzed.stderr);
+  assert.equal(JSON.parse(await readFile(nested, 'utf8'))[0].status, 'ready-to-write');
+  assert.equal(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')).length, 3);
 });

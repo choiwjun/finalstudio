@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, access, readdir, rm, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, access, readdir, rename, rm, symlink, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { makeValidRecord, readJsonl } from './test-helpers.mjs';
@@ -186,4 +186,53 @@ test('dead stale owner recovery lets B enter while C cannot overlap B', async (t
   const c = await withExclusiveFileLock(lockPath, async () => { active += 1; maxActive = Math.max(maxActive, active); active -= 1; }, { timeoutMs: 35, staleMs: 0 }).catch((error) => error);
   await b;
   assert.equal(c.code, 'FILE_LOCK'); assert.equal(maxActive, 1);
+});
+
+
+test('nested records and ready projections use independently verified parent FDs', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const nested = join(paths.root, 'data/keywords/a/b');
+  const recordsPath = join(nested, 'records.json'); const readyPath = join(nested, 'ready-to-write.json');
+  await mkdir(nested, { recursive: true });
+  const ready = makeValidRecord({ status: 'ready-to-write' });
+  await upsertRecords([ready], { path: recordsPath, event: { type: 'analysis_success' } });
+  await writeReadyToWriteExport([ready], { path: readyPath, recordsPath });
+  assert.deepEqual(await readReadyToWriteExport(readyPath, { recordsPath }), [ready]);
+});
+
+test('replacing an acquired lock pathname cannot be removed by the old owner', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const lockPath = join(paths.root, 'data/keywords/replaced.lock');
+  let entered; const enteredPromise = new Promise((resolvePromise) => { entered = resolvePromise; });
+  const owner = withExclusiveFileLock(lockPath, async () => {
+    entered();
+    const replacement = `${lockPath}.replacement`;
+    await rename(lockPath, replacement);
+    await writeFile(lockPath, JSON.stringify({ token: 'owner-B', pid: process.pid }) + '\n');
+  });
+  await enteredPromise; await owner;
+  assert.equal(JSON.parse(await readFile(lockPath, 'utf8')).token, 'owner-B');
+  await rm(lockPath, { force: true }); await rm(`${lockPath}.replacement`, { force: true });
+});
+
+
+test('malformed persisted decisions never authorize terminal status changes', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const ready = makeValidRecord({ status: 'ready-to-write' }); const written = makeValidRecord({ status: 'written' });
+  await upsertRecords([ready], { path: paths.records, event: { type: 'analysis_success' } });
+  await writeFile(paths.decisions, JSON.stringify({ type: 'writer_handoff', category: written.category, head_keyword: written.head_keyword }) + '\n');
+  await assert.rejects(() => upsertRecords([written], { path: paths.records, decisionsPath: paths.decisions, event: { type: 'writer_handoff', reference: 'draft.md', reason: 'human selected' } }), /reference|reason|decision/iu);
+  assert.equal(JSON.parse(await readFile(paths.records, 'utf8'))[0].status, 'ready-to-write');
+});
+
+
+test('decision append failure rolls records back before any terminal state can survive', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const candidate = makeValidRecord({ status: 'candidate', evidence_available: false, freshness: 'unknown', source: ['naver-api-hub-blog'] });
+  await upsertRecords([candidate], { path: paths.records });
+  const outside = join(paths.root, 'outside-decisions'); await writeFile(outside, ''); await rm(paths.decisions, { force: true }); await symlink(outside, paths.decisions);
+  const rejected = makeValidRecord({ status: 'rejected', evidence_available: false, freshness: 'unknown', source: ['naver-api-hub-blog'], risk_flags: ['api_error'] });
+  await assert.rejects(() => upsertRecords([rejected], { path: paths.records, decisionsPath: paths.decisions, event: { type: 'reject', reason: 'human review' } }), /symlink|decision|lock/iu);
+  assert.equal(JSON.parse(await readFile(paths.records, 'utf8'))[0].status, 'candidate');
+  assert.equal(await readFile(outside, 'utf8'), '');
 });

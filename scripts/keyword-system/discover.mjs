@@ -1,13 +1,14 @@
 import { readFile } from 'node:fs/promises';
-import { basename, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { discoverCandidates, parseSeedInput } from './lib/discovery.mjs';
 import { writeStableJson } from './lib/evidence-store.mjs';
 import { directoryFdPath, withExclusiveFileLock } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
-const DEFAULT_SEED_FILE = resolve(process.cwd(), 'data/keywords/seeds.json');
-const DEFAULT_OUT_DIR = resolve(process.cwd(), 'data/keywords');
+const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const DEFAULT_SEED_FILE = resolve(REPOSITORY_ROOT, 'data/keywords/seeds.json');
+const DEFAULT_OUT_DIR = resolve(REPOSITORY_ROOT, 'data/keywords');
 
 export class DiscoverCliError extends Error {
   constructor(message) { super(message); this.name = 'DiscoverCliError'; this.code = 'DISCOVER_CLI'; }
