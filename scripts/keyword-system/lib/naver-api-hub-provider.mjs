@@ -18,6 +18,7 @@
 import {
   ContractValidationError,
   normalizeApiFailure,
+  redactCredentialValues,
   normalizeBlogSearchRequest,
   normalizeBlogSearchResponse,
   normalizeTrendRequest,
@@ -68,7 +69,7 @@ function buildTrendInit(request, headers, signal) {
   };
 }
 
-function networkFailure(error, timeoutMs) {
+function networkFailure(error, timeoutMs, redactionValues = []) {
   const name = String(error?.name ?? error?.reason?.name ?? '');
   const aborted = name === 'AbortError' || name === 'TimeoutError' || error?.signal?.aborted === true;
   let message = 'Keyword API network request failed';
@@ -77,39 +78,40 @@ function networkFailure(error, timeoutMs) {
   } else if (name === 'AbortError') {
     message = 'Keyword API request was aborted';
   }
-  return normalizeApiFailure({ kind: 'network_error', status: 0, retryable: true, risk_flags: ['api_error'], message });
+  return normalizeApiFailure({ kind: 'network_error', status: 0, retryable: true, risk_flags: ['api_error'], message }, { redactValues: redactionValues });
 }
 
-function malformedJsonFailure() {
+function malformedJsonFailure(redactionValues = []) {
   return normalizeApiFailure({
     kind: 'malformed_json',
     status: 0,
     retryable: false,
     message: 'response body was not valid JSON',
     risk_flags: ['malformed_response'],
-  });
+  }, { redactValues: redactionValues });
 }
 
-function httpFailure(status, text) {
+function httpFailure(status, text, redactionValues = []) {
   let body;
   try {
-    body = JSON.parse(text);
+    body = redactCredentialValues(JSON.parse(text), redactionValues);
   } catch {
     body = undefined;
   }
   if (body !== undefined && body !== null && typeof body === 'object' && !Array.isArray(body)) {
-    return normalizeApiFailure({ status, body });
+    return normalizeApiFailure({ status, body }, { redactValues: redactionValues });
   }
   return normalizeApiFailure({
     status,
     body: {},
     message: `Keyword API returned non-JSON HTTP ${status} response`,
-  });
+  }, { redactValues: redactionValues });
 }
 
 async function run(searchKind, request, state) {
   const credentials = readCredentials(state.env);
   if (credentials === null) return missingCredentialFailure();
+  const redactionValues = [credentials.clientId, credentials.clientSecret];
 
   const signal = AbortSignal.timeout(state.timeoutMs);
   const headers = new Headers({
@@ -126,23 +128,23 @@ async function run(searchKind, request, state) {
   try {
     response = await state.fetchImpl(url.href, init);
   } catch (error) {
-    return networkFailure(error, state.timeoutMs);
+    return networkFailure(error, state.timeoutMs, redactionValues);
   }
 
   let text;
   try {
     text = await response.text();
   } catch (error) {
-    return networkFailure(error, state.timeoutMs);
+    return networkFailure(error, state.timeoutMs, redactionValues);
   }
 
-  if (!response.ok) return httpFailure(response.status, text);
+  if (!response.ok) return httpFailure(response.status, text, redactionValues);
 
   let parsed;
   try {
-    parsed = JSON.parse(text);
+    parsed = redactCredentialValues(JSON.parse(text), redactionValues);
   } catch {
-    return malformedJsonFailure();
+    return malformedJsonFailure(redactionValues);
   }
 
   try {
@@ -157,7 +159,7 @@ async function run(searchKind, request, state) {
         retryable: false,
         message: error.message,
         risk_flags: ['malformed_response'],
-      });
+      }, { redactValues: redactionValues });
     }
     throw error;
   }

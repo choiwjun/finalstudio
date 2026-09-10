@@ -337,8 +337,8 @@ test('Given a failure envelope builder input with a secret, when built, then the
 test('Given hostile keywords and run ids, when written, then every resolved path stays inside the raw root', async () => {
   await withTempRoot(async (root) => {
     const rootWithSep = root.endsWith(sep) ? root : `${root}${sep}`;
-    for (const query of ['../../etc/passwd', '/etc/passwd', '..\\..\\etc', 'a/b', '..']) {
-      const result = await writeEvidence({ ...BLOG_BASE(), request: { ...BLOG_REQUEST(), query }, rootDir: root });
+    for (const [index, query] of ['../../etc/passwd', '/etc/passwd', '..\\..\\etc', 'a/b', '..'].entries()) {
+      const result = await writeEvidence({ ...BLOG_BASE(), request: { ...BLOG_REQUEST(), query }, runId: `20260909T000000Z-${String(index + 1).padStart(8, '0')}`, rootDir: root });
       assert.ok(result.path.startsWith(rootWithSep), result.path);
       assert.ok(!result.path.split(sep).includes('..'));
     }
@@ -394,12 +394,50 @@ test('Given successful and failed envelopes, when an index entry is made, then i
       http: { status: 500, ok: false },
       error: { kind: 'server_error', message: 'upstream exploded' },
       collectedAt: COLLECTED_AT,
-      runId: RUN_ID,
+      runId: '20260909T000000Z-76543210',
       rootDir: root,
     });
     assert.equal(bad.indexEntry.outcome, 'failure');
     assert.equal(bad.indexEntry.error_kind, 'server_error');
     const parsed = JSON.parse(await readFile(bad.path, 'utf8'));
     assert.deepEqual(parsed.http, { status: 500, ok: false });
+  });
+});
+
+
+test('Given an opaque credential in an upstream failure, when failure evidence is persisted with redaction values, then neither envelope nor bytes contain it', async () => {
+  await withTempRoot(async (root) => {
+    const opaque = 'qaOpaqueValue9Zp3';
+    const result = await writeFailureEvidence({
+      source: 'naver-api-hub-blog', endpoint: '/search/v1/blog', method: 'GET', request: BLOG_REQUEST(),
+      http: { status: 401, ok: false },
+      error: { kind: 'auth_missing', message: opaque }, collectedAt: COLLECTED_AT, runId: RUN_ID,
+      rootDir: root, redactValues: [opaque],
+    });
+    assert.equal(JSON.stringify(result.envelope).includes(opaque), false);
+    assert.equal((await readFile(result.path, 'utf8')).includes(opaque), false);
+  });
+});
+
+test('Given an existing same-run source/key evidence file, when evidence is written again, then the second write is rejected and bytes remain unchanged', async () => {
+  await withTempRoot(async (root) => {
+    const first = await writeEvidence({ ...BLOG_BASE(), rootDir: root });
+    const before = await readFile(first.path, 'utf8');
+    await assert.rejects(() => writeEvidence({ ...BLOG_BASE(), response: { ...BLOG_RESPONSE(), total: 2 }, rootDir: root }));
+    assert.equal(await readFile(first.path, 'utf8'), before);
+  });
+});
+
+
+test('Given concurrent writes to one same-run evidence target, when both complete, then exactly one installs the target atomically', async () => {
+  await withTempRoot(async (root) => {
+    const writes = await Promise.allSettled([
+      writeEvidence({ ...BLOG_BASE(), rootDir: root }),
+      writeEvidence({ ...BLOG_BASE(), rootDir: root }),
+    ]);
+    assert.equal(writes.filter((result) => result.status === 'fulfilled').length, 1);
+    assert.equal(writes.filter((result) => result.status === 'rejected').length, 1);
+    const entries = await readdir(join(root, '2026', '09', '09', RUN_ID));
+    assert.equal(entries.filter((entry) => entry.endsWith('.tmp')).length, 0);
   });
 });

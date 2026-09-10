@@ -164,13 +164,32 @@ export function normalizeTrendResponse(input) {
 export const validateTrendResponse = normalizeTrendResponse;
 export const isValidTrendResponse = (value) => { try { normalizeTrendResponse(value); return true; } catch { return false; } };
 
-const redactText = (value) => String(value)
-  .replace(/((?:authorization|proxy-authorization|x-ncp-[^\s:=]+|api[-_ ]?key|client[-_ ]?(?:id|secret)|access[-_]?token|refresh[-_]?token|password|credential|secret|token)\s*[:=]\s*)(?:(?:bearer|basic)\s+[^\s,;&]+|"[^"]*"|'[^']*'|[^\s,;&]+)/giu, '$1[redacted]')
-  .replace(/\b(?:bearer|basic)\s+[^\s,;&]+/giu, '[redacted]')
-  .replace(/[A-Za-z0-9_-]*SECRET[A-Za-z0-9_-]*/giu, '[redacted]');
-const redact = (value) => redactText(value);
+const normalizeRedactionValues = (values) => [...new Set((Array.isArray(values) ? values : [values])
+  .filter((value) => typeof value === 'string' && value.length > 0))]
+  .sort((a, b) => b.length - a.length);
 
-export function normalizeApiFailure(input) {
+const redactText = (value, redactionValues = []) => {
+  let text = String(value);
+  for (const secret of normalizeRedactionValues(redactionValues)) text = text.split(secret).join('[redacted]');
+  return text
+    .replace(/((?:authorization|proxy-authorization|x-ncp-[^\s:=]+|api[-_ ]?key|client[-_ ]?(?:id|secret)|access[-_]?token|refresh[-_]?token|password|credential|secret|token)\s*[:=]\s*)(?:(?:bearer|basic)\s+[^\s,;&]+|"[^"]*"|'[^']*'|[^\s,;&]+)/giu, '$1[redacted]')
+    .replace(/\b(?:bearer|basic)\s+[^\s,;&]+/giu, '[redacted]')
+    .replace(/[A-Za-z0-9_-]*SECRET[A-Za-z0-9_-]*/giu, '[redacted]');
+};
+
+/** Redact configured opaque credentials from JSON-safe upstream values. */
+export function redactCredentialValues(value, redactionValues = []) {
+  if (typeof value === 'string') return redactText(value, redactionValues);
+  if (Array.isArray(value)) return value.map((item) => redactCredentialValues(item, redactionValues));
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactCredentialValues(item, redactionValues)]));
+  }
+  return value;
+}
+
+const redact = (value, redactionValues = []) => redactText(value, redactionValues);
+
+export function normalizeApiFailure(input, options = {}) {
   const value = object(input, 'failure');
   const body = value.body && typeof value.body === 'object' ? value.body : {};
   const gateway = body.error && typeof body.error === 'object' ? body.error : {};
@@ -182,7 +201,8 @@ export function normalizeApiFailure(input) {
   }
   enumValue(kind, API_FAILURE_KINDS, 'failure.kind');
   const code = value.code ?? gateway.errorCode ?? body.errorCode ?? body.errId ?? 'unknown';
-  const message = redact(value.message ?? gateway.message ?? body.errorMessage ?? body.errMsg ?? 'Keyword API request failed');
+  const redactionValues = options?.redactValues ?? [];
+  const message = redact(value.message ?? gateway.message ?? body.errorMessage ?? body.errMsg ?? 'Keyword API request failed', redactionValues);
   if (value.retryable !== undefined && typeof value.retryable !== 'boolean') fail('failure.retryable', 'must be boolean');
   const risk = new Set(Array.isArray(value.risk_flags) ? value.risk_flags.map((item, index) => enumValue(item, RISK_FLAGS, `failure.risk_flags[${index}]`)) : []);
   if (status >= 400) risk.add('api_error');
@@ -191,7 +211,7 @@ export function normalizeApiFailure(input) {
   if (kind === 'rate_limited') risk.add('rate_limited');
   return {
     kind,
-    code: redact(code),
+    code: redact(code, redactionValues),
     message,
     status,
     retryable: value.retryable ?? (kind === 'rate_limited' || kind === 'server_error' || kind === 'network_error'),
@@ -201,21 +221,21 @@ export function normalizeApiFailure(input) {
 
 export const validateApiFailure = normalizeApiFailure;
 
-function safeValue(value, path = 'value', seen = new Set()) {
+function safeValue(value, path = 'value', seen = new Set(), redactionValues = []) {
   if (value === null) return value;
-  if (typeof value === 'string') return redactText(value);
+  if (typeof value === 'string') return redactText(value, redactionValues);
   if (typeof value !== 'object') {
     if (typeof value === 'number' || typeof value === 'boolean') return value;
     fail(path, 'must contain only JSON values');
   }
   if (seen.has(value)) fail(path, 'must not contain circular values');
   seen.add(value);
-  if (Array.isArray(value)) return value.map((item, index) => safeValue(item, `${path}[${index}]`, seen));
+  if (Array.isArray(value)) return value.map((item, index) => safeValue(item, `${path}[${index}]`, seen, redactionValues));
   const result = {};
   for (const [key, item] of Object.entries(value)) {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') fail(`${path}.${key}`, 'prototype-control keys are not allowed');
     if (/headers|authorization|secret|credential|client[_-]?id|api[-_]?key|token/iu.test(key)) fail(`${path}.${key}`, 'credential-bearing fields are not allowed');
-    result[key] = safeValue(item, `${path}.${key}`, seen);
+    result[key] = safeValue(item, `${path}.${key}`, seen, redactionValues);
   }
   seen.delete(value);
   return result;
@@ -240,7 +260,7 @@ const EVIDENCE_CONTRACTS = Object.freeze({
   }),
 });
 
-export function normalizeRawEvidenceEnvelope(input) {
+export function normalizeRawEvidenceEnvelope(input, options = {}) {
   const value = object(input, 'evidence');
   if (value.schema_version !== 1) fail('evidence.schema_version', 'must be 1');
   const source = enumValue(value.source, [...SAFE_SOURCES], 'evidence.source');
@@ -251,7 +271,8 @@ export function normalizeRawEvidenceEnvelope(input) {
   const http = object(value.http, 'evidence.http');
   integer(http.status, 'evidence.http.status', 0, 599);
   if (typeof http.ok !== 'boolean') fail('evidence.http.ok', 'must be boolean');
-  const requestInput = safeValue(object(value.request, 'evidence.request'), 'evidence.request');
+  const redactionValues = options?.redactValues ?? [];
+  const requestInput = safeValue(object(value.request, 'evidence.request'), 'evidence.request', new Set(), redactionValues);
   contract.request(requestInput);
   const request = Object.fromEntries(contract.requestFields.filter((field) => requestInput[field] !== undefined).map((field) => [field, requestInput[field]]));
   const result = {
@@ -268,14 +289,14 @@ export function normalizeRawEvidenceEnvelope(input) {
     if (http.status !== 200) fail('evidence.http.status', 'successful evidence must use HTTP 200');
     if (value.error !== undefined) fail('evidence.error', 'must be absent for successful evidence');
     if (value.response === undefined) fail('evidence.response', 'is required for successful evidence');
-    const response = contract.response(safeValue(value.response, 'evidence.response'));
+    const response = contract.response(safeValue(value.response, 'evidence.response', new Set(), redactionValues));
     if (contract.isEmpty(response)) fail('evidence.response', 'empty response is not usable evidence');
     result.response = response;
   } else {
     if (http.status !== 0 && http.status < 400) fail('evidence.http.status', 'failed evidence must use HTTP 0 or a 4xx/5xx status');
     if (value.response !== undefined) fail('evidence.response', 'must be absent for failed evidence');
     if (value.error === undefined) fail('evidence.error', 'is required for failed evidence');
-    const error = normalizeApiFailure({ ...safeValue(value.error, 'evidence.error'), status: http.status });
+    const error = normalizeApiFailure({ ...safeValue(value.error, 'evidence.error', new Set(), redactionValues), status: http.status }, { redactValues: redactionValues });
     if (http.status === 0 && error.kind !== 'network_error') fail('evidence.error.kind', 'HTTP 0 failures must be network_error');
     result.error = error;
   }

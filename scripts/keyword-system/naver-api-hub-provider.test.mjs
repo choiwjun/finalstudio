@@ -305,3 +305,16 @@ test('Given a fixture transport without any real network, when both endpoints ru
   assert.deepEqual(blogResult, normalizeBlogSearchResponse(await readJsonFixture('blog-success.json')));
   assert.deepEqual(trendResult, normalizeTrendResponse(await readJsonFixture('trend-success.json')));
 });
+
+
+test('Given an opaque configured credential echoed by upstream, when a failure is normalized, then the value is absent from the provider result', async () => {
+  const opaque = 'qaOpaqueValue9Zp3';
+  const env = { [CLIENT_ID_ENV]: 'qaClientId', [CLIENT_SECRET_ENV]: opaque };
+  const { provider } = makeMockProvider({
+    status: 401,
+    body: { errorCode: '401', errorMessage: opaque },
+    env,
+  });
+  const failure = await provider.searchBlogs(BLOG_REQUEST);
+  assert.equal(JSON.stringify(failure).includes(opaque), false);
+});
