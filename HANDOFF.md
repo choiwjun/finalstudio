@@ -1054,3 +1054,11 @@ Task 1 독립 리뷰는 **미승인 / REQUEST_CHANGES**다. 다음 수정 없이
 - NAVER API HUB 공식 API만 사용한다. 비공식 자동완성 endpoint와 Google은 초기 범위에서 제외한다.
 - API Secret은 코드·문서·로그·fixture에 저장하거나 출력하지 않는다. 제공된 Secret은 노출된 것으로 간주하고 실제 사용 전 재발급한다.
 - 자동 글 생성·자동 발행·calendar 수정은 이번 시스템의 범위가 아니다.
+
+## 2026-09-10 Task 6 일시중지 핸드오프
+
+사용자 요청으로 NAVER API HUB 키워드 시스템 Task 6 작업을 중지했다. 최신 구현 작업 트리는 `/home/wj941/orca/workspaces/blog/keyword-task6`, 브랜치는 `choiwjun/keyword-task6`, HEAD는 `2d90d49`다. 부모 `main`의 HEAD는 `78b1cf6`이며 미커밋 `src/styles/site.css`를 보존하고 있다. Task 6은 아직 부모 `main`에 통합하지 않았고, `2d90d49` 이후 누적 검증과 fresh independent QA가 남아 있다.
+
+전체 작업 내용·커밋 체인·QA 차단 사항·재개 순서는 다음 문서가 최신 기준이다.
+
+- [`docs/superpowers/handoffs/wj-naver-api-hub-task6-paused-2026-09-10.md`](docs/superpowers/handoffs/wj-naver-api-hub-task6-paused-2026-09-10.md)
