@@ -1,4 +1,4 @@
-import { ContractValidationError, SEARCH_INTENTS } from './contracts.mjs';
+import { ContractValidationError, normalizeKeywordKey, SEARCH_INTENTS } from './contracts.mjs';
 
 const CATEGORY_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const NUMERIC_ONLY_PATTERN = /^[\p{N}\s.,%]+$/u;
@@ -62,7 +62,7 @@ export function normalizeKeyword(text) {
 
 const isNumericOnly = (text) => NUMERIC_ONLY_PATTERN.test(text);
 
-const keywordKey = (text) => text.normalize('NFC').toLowerCase();
+const keywordKey = normalizeKeywordKey;
 
 /**
  * Validate and normalize a versioned seed document:

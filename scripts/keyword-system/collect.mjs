@@ -3,6 +3,7 @@ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createNaverApiHubProvider } from './lib/naver-api-hub-provider.mjs';
 import { discoverCandidates } from './lib/discovery.mjs';
+import { normalizeKeywordKey } from './lib/contracts.mjs';
 import {
   deriveSafeKey,
   evidenceRelativePath,
@@ -13,6 +14,7 @@ import {
   resolveRawRoot,
 } from './lib/evidence-store.mjs';
 import { appendEvidenceIndexEntry } from './lib/records-store.mjs';
+import { directoryFdPath, removeVerifiedFile, withExclusiveFileLock } from './lib/file-lock.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 import { readSeedFile, parseArgs } from './discover.mjs';
 
@@ -25,6 +27,10 @@ export class CollectCliError extends Error {
 }
 
 function fail(message) { throw new CollectCliError(message); }
+
+async function writeBoundedJson(path, value) {
+  return withExclusiveFileLock(`${path}.lock`, async ({ directoryHandle }) => writeStableJson(path, value, { installPath: join(directoryFdPath(directoryHandle), basename(path)) }));
+}
 
 async function pathExists(path) {
   try { await access(path); return true; } catch { return false; }
@@ -133,7 +139,7 @@ function dateRequest(now, candidate) {
 function assertUniqueCandidates(candidates) {
   const seen = new Set();
   for (const candidate of candidates) {
-    const key = `${candidate.category}\u0000${candidate.head_keyword.normalize('NFC').toLowerCase()}`;
+    const key = `${normalizeKeywordKey(candidate.category)}\u0000${normalizeKeywordKey(candidate.head_keyword)}`;
     if (seen.has(key)) fail(`duplicate candidate in one collection run: ${candidate.category}/${candidate.head_keyword}`);
     seen.add(key);
   }
@@ -159,7 +165,7 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
     const safeKey = deriveSafeKey(item.source, item.request);
     const relativeRaw = evidenceRelativePath({ collectedAt, runId, source: item.source, safeKey });
     const target = resolve(rawRoot, relativeRaw);
-    const targetKey = `${item.source}\u0000${safeKey.normalize('NFC').toLowerCase()}`;
+    const targetKey = `${item.source}\u0000${normalizeKeywordKey(safeKey)}`;
     if (seenTargets.has(targetKey)) fail(`duplicate evidence target in one run: ${item.source}/${safeKey}`);
     seenTargets.add(targetKey);
     if (await pathExists(target)) fail(`evidence target already exists for this run: ${item.source}/${safeKey}`);
@@ -182,8 +188,12 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
       const indexEntry = { ...persisted.indexEntry, path: repositoryRelativePath(persisted.path, outDir) };
       const indexPath = await assertContainedPath(resolve(outDir, 'evidence-index.jsonl'), outDir);
       await appendEvidenceIndexEntry({ path: indexPath, entry: indexEntry });
-      traces.push({ source: item.source, outcome: empty ? 'empty' : indexEntry.outcome, path: indexEntry.path });
+      traces.push({ source: item.source, outcome: empty ? 'failure' : indexEntry.outcome, path: indexEntry.path, run_id: indexEntry.run_id, collected_at: indexEntry.collected_at });
     } catch {
+      // An evidence file is not valid provenance until its index line exists.
+      // Remove only the file installed by this attempt; the verified parent
+      // handle prevents cleanup from following a swapped symlink.
+      if (persisted?.path) await removeVerifiedFile(persisted.path).catch(() => {});
       failures += 1;
       traces.push({ source: item.source, outcome: 'failure' });
     }
@@ -232,9 +242,9 @@ export async function main(argv = process.argv.slice(2)) {
   const candidatesPath = await assertContainedPath(resolve(args.outDir, 'candidates.json'), args.outDir);
   const collectionPath = await assertContainedPath(resolve(args.outDir, 'collection.json'), args.outDir);
   await assertContainedPath(resolve(args.outDir, 'evidence-index.jsonl'), args.outDir);
-  await writeStableJson(candidatesPath, candidates);
-  await writeStableJson(collectionPath, { schema_version: 1, run_id: runId, collected_at: collectedAt, candidates: traces });
-  console.log(`collected ${candidates.length} candidate(s), ${traces.reduce((sum, item) => sum + item.evidence.filter((evidence) => evidence.outcome === 'success').length, 0)} successful evidence call(s)`);
+  await writeBoundedJson(candidatesPath, candidates);
+  await writeBoundedJson(collectionPath, { schema_version: 1, run_id: runId, collected_at: collectedAt, candidates: traces });
+  console.log(`collected ${candidates.length} candidate(s), ${traces.reduce((sum, item) => sum + item.evidence.filter((evidence) => evidence.outcome === 'success').length, 0)} successful evidence call(s); outputs data/keywords/raw, data/keywords/evidence-index.jsonl, data/keywords/collection.json`);
   if (failures > 0) fail('one or more provider/evidence operations failed');
   return { ...args, candidates, runId, collectedAt, traces };
 }

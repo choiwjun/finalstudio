@@ -3,6 +3,9 @@ export const TREND_TIME_UNITS = Object.freeze(['date', 'week', 'month']);
 export const SEARCH_INTENTS = Object.freeze(['방법', '개념', '비교', '문제 해결', '최신 이슈']);
 export const FRESHNESS_VALUES = Object.freeze(['fresh', 'stale', 'unknown']);
 export const STATUS_VALUES = Object.freeze(['candidate', 'researching', 'ready-to-write', 'written', 'rejected']);
+/** Canonical identity for a keyword across discovery, manifests, records, and decisions. */
+export const normalizeKeywordKey = (value) => String(value ?? '').normalize('NFC').replace(/\s+/gu, ' ').trim().toLowerCase();
+
 export const RISK_FLAGS = Object.freeze([
   'api_error', 'rate_limited', 'auth_missing', 'forbidden', 'malformed_response',
   'empty_evidence', 'broad_keyword', 'sensitive_topic', 'stale_evidence',
