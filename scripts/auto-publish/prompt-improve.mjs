@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync, spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
+import { buildWriterEnvironment } from './writer-env.mjs';
 
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
@@ -41,8 +42,15 @@ const read = (file) => {
   return readFileSync(full, 'utf8');
 };
 const hash = (value) => createHash('sha256').update(value).digest('hex');
+const readJson = (file) => {
+  try {
+    return JSON.parse(read(file));
+  } catch (error) {
+    fail(`JSON 파일을 읽을 수 없습니다: ${file} (${error instanceof Error ? error.message : String(error)})`);
+  }
+};
 
-const manifest = JSON.parse(read('.editorial/manifest.json'));
+const manifest = readJson('.editorial/manifest.json');
 const moduleFiles = [
   manifest.modules.constitution,
   manifest.modules.styleGuide,
@@ -79,6 +87,7 @@ const runCodex = (instructions, context) => new Promise((resolvePromise, rejectP
   const child = spawn(command.executable, [...command.prefix, 'exec', '--sandbox', 'read-only', '--ephemeral', '--', instructions], {
     cwd: ROOT,
     shell: command.shell,
+    env: buildWriterEnvironment(),
     stdio: ['pipe', 'pipe', 'pipe'],
   });
   let stdout = '';

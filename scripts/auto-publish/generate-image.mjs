@@ -21,6 +21,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { execFileSync, spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { parseFrontmatter } from '../lib/content-contract.mjs';
+import { buildWriterEnvironment } from './writer-env.mjs';
 
 const ROOT = process.cwd();
 const IMAGES_DIR = join(ROOT, 'public', 'images');
@@ -93,7 +94,8 @@ const codexRun = (prompt) => new Promise((resolveP, rejectP) => {
   codexArgs.push('--', prompt);
   const child = spawn(CODEX_COMMAND.executable, [...CODEX_COMMAND.prefix, ...codexArgs], {
     cwd: ROOT,
-    shell: CODEX_COMMAND.shell,
+    shell: false,
+    env: buildWriterEnvironment(),
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let out = '';

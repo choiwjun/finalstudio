@@ -13,6 +13,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { analyzePost, extractMarkers } from './check-writing.mjs';
+import { buildWriterEnvironment } from './auto-publish/writer-env.mjs';
 
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
@@ -27,13 +28,27 @@ const label = getArg('label') ?? (existsSync(join(ROOT, 'out', 'evals', 'baselin
 
 const fail = (msg) => { console.error(`[run-evals] 오류: ${msg}`); process.exit(1); };
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8');
+const readJson = (p) => {
+  try {
+    return JSON.parse(read(p));
+  } catch (error) {
+    fail(`JSON 파일을 읽을 수 없습니다: ${p} (${error instanceof Error ? error.message : String(error)})`);
+  }
+};
+const parseJsonLine = (line, index) => {
+  try {
+    return JSON.parse(line);
+  } catch (error) {
+    fail(`평가 케이스 ${index + 1}행이 올바른 JSON이 아닙니다 (${error instanceof Error ? error.message : String(error)})`);
+  }
+};
 
-const manifest = JSON.parse(read('.editorial/manifest.json'));
+const manifest = readJson('.editorial/manifest.json');
 const NOTES_REQUIRED = new Set(manifest.generationGate?.notesRequiredFormats ?? []);
 const JUDGE_THRESHOLD = manifest.generationGate?.independentJudgeMinScore ?? 90;
 const MAX_PASSES = Number(process.env.AUTO_MAX_PASSES ?? 2);
 
-const persona = JSON.parse(read(manifest.modules.personas[manifest.defaultPersona]));
+const persona = readJson(manifest.modules.personas[manifest.defaultPersona]);
 const moduleText = [
   `EDITORIAL_SYSTEM_VERSION: ${manifest.version}`,
   `SELECTED_PERSONA: ${manifest.defaultPersona}`,
@@ -66,6 +81,7 @@ const runCodex = (system, user) => new Promise((resolveP, rejectP) => {
   const child = spawn(command.executable, [...command.prefix, 'exec', '--sandbox', 'read-only', '--ephemeral', '--', user], {
     cwd: ROOT,
     shell: command.shell,
+    env: buildWriterEnvironment(),
     stdio: ['pipe', 'pipe', 'pipe'],
   });
   let out = '';
@@ -87,7 +103,7 @@ const extractArticle = (text) => {
 
 const cases = read('.editorial/evals/writing-cases.jsonl')
   .split(/\r?\n/).filter(Boolean)
-  .map((line) => JSON.parse(line))
+  .map(parseJsonLine)
   .filter((c) => (onlyId ? c.id === onlyId : true));
 if (cases.length === 0) fail(`평가 케이스를 찾을 수 없습니다 (id=${onlyId ?? '전체'})`);
 const selected = cases.slice(0, limit);
@@ -243,7 +259,7 @@ if (label === 'before') writeFileSync(join(ROOT, 'out', 'evals', 'baseline.json'
 const beforePath = join(ROOT, 'out', 'evals', label === 'after' ? 'eval-before.json' : '');
 let regression = false;
 if (label === 'after' && beforePath && existsSync(beforePath)) {
-  const before = JSON.parse(readFileSync(beforePath, 'utf8'));
+  const before = readJson(beforePath);
   const prev = Object.fromEntries(before.cases.map((c) => [c.id, c]));
   const comparison = results.map((r) => {
     const p = prev[r.id];
