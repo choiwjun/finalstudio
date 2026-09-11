@@ -27,6 +27,7 @@ import {
 
 export const NAVER_API_HUB_BASE_URL = 'https://naverapihub.apigw.ntruss.com';
 export const NAVER_API_HUB_TIMEOUT_MS = 10_000;
+const NAVER_API_HUB_MAX_RESPONSE_BYTES = 1_000_000;
 
 const PROVIDER_ID = 'naver-api-hub';
 const BLOG_ENDPOINT = '/search/v1/blog';
@@ -71,7 +72,6 @@ function buildTrendInit(request, headers, signal) {
 
 function networkFailure(error, timeoutMs, redactionValues = []) {
   const name = String(error?.name ?? error?.reason?.name ?? '');
-  const aborted = name === 'AbortError' || name === 'TimeoutError' || error?.signal?.aborted === true;
   let message = 'Keyword API network request failed';
   if (name === 'TimeoutError' || error?.signal?.aborted === true) {
     message = `Keyword API request timed out after ${timeoutMs} ms`;
@@ -89,6 +89,45 @@ function malformedJsonFailure(redactionValues = []) {
     message: 'response body was not valid JSON',
     risk_flags: ['malformed_response'],
   }, { redactValues: redactionValues });
+}
+
+function responseTooLargeFailure(status, redactionValues = []) {
+  return normalizeApiFailure({
+    kind: 'malformed_response',
+    status: Number.isInteger(status) && status >= 0 && status <= 599 ? status : 0,
+    retryable: false,
+    message: `Keyword API response exceeded ${NAVER_API_HUB_MAX_RESPONSE_BYTES} bytes`,
+    risk_flags: ['malformed_response'],
+  }, { redactValues: redactionValues });
+}
+
+async function readResponseText(response) {
+  if (response.body && typeof response.body.getReader === 'function') {
+    const reader = response.body.getReader();
+    const chunks = [];
+    let totalBytes = 0;
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      const bytes = chunk.value instanceof Uint8Array ? chunk.value : new Uint8Array(chunk.value);
+      totalBytes += bytes.byteLength;
+      if (totalBytes > NAVER_API_HUB_MAX_RESPONSE_BYTES) {
+        await reader.cancel().catch(() => {});
+        const error = new Error('response body exceeded configured limit');
+        error.code = 'NAVER_RESPONSE_TOO_LARGE';
+        throw error;
+      }
+      chunks.push(Buffer.from(bytes));
+    }
+    return Buffer.concat(chunks).toString('utf8');
+  }
+  const text = await response.text();
+  if (Buffer.byteLength(text, 'utf8') > NAVER_API_HUB_MAX_RESPONSE_BYTES) {
+    const error = new Error('response body exceeded configured limit');
+    error.code = 'NAVER_RESPONSE_TOO_LARGE';
+    throw error;
+  }
+  return text;
 }
 
 function httpFailure(status, text, redactionValues = []) {
@@ -133,8 +172,9 @@ async function run(searchKind, request, state) {
 
   let text;
   try {
-    text = await response.text();
+    text = await readResponseText(response);
   } catch (error) {
+    if (error?.code === 'NAVER_RESPONSE_TOO_LARGE') return responseTooLargeFailure(response.status, redactionValues);
     return networkFailure(error, state.timeoutMs, redactionValues);
   }
 

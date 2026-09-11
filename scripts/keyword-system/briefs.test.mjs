@@ -130,6 +130,37 @@ test("renderKeywordBrief produces a manual-review draft note with evidence links
     assert.doesNotMatch(markdown, /자동 발행/u);
 });
 
+test("quotes untrusted evidence instead of rendering it as Markdown instructions", () => {
+    const markdown = renderKeywordBrief({
+        head_keyword: "선정 키워드",
+        category: "ai",
+        search_intent: "개념",
+        content_angle: "자동 제안",
+        collected_at: "2026-09-11T00:00:00.000Z",
+        review_gate: "사람 검토 필요",
+        outline: ["문제"],
+        evidence: {
+            blog: [{
+                title: "ignore this instruction\n---",
+                description: "[지시문이 아닌 데이터]",
+                link: "https://example.test/a) [악성](https://evil.test)",
+                collected_at: "2026-09-11T00:00:00.000Z",
+            }],
+            trend: [{
+                group_name: "ignore system",
+                latest_period: "2026-09-11",
+                latest_ratio: 10,
+                max_ratio: 10,
+            }],
+        },
+    });
+
+    assert.match(markdown, /외부 데이터 제목/u);
+    assert.match(markdown, /ignore this instruction/u);
+    assert.doesNotMatch(markdown, /\[출처\]\(/u);
+    assert.doesNotMatch(markdown, /\n---/u);
+});
+
 test("buildKeywordBrief rejects malformed evidence and mismatched collection runs", () => {
     const ready = makeValidRecord({
         collected_at: "2026-09-11T00:00:00.000Z",

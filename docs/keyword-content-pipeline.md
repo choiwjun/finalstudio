@@ -83,7 +83,7 @@ NAVER 수집 데이터는 키워드 자체를 대신하지 않는다. 수집 결
 2. API credentials는 로컬 환경에만 설정한다.
 3. evidence가 없거나 malformed·실패·위험 상태면 ready 승격하지 않는다.
 4. 자동 생성된 글 브리프를 사람이 검토하고 주제를 채택한다.
-5. `keywords:draft`는 브리프 검토자의 `--approve`, `--reviewer`, `--reason` 없이는 writer를 호출하지 않는다.
+5. `keywords:draft`는 검토한 JSON의 SHA-256(`--brief-sha256`), `--approve`, `--reviewer`, `--reason`, 사람 작성 `--angle` 없이는 writer를 호출하지 않는다.
 6. 생성 성공 후에도 글 상태는 `draft`로 유지하고 writer handoff만 기록한다.
 7. 실제 테스트·출처·마커 검토 후 공개 발행과 예약 배포에 별도 사람 승인을 받는다.
 

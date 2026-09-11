@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { test } from "node:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -51,7 +52,9 @@ test("draft bridge requires approval and records the writer handoff after draft 
   await writeReadyToWriteExport([record], { path: readyPath, recordsPath });
 
   const briefPath = join(briefDir, "ai-selected.json");
-  await writeFile(briefPath, `${JSON.stringify(makeBrief(), null, 2)}\n`);
+  const briefText = `${JSON.stringify(makeBrief(), null, 2)}\n`;
+  const briefSha256 = createHash("sha256").update(briefText).digest("hex");
+  await writeFile(briefPath, briefText);
   await writeFile(join(briefDir, "ai-selected.md"), "# 선정 키워드\n\n사람 검토 필요\n");
 
   await assert.rejects(
@@ -68,11 +71,15 @@ test("draft bridge requires approval and records the writer handoff after draft 
           briefPath,
           "--records",
           outsideRecords,
+          "--brief-sha256",
+          briefSha256,
           "--approve",
           "--reviewer",
           "운영자",
           "--reason",
           "검토함",
+          "--angle",
+          "사람이 승인한 글의 범위와 독자 문제",
         ],
         { repositoryRoot: root, runWriter: async () => ({ code: 0, stdout: "", stderr: "" }) },
       ),
@@ -80,10 +87,9 @@ test("draft bridge requires approval and records the writer handoff after draft 
   );
 
   const malformedPath = join(briefDir, "malformed.json");
-  await writeFile(
-    malformedPath,
-    `${JSON.stringify({ ...makeBrief(), related_keywords: ["", ""] })}\n`,
-  );
+  const malformedText = `${JSON.stringify({ ...makeBrief(), related_keywords: ["", ""] })}\n`;
+  const malformedSha256 = createHash("sha256").update(malformedText).digest("hex");
+  await writeFile(malformedPath, malformedText);
   await assert.rejects(
     () =>
       draftMain(
@@ -95,9 +101,13 @@ test("draft bridge requires approval and records the writer handoff after draft 
           "운영자",
           "--reason",
           "검토함",
+          "--angle",
+          "사람이 승인한 글의 범위와 독자 문제",
+          "--brief-sha256",
+          malformedSha256,
         ],
         { repositoryRoot: root },
-      ),
+    ),
     /related_keywords/iu,
   );
 
@@ -116,6 +126,10 @@ test("draft bridge requires approval and records the writer handoff after draft 
       "운영자",
       "--reason",
       "근거와 글 방향을 확인함",
+      "--angle",
+      "사람이 승인한 글의 범위와 독자 문제",
+      "--brief-sha256",
+      briefSha256,
     ],
     {
       repositoryRoot: root,

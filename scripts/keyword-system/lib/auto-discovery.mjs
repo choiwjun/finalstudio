@@ -18,6 +18,7 @@ const AUTO_STOPWORDS = Object.freeze([
 const MAX_TOPIC_WORDS = 3;
 const MIN_TOPIC_WORDS = 2;
 const MAX_TOPIC_LENGTH = 80;
+const SAFE_TOPIC_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} .+/_-]{0,79}$/u;
 
 function fail(message) {
   const error = new Error(message);
@@ -44,7 +45,7 @@ function phraseWindows(text, stopwords) {
       const window = tokens.slice(start, start + size);
       if (window.some((token) => token.length < 2 || stopwords.has(token.toLowerCase()))) continue;
       const phrase = window.join(' ');
-      if (phrase.length <= MAX_TOPIC_LENGTH) phrases.push(phrase);
+      if (phrase.length <= MAX_TOPIC_LENGTH && SAFE_TOPIC_PATTERN.test(phrase)) phrases.push(phrase);
     }
   }
   return phrases;

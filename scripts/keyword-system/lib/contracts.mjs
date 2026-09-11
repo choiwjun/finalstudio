@@ -42,6 +42,19 @@ const integer = (value, path, minimum, maximum) => {
   return value;
 };
 const normalizedText = (value, path) => string(value, path).normalize('NFC').replace(/\s+/gu, ' ').trim();
+const boundedNormalizedText = (value, path, maximum) => {
+  const normalized = normalizedText(value, path);
+  if (normalized.length > maximum) fail(path, `must be ${maximum} characters or fewer`);
+  return normalized;
+};
+const MAX_QUERY_TEXT_LENGTH = 300;
+const MAX_BLOG_ITEMS = 100;
+const MAX_BLOG_TITLE_LENGTH = 300;
+const MAX_BLOG_DESCRIPTION_LENGTH = 4000;
+const MAX_BLOG_LINK_LENGTH = 2048;
+const MAX_TREND_RESULTS = 5;
+const MAX_TREND_KEYWORDS = 20;
+const MAX_TREND_DATA_POINTS = 1000;
 const date = (value, path) => {
   string(value, path);
   if (!/^\d{4}-\d{2}-\d{2}$/u.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00.000Z`))) fail(path, 'must be an ISO date');
@@ -64,7 +77,7 @@ const stripBold = (value) => value.replace(/<\/?b>/giu, '');
 export function normalizeBlogSearchRequest(input) {
   const value = object(input, 'request');
   return {
-    query: normalizedText(value.query, 'request.query'),
+    query: boundedNormalizedText(value.query, 'request.query', MAX_QUERY_TEXT_LENGTH),
     display: integer(value.display ?? 10, 'request.display', 1, 100),
     start: integer(value.start ?? 1, 'request.start', 1, 1000),
     sort: enumValue(value.sort ?? 'sim', BLOG_SORTS, 'request.sort'),
@@ -86,8 +99,8 @@ export function normalizeTrendRequest(input) {
     const keywords = Array.isArray(item.keywords) ? item.keywords : fail(`request.keywordGroups[${index}].keywords`, 'must be an array');
     integer(keywords.length, `request.keywordGroups[${index}].keywords.length`, 1, 20);
     return {
-      groupName: normalizedText(item.groupName, `request.keywordGroups[${index}].groupName`),
-      keywords: keywords.map((keyword, keywordIndex) => normalizedText(keyword, `request.keywordGroups[${index}].keywords[${keywordIndex}]`)),
+      groupName: boundedNormalizedText(item.groupName, `request.keywordGroups[${index}].groupName`, MAX_QUERY_TEXT_LENGTH),
+      keywords: keywords.map((keyword, keywordIndex) => boundedNormalizedText(keyword, `request.keywordGroups[${index}].keywords[${keywordIndex}]`, MAX_QUERY_TEXT_LENGTH)),
     };
   });
   const result = { startDate, endDate, timeUnit: enumValue(value.timeUnit, TREND_TIME_UNITS, 'request.timeUnit'), keywordGroups };
@@ -107,32 +120,35 @@ export const validateTrendRequest = normalizeTrendRequest;
 function normalizeBlogItem(item, index) {
   const value = object(item, `response.items[${index}]`);
   return {
-    title: stripBold(normalizedText(value.title, `response.items[${index}].title`)),
-    description: stripBold(normalizedText(value.description, `response.items[${index}].description`)),
-    link: normalizedText(value.link, `response.items[${index}].link`),
+    title: stripBold(boundedNormalizedText(value.title, `response.items[${index}].title`, MAX_BLOG_TITLE_LENGTH)),
+    description: stripBold(boundedNormalizedText(value.description, `response.items[${index}].description`, MAX_BLOG_DESCRIPTION_LENGTH)),
+    link: boundedNormalizedText(value.link, `response.items[${index}].link`, MAX_BLOG_LINK_LENGTH),
     postdate: string(value.postdate, `response.items[${index}].postdate`),
   };
 }
 
 export function normalizeBlogSearchResponse(input) {
   const value = object(input, 'response');
-  const items = Array.isArray(value.items) ? value.items.map(normalizeBlogItem) : fail('response.items', 'must be an array');
+  const items = Array.isArray(value.items) ? value.items : fail('response.items', 'must be an array');
+  if (items.length > MAX_BLOG_ITEMS) fail('response.items', `must contain ${MAX_BLOG_ITEMS} items or fewer`);
+  const normalizedItems = items.map(normalizeBlogItem);
   integer(value.total, 'response.total', 0, Number.MAX_SAFE_INTEGER);
-  for (const [index, item] of items.entries()) {
+  for (const [index] of items.entries()) {
+    const item = normalizedItems[index];
     if (!/^\d{8}$/u.test(item.postdate)) fail(`response.items[${index}].postdate`, 'must be YYYYMMDD');
     const postdate = `${item.postdate.slice(0, 4)}-${item.postdate.slice(4, 6)}-${item.postdate.slice(6, 8)}`;
     date(postdate, `response.items[${index}].postdate`);
   }
-  const result = { total: value.total, items };
+  const result = { total: value.total, items: normalizedItems };
   for (const field of ['lastBuildDate', 'start', 'display']) {
     if (value[field] !== undefined) {
       result[field] = field === 'lastBuildDate'
-        ? string(value[field], `response.${field}`)
+        ? boundedNormalizedText(value[field], `response.${field}`, 128)
         : integer(value[field], `response.${field}`, field === 'start' ? 1 : 1, field === 'start' ? 1000 : 100);
     }
   }
-  if (items.length > value.total) fail('response.items', 'must not contain more items than total');
-  if (result.display !== undefined && items.length > result.display) fail('response.items', 'must not exceed response.display');
+  if (normalizedItems.length > value.total) fail('response.items', 'must not contain more items than total');
+  if (result.display !== undefined && normalizedItems.length > result.display) fail('response.items', 'must not exceed response.display');
   return result;
 }
 
@@ -142,6 +158,7 @@ export const isValidBlogSearchResponse = (value) => { try { normalizeBlogSearchR
 function normalizeTrendData(data, resultIndex) {
   if (!Array.isArray(data)) fail(`response.results[${resultIndex}].data`, 'must be an array');
   if (data.length === 0) fail(`response.results[${resultIndex}].data`, 'must not be empty');
+  if (data.length > MAX_TREND_DATA_POINTS) fail(`response.results[${resultIndex}].data`, `must contain ${MAX_TREND_DATA_POINTS} points or fewer`);
   return data.map((item, index) => {
     const value = object(item, `response.results[${resultIndex}].data[${index}]`);
     const period = date(value.period, `response.results[${resultIndex}].data[${index}].period`);
@@ -155,12 +172,15 @@ export function normalizeTrendResponse(input) {
   const startDate = date(value.startDate, 'response.startDate');
   const endDate = date(value.endDate, 'response.endDate');
   if (startDate > endDate) fail('response', 'startDate must not be after endDate');
-  const results = Array.isArray(value.results) ? value.results.map((result, index) => {
+  if (!Array.isArray(value.results)) fail('response.results', 'must be an array');
+  if (value.results.length > MAX_TREND_RESULTS) fail('response.results', `must contain ${MAX_TREND_RESULTS} results or fewer`);
+  const results = value.results.map((result, index) => {
     const item = object(result, `response.results[${index}]`);
-    const keywords = Array.isArray(item.keywords) ? item.keywords.map((keyword, keywordIndex) => normalizedText(keyword, `response.results[${index}].keywords[${keywordIndex}]`)) : fail(`response.results[${index}].keywords`, 'must be an array');
+    const keywords = Array.isArray(item.keywords) ? item.keywords : fail(`response.results[${index}].keywords`, 'must be an array');
+    if (keywords.length > MAX_TREND_KEYWORDS) fail(`response.results[${index}].keywords`, `must contain ${MAX_TREND_KEYWORDS} keywords or fewer`);
     if (keywords.length === 0) fail(`response.results[${index}].keywords`, 'must not be empty');
-    return { title: normalizedText(item.title, `response.results[${index}].title`), keywords, data: normalizeTrendData(item.data, index) };
-  }) : fail('response.results', 'must be an array');
+    return { title: boundedNormalizedText(item.title, `response.results[${index}].title`, MAX_QUERY_TEXT_LENGTH), keywords: keywords.map((keyword, keywordIndex) => boundedNormalizedText(keyword, `response.results[${index}].keywords[${keywordIndex}]`, MAX_QUERY_TEXT_LENGTH)), data: normalizeTrendData(item.data, index) };
+  });
   return { startDate, endDate, timeUnit: enumValue(value.timeUnit, TREND_TIME_UNITS, 'response.timeUnit'), results };
 }
 

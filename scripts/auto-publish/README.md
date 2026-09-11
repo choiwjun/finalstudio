@@ -1,10 +1,11 @@
 # 자동 글발행 파이프라인
 
 관리자 대시보드(`/admin`, 개발 환경)의 **자동 글발행** 메뉴와 연결되는 파이프라인 설명서입니다.
-**명령 1줄로 초안 생성 → 윤문 → 검수 → draft 저장까지 자동 실행**됩니다.
+Codex writer는 승인 artifact를 발급하는 `npm run keywords:draft`를 통해서만 실행됩니다. `auto:write`를 직접 호출하면 승인·해시·사람 작성 angle 게이트에서 거부됩니다.
 
 ```
-npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카테고리 [--format 유형] [--notes 원자료]
+npm run keywords:draft -- --brief <검토한-브리프.json> --brief-sha256 <SHA-256> \
+  --approve --reviewer "검토자" --reason "검토 사유" --angle "사람이 승인한 글 방향"
         │
         ├─ [자동] 1단계 초안 (편집 헌법+문체+페르소나+블루프린트+exemplar)
         │         --best-of N이면 N개 생성 후 기계 점수로 최적 선택
@@ -27,11 +28,12 @@ npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카�
 ```bash
 npm run keywords:draft -- \
   --brief out/keyword-briefs/<category>-<keyword>.json \
+  --brief-sha256 "$(sha256sum out/keyword-briefs/<category>-<keyword>.json | cut -d' ' -f1)" \
   --approve --reviewer "검토자" --reason "근거와 글 방향 확인" \
-  [--format how-to]
+  --angle "사람이 승인한 글 방향" [--format how-to]
 ```
 
-이 명령은 브리프 Markdown을 writer의 원자료로 전달하고, 통과한 결과를 `src/content/posts/`에 `status: draft`로 저장합니다. 실패하거나 `--approve`가 없으면 writer를 호출하지 않습니다. `written` keyword record는 draft 경로와 writer handoff 결정을 기록할 뿐이며, 발행·예약은 별도 사람 승인이 필요합니다.
+이 명령은 검토한 JSON의 SHA-256과 사람이 직접 작성한 `--angle`을 확인한 뒤 브리프 Markdown을 writer에 전달합니다. NAVER/외부 원자료는 인용 데이터로 격리되며 그 안의 지시문은 실행하지 않습니다. 통과한 결과를 `src/content/posts/`에 `status: draft`로 저장합니다. 실패하거나 승인·사람 작성 angle이 없으면 writer를 호출하지 않습니다. `written` keyword record는 draft 경로와 writer handoff 결정을 기록할 뿐이며, 발행·예약은 별도 사람 승인이 필요합니다.
 
 ## 1회 설정
 
@@ -39,7 +41,7 @@ npm run keywords:draft -- \
 
 1. `npm install -g @openai/codex`
 2. 터미널에서 `codex login` → 브라우저가 열리면 **ChatGPT 계정으로 로그인**
-3. 끝. `npm run auto:write`가 codex 엔진으로 3단계를 자동 실행합니다.
+3. 끝. 사람이 승인한 `npm run keywords:draft`가 codex 엔진으로 3단계를 실행합니다.
    - 엔진은 Codex로 고정되어 있으며 OpenAI API 키를 읽거나 호출하지 않습니다.
    - 로그인 상태 확인: `codex login status`
 
@@ -57,10 +59,8 @@ npm run keywords:draft -- \
 ## 명령 레퍼런스
 
 ```bash
-# 풀 자동 (주제 직접 지정) — ChatGPT OAuth Codex 세션 사용
-npm run auto:write "주제" --topic 카테고리 --level 완전초보 --stage 정보 [--format how-to] [--persona wj-editor] [--slug my-slug]
-npm run auto:write "주제" --topic 일상 --format experience --notes notes/memo.md   # 경험 계열은 원자료 필수
-npm run auto:write "주제" --topic 카테고리 --best-of 2                            # 초안 2개 생성 후 기계 점수로 선택
+# Codex writer는 승인된 `npm run keywords:draft` 브리지에서만 호출
+# `npm run auto:write` 직접 호출은 승인 artifact가 없어 거부됨
 
 # 기계 문장·구조 검사 단독 실행 (생성 없이 기존 글 측정)
 npm run check:writing -- src/content/posts/excel-vlookup-other-sheet.md --format how-to

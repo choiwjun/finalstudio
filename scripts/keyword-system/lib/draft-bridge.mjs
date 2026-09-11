@@ -25,6 +25,8 @@ const fail = (message) => {
 };
 
 const clean = (value) => String(value ?? "").replace(/[\r\n]/gu, " ").trim();
+const MAX_HUMAN_ANGLE_LENGTH = 300;
+const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
 export function assertContainedPath(root, target, label) {
   const suffix = relative(resolve(root), resolve(target));
@@ -50,21 +52,56 @@ export function requireHumanApproval({ approved, reviewer, reason } = {}) {
   return { reviewer: normalizedReviewer, reason: normalizedReason };
 }
 
-export function buildAutoWriteArgs(brief, { notesPath, outputDir, format = "how-to" } = {}) {
+export function requireHumanAuthoredAngle(value) {
+  const angle = clean(value);
+  if (angle === "") fail("--angle is required and must be written by the reviewer");
+  if (angle.length > MAX_HUMAN_ANGLE_LENGTH)
+    fail(`--angle must be ${MAX_HUMAN_ANGLE_LENGTH} characters or fewer`);
+  return angle;
+}
+
+export function requireReviewedBriefHash(expected, actual) {
+  const supplied = clean(expected);
+  if (!SHA256_PATTERN.test(supplied))
+    fail("--brief-sha256 must be a 64-character lowercase SHA-256 hash");
+  if (supplied !== actual)
+    fail("--brief-sha256 does not match the reviewed brief");
+  return supplied;
+}
+
+export function buildAutoWriteArgs(
+  brief,
+  {
+    notesPath,
+    outputDir,
+    format = "how-to",
+    humanAngle,
+    briefSha256,
+    approvalArtifact,
+  } = {},
+) {
   const normalized = normalizeKeywordBrief(brief);
   const notes = clean(notesPath);
   if (notes === "") fail("brief Markdown path is required as writer notes");
   const selectedFormat = normalizeDraftFormat(format);
+  const selectedAngle = requireHumanAuthoredAngle(humanAngle);
+  const selectedBriefSha256 = requireReviewedBriefHash(briefSha256, briefSha256);
+  const approvalPath = clean(approvalArtifact);
+  if (approvalPath === "") fail("bridge approval artifact is required");
   const args = [
     normalized.head_keyword,
     "--topic",
     normalized.category,
     "--angle",
-    normalized.content_angle,
+    selectedAngle,
     "--format",
     selectedFormat,
     "--notes",
     notes,
+    "--brief-sha256",
+    selectedBriefSha256,
+    "--approval-artifact",
+    approvalPath,
   ];
   const output = clean(outputDir);
   if (output !== "") args.push("--out", output);

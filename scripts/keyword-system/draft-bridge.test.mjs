@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { buildWriterEnvironment } from "./draft.mjs";
 import {
   DraftBridgeError,
   buildAutoWriteArgs,
@@ -7,6 +8,8 @@ import {
   normalizeDraftFormat,
   parseDraftPath,
   requireHumanApproval,
+  requireHumanAuthoredAngle,
+  requireReviewedBriefHash,
 } from "./lib/draft-bridge.mjs";
 
 const brief = {
@@ -27,6 +30,26 @@ const brief = {
   },
 };
 
+test("review approval binds to the exact brief hash", () => {
+  const hash = "a".repeat(64);
+  assert.equal(requireReviewedBriefHash(hash, hash), hash);
+  assert.throws(() => requireReviewedBriefHash(hash.toUpperCase(), hash), DraftBridgeError);
+  assert.throws(() => requireReviewedBriefHash("b".repeat(64), hash), DraftBridgeError);
+  assert.throws(() => requireReviewedBriefHash("not-a-hash", hash), DraftBridgeError);
+});
+
+test("writer subprocess environment excludes NAVER credentials", () => {
+  const environment = buildWriterEnvironment({
+    PATH: "/usr/bin",
+    HOME: "/home/test",
+    NCP_NAVER_API_HUB_CLIENT_ID: "client-secret-value",
+    NCP_NAVER_API_HUB_CLIENT_SECRET: "secret-value",
+    OPENAI_API_KEY: "must-not-be-inherited",
+  });
+
+  assert.deepEqual(environment, { PATH: "/usr/bin", HOME: "/home/test" });
+});
+
 test("human approval is explicit and requires reviewer context", () => {
   assert.throws(() => requireHumanApproval({}), DraftBridgeError);
   assert.deepEqual(
@@ -35,20 +58,30 @@ test("human approval is explicit and requires reviewer context", () => {
   );
 });
 
-test("writer args pass the reviewed brief as notes without publish options", () => {
+test("writer args require a human-authored angle and pass reviewed notes without publish options", () => {
   assert.equal(normalizeDraftFormat("HOW-TO"), "how-to");
+  assert.throws(() => requireHumanAuthoredAngle(""), DraftBridgeError);
   assert.deepEqual(
-    buildAutoWriteArgs(brief, { notesPath: "/repo/out/keyword-briefs/ai-선정.json.md" }),
+    buildAutoWriteArgs(brief, {
+      notesPath: "/repo/out/keyword-briefs/ai-선정.json.md",
+      humanAngle: "사람이 승인한 글의 범위와 독자 문제를 설명합니다",
+      briefSha256: "a".repeat(64),
+      approvalArtifact: "/repo/out/.keyword-approval.json",
+    }),
     [
       "선정 키워드",
       "--topic",
       "ai",
       "--angle",
-      "공식 근거와 확인 절차를 중심으로 설명합니다",
+      "사람이 승인한 글의 범위와 독자 문제를 설명합니다",
       "--format",
       "how-to",
       "--notes",
       "/repo/out/keyword-briefs/ai-선정.json.md",
+      "--brief-sha256",
+      "a".repeat(64),
+      "--approval-artifact",
+      "/repo/out/.keyword-approval.json",
     ],
   );
 });

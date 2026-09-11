@@ -209,6 +209,33 @@ test('Given parseable JSON that violates the response contract, when normalized,
   assert.deepEqual(failure.risk_flags, ['malformed_response']);
 });
 
+test('Given a streaming response larger than the provider limit, when searchBlogs reads it, then the body is rejected before parsing', async () => {
+  const body = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('x'.repeat(1_000_001)));
+      controller.close();
+    },
+  });
+  const provider = createNaverApiHubProvider({
+    env: { [CLIENT_ID_ENV]: 'client-id', [CLIENT_SECRET_ENV]: 'client-secret' },
+    fetchImpl: async () => ({ ok: true, status: 200, body, text: async () => 'should not be called' }),
+  });
+  const failure = await provider.searchBlogs(BLOG_REQUEST);
+  assert.equal(failure.kind, 'malformed_response');
+  assert.match(failure.message, /exceeded/iu);
+  assert.deepEqual(failure.risk_flags, ['malformed_response']);
+});
+
+test('Given oversized upstream text fields, when normalized, then the response contract rejects them', () => {
+  assert.throws(
+    () => normalizeBlogSearchResponse({
+      total: 1,
+      items: [{ title: 'x'.repeat(301), description: 'description', link: 'https://example.test', postdate: '20260910' }],
+    }),
+    ContractValidationError,
+  );
+});
+
 test('Given an aborted fetch, when handled, then a retryable network_error ApiFailure with the api_error risk is returned', async () => {
   const { provider } = makeMockProvider({
     fetchImpl: async () => {

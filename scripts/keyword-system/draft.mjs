@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash, randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { mkdtemp, rm } from "node:fs/promises";
 import {
@@ -28,8 +29,13 @@ import {
   buildWriterReference,
   parseDraftPath,
   requireHumanApproval,
+  requireHumanAuthoredAngle,
+  requireReviewedBriefHash,
 } from "./lib/draft-bridge.mjs";
-import { normalizeKeywordBrief } from "./lib/briefs.mjs";
+import { normalizeKeywordBrief, renderKeywordBrief } from "./lib/briefs.mjs";
+import { buildWriterEnvironment } from "../auto-publish/writer-env.mjs";
+
+export { buildWriterEnvironment } from "../auto-publish/writer-env.mjs";
 
 const REPOSITORY_ROOT = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -49,7 +55,6 @@ const fail = (message) => {
 };
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
-
 function valueFor(argv, index, name) {
   const value = argv[index + 1];
   if (typeof value !== "string" || value === "" || value.startsWith("--"))
@@ -72,6 +77,8 @@ export function parseDraftArgs(
     approved: false,
     reviewer: undefined,
     reason: undefined,
+    angle: undefined,
+    briefSha256: undefined,
   };
   const valueOptions = new Map([
     ["--brief", "brief"],
@@ -82,6 +89,8 @@ export function parseDraftArgs(
     ["--format", "format"],
     ["--reviewer", "reviewer"],
     ["--reason", "reason"],
+    ["--angle", "angle"],
+    ["--brief-sha256", "briefSha256"],
   ]);
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -92,7 +101,7 @@ export function parseDraftArgs(
     const key = valueOptions.get(argument);
     if (!key) fail(`unknown argument ${JSON.stringify(argument)}`);
     const value = valueFor(argv, index, argument);
-    if (["format", "reviewer", "reason"].includes(key)) {
+    if (["format", "reviewer", "reason", "briefSha256"].includes(key)) {
       result[key] = value;
     } else {
       result[key] = isAbsolute(value) ? resolve(value) : resolve(root, value);
@@ -128,20 +137,11 @@ async function readTextAt(root, target, label) {
   }
 }
 
-async function readJsonAt(root, target, label) {
-  try {
-    return JSON.parse(await readTextAt(root, target, label));
-  } catch (error) {
-    if (error instanceof DraftCliError) throw error;
-    fail(`${label} is not valid JSON`);
-  }
-}
-
 export function runAutoWriter({ cwd, scriptPath, args }) {
   return new Promise((resolvePromise) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
       cwd,
-      env: process.env,
+      env: buildWriterEnvironment(),
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
@@ -196,6 +196,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const root = resolve(dependencies.repositoryRoot ?? REPOSITORY_ROOT);
   const args = parseDraftArgs(argv, root);
   const approval = requireHumanApproval(args);
+  const humanAngle = requireHumanAuthoredAngle(args.angle);
   const keywordRoot = resolve(root, "data/keywords");
   const outDir = assertContainedPath(keywordRoot, args.outDir, "--out-dir");
   const dataHandle = await openVerifiedDirectory(outDir, { create: false });
@@ -205,9 +206,16 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const decisionsPath = assertContainedPath(outDir, args.decisions, "--decisions");
   const briefRoot = resolve(root, "out/keyword-briefs");
   const briefPath = assertContainedPath(briefRoot, args.brief, "brief");
-  const brief = normalizeKeywordBrief(
-    await readJsonAt(briefRoot, briefPath, "brief JSON"),
-  );
+  const briefText = await readTextAt(briefRoot, briefPath, "brief JSON");
+  let briefValue;
+  try {
+    briefValue = JSON.parse(briefText);
+  } catch {
+    fail("brief JSON is not valid JSON");
+  }
+  const briefHash = createHash("sha256").update(briefText).digest("hex");
+  requireReviewedBriefHash(args.briefSha256, briefHash);
+  const brief = normalizeKeywordBrief(briefValue);
   const markdownPath = `${briefPath.slice(0, -5)}.md`;
   await readTextAt(briefRoot, markdownPath, "brief Markdown");
   const ready = await readReadyToWriteExport({
@@ -224,10 +232,35 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const stagingParent = await openVerifiedDirectory(stagingRoot, { create: true });
   await stagingParent.close().catch(() => {});
   const stagingDir = await mkdtemp(join(stagingRoot, ".keyword-draft-"));
+  const reviewedNotes = renderKeywordBrief(brief);
+  const reviewedNotesPath = join(stagingDir, ".reviewed-brief.md");
+  const approvalArtifactPath = join(stagingDir, ".keyword-approval.json");
+  const reviewedNotesSha256 = createHash("sha256").update(reviewedNotes).digest("hex");
+  const approvalArtifact = {
+    schema_version: 1,
+    kind: "keyword-draft-bridge-approval",
+    approved: true,
+    brief_sha256: briefHash,
+    notes_sha256: reviewedNotesSha256,
+    reviewer: approval.reviewer,
+    reason: approval.reason,
+    human_angle: humanAngle,
+    nonce: randomBytes(32).toString("hex"),
+  };
+  const stagingHandle = await openVerifiedDirectory(stagingDir, { create: false });
+  try {
+    await writeStableTextAtDirectory(stagingHandle, ".reviewed-brief.md", reviewedNotes);
+    await writeStableTextAtDirectory(stagingHandle, ".keyword-approval.json", `${JSON.stringify(approvalArtifact)}\n`);
+  } finally {
+    await stagingHandle.close().catch(() => {});
+  }
   const writerArgs = buildAutoWriteArgs(brief, {
-    notesPath: markdownPath,
+    notesPath: reviewedNotesPath,
     outputDir: stagingDir,
     format: args.format,
+    humanAngle,
+    briefSha256: briefHash,
+    approvalArtifact: approvalArtifactPath,
   });
   const writer = dependencies.runWriter ?? runAutoWriter;
   try {
@@ -259,7 +292,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     const event = {
       type: "writer_handoff",
       reference,
-      reason: `brief approved by ${approval.reviewer}: ${approval.reason}; brief=${relative(root, briefPath).replaceAll("\\", "/")}`,
+      reason: `brief approved by ${approval.reviewer}: ${approval.reason}; angle=${humanAngle}; brief_sha256=${briefHash}; brief=${relative(root, briefPath).replaceAll("\\", "/")}`,
     };
     const writtenRecord = transitionStatus(record, event);
     const records = await upsertRecords([writtenRecord], {
