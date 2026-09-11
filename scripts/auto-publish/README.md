@@ -20,6 +20,19 @@ npm run auto:write "글 주제" --level 완전초보 --stage 정보 --topic 카�
 
 지원 글 형식: `how-to`(사용법) · `review`(리뷰) · `essay`(에세이) · `experience`(경험 기록) · `place-log`(여행·장소) · `book-memo`(책·콘텐츠 메모) · `photo-log`(사진 기록). `experience`·`place-log`·`book-memo`·`photo-log`는 `--notes` 원자료가 필수다 — 모델은 원자료에 없는 경험을 만들지 못한다 (`notes/README.md`).
 
+## 키워드 브리프 연결
+
+키워드 시스템에서 생성한 JSON 브리프는 사람이 Markdown을 검토한 뒤에만 기존 writer로 넘깁니다.
+
+```bash
+npm run keywords:draft -- \
+  --brief out/keyword-briefs/<category>-<keyword>.json \
+  --approve --reviewer "검토자" --reason "근거와 글 방향 확인" \
+  [--format how-to]
+```
+
+이 명령은 브리프 Markdown을 writer의 원자료로 전달하고, 통과한 결과를 `src/content/posts/`에 `status: draft`로 저장합니다. 실패하거나 `--approve`가 없으면 writer를 호출하지 않습니다. `written` keyword record는 draft 경로와 writer handoff 결정을 기록할 뿐이며, 발행·예약은 별도 사람 승인이 필요합니다.
+
 ## 1회 설정
 
 ### A. ChatGPT OAuth 모드 — Codex CLI (권장)

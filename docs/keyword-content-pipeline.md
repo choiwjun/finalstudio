@@ -24,10 +24,10 @@
   -> 공식 NAVER API HUB 수집
   -> raw evidence와 evidence index 저장
   -> 정한 키워드와 수집 근거의 일치·최신성·위험도 분석
-  -> 카테고리별 글 브리프 생성
+  -> 카테고리별 글 브리프(Markdown + JSON) 생성
   -> 사람 검토·작성 승인
-  -> 기존 초안 생성기에 브리프 전달
-  -> draft 저장
+  -> 승인된 JSON 브리프를 기존 초안 생성기에 전달
+  -> draft 저장 + writer handoff 기록
   -> 별도 사람 발행 승인
 ```
 
@@ -59,14 +59,17 @@ NAVER 수집 데이터는 키워드 자체를 대신하지 않는다. 수집 결
 - `ready-to-write` 수동 handoff gate
 - `npm run test:keywords`
 - `npm run keywords:brief`로 ready record와 같은 키워드의 raw evidence를 결합한 결정론적 사람 검토용 브리프 생성
+- `npm run keywords:draft`의 명시적 `--approve`·검토자·사유 게이트와 기존 auto-write 연결
+- 승인된 브리프만 `status: draft`로 저장하고 keyword record에 writer handoff 기록
 - CI에서 keyword regression test, content/prompt/build boundary 검사
 
 ### 다음 구현
 
 - 이 문서의 세부 키워드 목록을 `data/keywords/seeds.json`에 반영
-- 검토 승인된 브리프를 기존 `scripts/auto-publish/auto-write.mjs`의 승인된 입력으로 전달
-- 생성 결과를 `draft`로 저장하고 keyword record와 slug·초안 경로를 연결
-- 실제 NAVER 수집과 사람 승인 후에만 위 흐름을 실행
+- 최종 사용자의 경제·비즈니스 / AI / 여행 세부 키워드 목록을 `data/keywords/seeds.json`에 반영
+- 실제 NAVER 수집 credentials를 로컬에 설정하고 선택 키워드만 수집
+- 생성된 `draft`를 사람이 검토하고 마커·출처·스크린샷을 보완한 뒤 발행 승인
+- 배포 환경이 필요하면 `PUBLIC_SITE_URL`, `DEPLOY_HOOK_URL` 등 호스팅 설정
 
 ## 5. 운영 승인 게이트
 
@@ -74,9 +77,9 @@ NAVER 수집 데이터는 키워드 자체를 대신하지 않는다. 수집 결
 2. API credentials는 로컬 환경에만 설정한다.
 3. evidence가 없거나 malformed·실패·위험 상태면 ready 승격하지 않는다.
 4. 글 브리프를 사람이 검토한다.
-5. 초안 생성은 사람의 명시적 실행으로만 시작한다.
-6. 생성 성공 후에도 글 상태는 `draft`로 유지한다.
-7. 공개 발행과 예약 배포는 별도의 사람 승인을 받는다.
+5. `keywords:draft`는 브리프 검토자의 `--approve`, `--reviewer`, `--reason` 없이는 writer를 호출하지 않는다.
+6. 생성 성공 후에도 글 상태는 `draft`로 유지하고 writer handoff만 기록한다.
+7. 실제 테스트·출처·마커 검토 후 공개 발행과 예약 배포에 별도 사람 승인을 받는다.
 
 ## 6. 금지 사항
 

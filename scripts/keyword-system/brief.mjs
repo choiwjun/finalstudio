@@ -195,10 +195,16 @@ export async function main(argv = process.argv.slice(2)) {
       );
       const name = `${record.category}-${slugifySafeKey(record.head_keyword)}`;
       const fileName = `${name}.md`;
+      const jsonFileName = `${name}.json`;
       await writeStableTextAtDirectory(
         outputHandle,
         fileName,
         renderKeywordBrief(brief),
+      );
+      await writeStableTextAtDirectory(
+        outputHandle,
+        jsonFileName,
+        `${JSON.stringify(brief, null, 2)}\n`,
       );
       written.push({
         category: record.category,
@@ -207,6 +213,10 @@ export async function main(argv = process.argv.slice(2)) {
           "\\",
           "/",
         ),
+        json_path: relative(
+          REPOSITORY_ROOT,
+          resolve(briefDir, jsonFileName),
+        ).replaceAll("\\", "/"),
       });
     }
     await writeStableTextAtDirectory(

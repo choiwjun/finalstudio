@@ -95,8 +95,9 @@ const calendarPath = getArg('calendar');
 const inputPath = getArg('input');
 const finalPath = getArg('from-final');
 const notesPath = getArg('notes');
+const outputDirArg = getArg('out');
 const bestOfArg = getArg('best-of');
-const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|format|type|persona|calendar|input|from-final|notes|best-of)$/)));
+const positionalTopic = args.find((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].match(/^--(topic|level|stage|tone|slug|angle|format|type|persona|calendar|input|from-final|notes|out|best-of)$/)));
 
 const CODEX_MODEL = process.env.CODEX_MODEL;
 
@@ -230,6 +231,7 @@ const callCodex = async (system, user) => {
 const convert = (inputFile, topicTag, angle, fileSlug) => {
   const cmdArgs = [join(ROOT, 'scripts', 'auto-publish', 'convert-post.mjs'), inputFile, '--topic', topicTag, '--angle', angle, '--format', format];
   if (fileSlug) cmdArgs.push('--slug', fileSlug);
+  if (outputDirArg) cmdArgs.push('--out', outputDirArg);
   return execFileSync('node', cmdArgs, { encoding: 'utf8', cwd: ROOT });
 };
 

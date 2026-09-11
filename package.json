@@ -10,6 +10,7 @@
     "check:prompts": "node scripts/check-prompts.mjs",
     "test:keywords": "node --test scripts/keyword-system/*.test.mjs",
     "keywords:brief": "node scripts/keyword-system/brief.mjs",
+    "keywords:draft": "node scripts/keyword-system/draft.mjs",
     "check:writing": "node scripts/check-writing.mjs",
     "auto:eval": "node scripts/run-evals.mjs",
     "check:build": "node scripts/check-build.mjs",
