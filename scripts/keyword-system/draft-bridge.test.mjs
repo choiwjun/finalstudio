@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { buildWriterEnvironment } from "./draft.mjs";
 import {
   DraftBridgeError,
@@ -11,6 +14,8 @@ import {
   requireHumanAuthoredAngle,
   requireReviewedBriefHash,
 } from "./lib/draft-bridge.mjs";
+
+const ROOT = resolve(fileURLToPath(new URL("../../", import.meta.url)));
 
 const brief = {
   schema_version: 1,
@@ -48,6 +53,32 @@ test("writer subprocess environment excludes NAVER credentials", () => {
   });
 
   assert.deepEqual(environment, { PATH: "/usr/bin", HOME: "/home/test" });
+});
+
+test("standalone auto-write rejects before reaching Codex", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      resolve(ROOT, "scripts/auto-publish/auto-write.mjs"),
+      "직접 실행 주제",
+      "--topic",
+      "economy",
+      "--angle",
+      "사람 방향",
+    ],
+    {
+      cwd: ROOT,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        NCP_NAVER_API_HUB_CLIENT_ID: "test-client-sentinel",
+        NCP_NAVER_API_HUB_CLIENT_SECRET: "test-secret-sentinel",
+      },
+    },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}${result.stderr}`, /approved keyword draft bridge/iu);
+  assert.doesNotMatch(`${result.stdout}${result.stderr}`, /test-(?:client|secret)-sentinel/iu);
 });
 
 test("human approval is explicit and requires reviewer context", () => {
