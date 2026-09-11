@@ -210,7 +210,10 @@ export function buildKeywordBrief(record, entries, { runId } = {}) {
 export function normalizeKeywordBrief(value) {
   if (!isObject(value) || value.schema_version !== 1)
     fail("brief.schema_version must be 1");
-  if (typeof value.category !== "string" || typeof value.head_keyword !== "string")
+  if (
+    typeof value.category !== "string" ||
+    typeof value.head_keyword !== "string"
+  )
     fail("brief.category and brief.head_keyword must be strings");
   const category = cleanText(value.category);
   const headKeyword = cleanText(value.head_keyword);
@@ -229,7 +232,10 @@ export function normalizeKeywordBrief(value) {
   const searchIntent = cleanText(value.search_intent);
   if (!SEARCH_INTENTS.includes(searchIntent))
     fail("brief.search_intent is not canonical");
-  if (typeof value.content_angle !== "string" || typeof value.collected_at !== "string")
+  if (
+    typeof value.content_angle !== "string" ||
+    typeof value.collected_at !== "string"
+  )
     fail("brief.content_angle and brief.collected_at must be strings");
   const contentAngle = cleanText(value.content_angle);
   if (contentAngle === "") fail("brief.content_angle must be non-empty");
@@ -237,19 +243,60 @@ export function normalizeKeywordBrief(value) {
   if (collectedAt === "" || !Number.isFinite(Date.parse(collectedAt)))
     fail("brief.collected_at must be a valid timestamp");
   const freshness = cleanText(value.freshness);
-  if (!FRESHNESS_VALUES.includes(freshness)) fail("brief.freshness is not canonical");
-  if (!Array.isArray(value.source) || value.source.length !== 2 || value.source.some((item) => typeof item !== "string") || !value.source.includes(BLOG_SOURCE) || !value.source.includes(TREND_SOURCE))
+  if (!FRESHNESS_VALUES.includes(freshness))
+    fail("brief.freshness is not canonical");
+  if (
+    !Array.isArray(value.source) ||
+    value.source.length !== 2 ||
+    value.source.some((item) => typeof item !== "string") ||
+    !value.source.includes(BLOG_SOURCE) ||
+    !value.source.includes(TREND_SOURCE)
+  )
     fail("brief.source must include only official blog and trend evidence");
-  if (typeof value.review_gate !== "string" || !value.review_gate.includes("사람 검토 필요"))
+  if (
+    typeof value.review_gate !== "string" ||
+    !value.review_gate.includes("사람 검토 필요")
+  )
     fail("brief.review_gate must require human review");
-  if (!isObject(value.evidence) || !Array.isArray(value.evidence.blog) || value.evidence.blog.length === 0 || !Array.isArray(value.evidence.trend) || value.evidence.trend.length === 0)
+  if (
+    !isObject(value.evidence) ||
+    !Array.isArray(value.evidence.blog) ||
+    value.evidence.blog.length === 0 ||
+    !Array.isArray(value.evidence.trend) ||
+    value.evidence.trend.length === 0
+  )
     fail("brief.evidence must contain blog and trend evidence");
   const blog = value.evidence.blog.map((item) => {
-    if (!isObject(item) || typeof item.title !== "string" || cleanText(item.title) === "" || typeof item.description !== "string" || typeof item.collected_at !== "string" || !Number.isFinite(Date.parse(item.collected_at)) || (item.link !== undefined && safeUrl(item.link) === undefined)) fail("brief blog evidence is invalid");
+    if (
+      !isObject(item) ||
+      typeof item.title !== "string" ||
+      cleanText(item.title) === "" ||
+      typeof item.description !== "string" ||
+      typeof item.collected_at !== "string" ||
+      !Number.isFinite(Date.parse(item.collected_at)) ||
+      (item.link !== undefined && safeUrl(item.link) === undefined)
+    )
+      fail("brief blog evidence is invalid");
     return { ...item };
   });
   const trend = value.evidence.trend.map((item) => {
-    if (!isObject(item) || typeof item.group_name !== "string" || cleanText(item.group_name) === "" || typeof item.latest_period !== "string" || !Number.isFinite(Date.parse(item.latest_period)) || !Number.isFinite(item.latest_ratio) || item.latest_ratio < 0 || item.latest_ratio > 100 || !Number.isFinite(item.max_ratio) || item.max_ratio < 0 || item.max_ratio > 100 || item.ratio_note !== RATIO_NOTE || typeof item.collected_at !== "string" || !Number.isFinite(Date.parse(item.collected_at))) fail("brief trend evidence is invalid");
+    if (
+      !isObject(item) ||
+      typeof item.group_name !== "string" ||
+      cleanText(item.group_name) === "" ||
+      typeof item.latest_period !== "string" ||
+      !Number.isFinite(Date.parse(item.latest_period)) ||
+      !Number.isFinite(item.latest_ratio) ||
+      item.latest_ratio < 0 ||
+      item.latest_ratio > 100 ||
+      !Number.isFinite(item.max_ratio) ||
+      item.max_ratio < 0 ||
+      item.max_ratio > 100 ||
+      item.ratio_note !== RATIO_NOTE ||
+      typeof item.collected_at !== "string" ||
+      !Number.isFinite(Date.parse(item.collected_at))
+    )
+      fail("brief trend evidence is invalid");
     return { ...item };
   });
   return {
@@ -262,7 +309,9 @@ export function normalizeKeywordBrief(value) {
     collected_at: collectedAt,
     freshness,
     source: [...value.source],
-    outline: Array.isArray(value.outline) ? value.outline.map((item) => cleanText(item)).filter(Boolean) : [...OUTLINE],
+    outline: Array.isArray(value.outline)
+      ? value.outline.map((item) => cleanText(item)).filter(Boolean)
+      : [...OUTLINE],
     review_gate: cleanText(value.review_gate),
     evidence: { blog, trend },
   };
