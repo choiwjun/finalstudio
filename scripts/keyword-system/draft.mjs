@@ -21,6 +21,7 @@ import {
   openVerifiedDirectory,
   openVerifiedFileAtDirectory,
   readFileAtDirectory,
+  removeFileAtDirectory,
   writeStableTextAtDirectory,
 } from "./lib/file-lock.mjs";
 import {
@@ -79,6 +80,8 @@ export function parseDraftArgs(
     reason: undefined,
     angle: undefined,
     briefSha256: undefined,
+    automationPolicy: undefined,
+    automationPolicySha256: undefined,
   };
   const valueOptions = new Map([
     ["--brief", "brief"],
@@ -91,6 +94,8 @@ export function parseDraftArgs(
     ["--reason", "reason"],
     ["--angle", "angle"],
     ["--brief-sha256", "briefSha256"],
+    ["--automation-policy", "automationPolicy"],
+    ["--automation-policy-sha256", "automationPolicySha256"],
   ]);
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -101,7 +106,16 @@ export function parseDraftArgs(
     const key = valueOptions.get(argument);
     if (!key) fail(`unknown argument ${JSON.stringify(argument)}`);
     const value = valueFor(argv, index, argument);
-    if (["format", "reviewer", "reason", "briefSha256"].includes(key)) {
+    if (
+      [
+        "format",
+        "reviewer",
+        "reason",
+        "briefSha256",
+        "angle",
+        "automationPolicySha256",
+      ].includes(key)
+    ) {
       result[key] = value;
     } else {
       result[key] = isAbsolute(value) ? resolve(value) : resolve(root, value);
@@ -161,6 +175,49 @@ export function runAutoWriter({ cwd, scriptPath, args }) {
   });
 }
 
+async function readAutomationPolicy(root, policyPath, expectedSha256) {
+  const containedPath = assertContainedPath(
+    root,
+    policyPath,
+    "--automation-policy",
+  );
+  const text = await readTextAt(root, containedPath, "automation policy");
+  let policy;
+  try {
+    policy = JSON.parse(text);
+  } catch {
+    fail("automation policy is not valid JSON");
+  }
+  if (
+    !isObject(policy) ||
+    policy.schema_version !== 1 ||
+    policy.kind !== "keyword-automation-policy" ||
+    policy.enabled !== true ||
+    policy.allow_writer !== true ||
+    policy.allow_publish !== true ||
+    typeof policy.id !== "string" ||
+    typeof policy.persona !== "string" ||
+    typeof policy.reason !== "string" ||
+    policy.reason.trim() === "" ||
+    policy.images?.main !== 1 ||
+    ![1, 2].includes(policy.images?.sub) ||
+    policy.publish?.requires_deploy_hook !== true ||
+    policy.publish?.requires_complete_image_bundle !== true ||
+    policy.publish?.requires_content_check !== true
+  ) {
+    fail("automation policy is invalid or disabled");
+  }
+  const sha256 = createHash("sha256").update(text).digest("hex");
+  if (expectedSha256 !== undefined && expectedSha256 !== sha256) {
+    fail("automation policy changed during the draft run");
+  }
+  return {
+    ...policy,
+    path: containedPath,
+    sha256,
+  };
+}
+
 async function readDraftFile(draftPath) {
   const parent = await openVerifiedDirectory(dirname(draftPath), {
     create: false,
@@ -195,7 +252,22 @@ async function assertDraftTargetAvailable(directoryHandle, fileName) {
 export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const root = resolve(dependencies.repositoryRoot ?? REPOSITORY_ROOT);
   const args = parseDraftArgs(argv, root);
-  const approval = requireHumanApproval(args);
+  const automationPolicy = args.automationPolicy
+    ? await readAutomationPolicy(
+        root,
+        args.automationPolicy,
+        args.automationPolicySha256,
+      )
+    : undefined;
+  const approval = automationPolicy
+    ? {
+        reviewer: `automation:${automationPolicy.persona}`,
+        reason: automationPolicy.reason,
+        mode: "automation-policy",
+        policyId: automationPolicy.id,
+        policySha256: automationPolicy.sha256,
+      }
+    : { ...requireHumanApproval(args), mode: "human" };
   const humanAngle = requireHumanAuthoredAngle(args.angle);
   const keywordRoot = resolve(root, "data/keywords");
   const outDir = assertContainedPath(keywordRoot, args.outDir, "--out-dir");
@@ -203,7 +275,11 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   await dataHandle.close().catch(() => {});
   const recordsPath = assertContainedPath(outDir, args.records, "--records");
   const readyPath = assertContainedPath(outDir, args.ready, "--ready");
-  const decisionsPath = assertContainedPath(outDir, args.decisions, "--decisions");
+  const decisionsPath = assertContainedPath(
+    outDir,
+    args.decisions,
+    "--decisions",
+  );
   const briefRoot = resolve(root, "out/keyword-briefs");
   const briefPath = assertContainedPath(briefRoot, args.brief, "brief");
   const briefText = await readTextAt(briefRoot, briefPath, "brief JSON");
@@ -229,28 +305,53 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   );
   if (!record) fail("brief does not match a ready-to-write record");
   const stagingRoot = resolve(root, "out");
-  const stagingParent = await openVerifiedDirectory(stagingRoot, { create: true });
+  const stagingParent = await openVerifiedDirectory(stagingRoot, {
+    create: true,
+  });
   await stagingParent.close().catch(() => {});
   const stagingDir = await mkdtemp(join(stagingRoot, ".keyword-draft-"));
   const reviewedNotes = renderKeywordBrief(brief);
   const reviewedNotesPath = join(stagingDir, ".reviewed-brief.md");
   const approvalArtifactPath = join(stagingDir, ".keyword-approval.json");
-  const reviewedNotesSha256 = createHash("sha256").update(reviewedNotes).digest("hex");
-  const approvalArtifact = {
-    schema_version: 1,
-    kind: "keyword-draft-bridge-approval",
-    approved: true,
-    brief_sha256: briefHash,
-    notes_sha256: reviewedNotesSha256,
-    reviewer: approval.reviewer,
-    reason: approval.reason,
-    human_angle: humanAngle,
-    nonce: randomBytes(32).toString("hex"),
-  };
-  const stagingHandle = await openVerifiedDirectory(stagingDir, { create: false });
+  const reviewedNotesSha256 = createHash("sha256")
+    .update(reviewedNotes)
+    .digest("hex");
+  const approvalArtifact = Object.freeze(
+    Object.assign(
+      {
+        schema_version: 1,
+        kind: "keyword-draft-bridge-approval",
+        approved: true,
+        brief_sha256: briefHash,
+        notes_sha256: reviewedNotesSha256,
+        reviewer: approval.reviewer,
+        reason: approval.reason,
+        human_angle: humanAngle,
+        nonce: randomBytes(32).toString("hex"),
+        approval_mode: approval.mode,
+      },
+      approval.policyId
+        ? {
+            policy_id: approval.policyId,
+            policy_sha256: approval.policySha256,
+          }
+        : undefined,
+    ),
+  );
+  const stagingHandle = await openVerifiedDirectory(stagingDir, {
+    create: false,
+  });
   try {
-    await writeStableTextAtDirectory(stagingHandle, ".reviewed-brief.md", reviewedNotes);
-    await writeStableTextAtDirectory(stagingHandle, ".keyword-approval.json", `${JSON.stringify(approvalArtifact)}\n`);
+    await writeStableTextAtDirectory(
+      stagingHandle,
+      ".reviewed-brief.md",
+      reviewedNotes,
+    );
+    await writeStableTextAtDirectory(
+      stagingHandle,
+      ".keyword-approval.json",
+      `${JSON.stringify(approvalArtifact)}\n`,
+    );
   } finally {
     await stagingHandle.close().catch(() => {});
   }
@@ -263,6 +364,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     approvalArtifact: approvalArtifactPath,
   });
   const writer = dependencies.runWriter ?? runAutoWriter;
+  let createdDraftPath;
   try {
     const writerResult = await writer({
       cwd: root,
@@ -280,19 +382,26 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     const draftText = await readDraftFile(stagedPath);
     const fileName = basename(stagedPath);
     const postsRoot = resolve(root, "src/content/posts");
-    const postsHandle = await openVerifiedDirectory(postsRoot, { create: false });
+    const draftPath = resolve(postsRoot, fileName);
+    const postsHandle = await openVerifiedDirectory(postsRoot, {
+      create: false,
+    });
     try {
       await assertDraftTargetAvailable(postsHandle, fileName);
       await writeStableTextAtDirectory(postsHandle, fileName, draftText);
+      createdDraftPath = draftPath;
     } finally {
       await postsHandle.close().catch(() => {});
     }
-    const draftPath = resolve(postsRoot, fileName);
+    await dependencies.afterDraftWritten?.(draftPath);
     const reference = buildWriterReference(root, draftPath);
+    const automationProvenance = automationPolicy
+      ? `; automation_policy=${relative(root, automationPolicy.path).replaceAll("\\", "/")}; policy_id=${automationPolicy.id}; policy_sha256=${automationPolicy.sha256}`
+      : "";
     const event = {
       type: "writer_handoff",
       reference,
-      reason: `brief approved by ${approval.reviewer}: ${approval.reason}; angle=${humanAngle}; brief_sha256=${briefHash}; brief=${relative(root, briefPath).replaceAll("\\", "/")}`,
+      reason: `${approval.mode} approved by ${approval.reviewer}: ${approval.reason}; angle=${humanAngle}; brief_sha256=${briefHash}; brief=${relative(root, briefPath).replaceAll("\\", "/")}${automationProvenance}`,
     };
     const writtenRecord = transitionStatus(record, event);
     const records = await upsertRecords([writtenRecord], {
@@ -314,6 +423,18 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
       `created draft ${reference} for ${brief.head_keyword}; publication remains human-approved\n`,
     );
     return result;
+  } catch (error) {
+    if (createdDraftPath) {
+      const parent = await openVerifiedDirectory(dirname(createdDraftPath), {
+        create: false,
+      });
+      try {
+        await removeFileAtDirectory(parent, basename(createdDraftPath));
+      } finally {
+        await parent.close().catch(() => {});
+      }
+    }
+    throw error;
   } finally {
     await rm(stagingDir, { recursive: true, force: true }).catch(() => {});
   }

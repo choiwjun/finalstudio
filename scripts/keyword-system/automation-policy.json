@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "keyword-automation-policy",
+  "id": "wj-editor-auto-publish-v1",
+  "enabled": true,
+  "allow_writer": true,
+  "allow_publish": true,
+  "persona": "wj-editor",
+  "reason": "자동화 정책의 근거 수집·글 품질·이미지 완성 검사를 통과한 키워드 번들을 자동 작성·게시합니다.",
+  "images": {
+    "main": 1,
+    "sub": 2
+  },
+  "publish": {
+    "requires_deploy_hook": true,
+    "requires_complete_image_bundle": true,
+    "requires_content_check": true
+  }
+}

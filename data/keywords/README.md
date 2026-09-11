@@ -19,7 +19,7 @@ category, head_keyword, related_keywords, search_intent, content_angle,
 source, collected_at, freshness, risk_flags, evidence_available, status
 ```
 
-The status values are `candidate`, `researching`, `ready-to-write`, `written`, and `rejected`. `written` is a human handoff state; this directory does not trigger or modify the existing auto-publish pipeline.
+The status values are `candidate`, `researching`, `ready-to-write`, `written`, and `rejected`. `written` records that the writer handoff completed; publication is handled only by the explicit `keywords:auto-publish` command.
 
 ## 실행 경계
 
@@ -28,5 +28,7 @@ The status values are `candidate`, `researching`, `ready-to-write`, `written`, a
 - `npm run keywords:auto -- --dry-run`은 고정 카테고리 조사 계획만 보여주고 network/file write를 수행하지 않는다.
 - fixture 검증은 `npm run keywords:auto -- --fixture scripts/keyword-system/fixtures/naver-api-hub --out-dir <workspace>/data/keywords`를 사용한다. fixture와 `--dry-run` 경로는 실제 credentials를 사용하지 않는다.
 - 실제 수집은 공식 NAVER API HUB만 사용하며, `NCP_NAVER_API_HUB_CLIENT_ID`와 `NCP_NAVER_API_HUB_CLIENT_SECRET`를 로컬 환경에만 설정한다. 값은 로그·fixture·커밋에 남기지 않는다.
-- 수집 후 `node scripts/keyword-system/analyze.mjs`가 evidence와 record를 검증한다. `npm run keywords:brief`는 `ready-to-write`와 같은 키워드의 NAVER 근거를 결합해 사람이 검토할 Markdown과 writer 입력용 JSON 브리프를 만든다. 검토가 끝난 뒤에만 `npm run keywords:draft -- --brief out/keyword-briefs/<category>-<keyword>.json --brief-sha256 "$(sha256sum out/keyword-briefs/<category>-<keyword>.json | cut -d' ' -f1)" --approve --reviewer "이름" --reason "검토 내용" --angle "사람이 승인한 글 방향"`을 실행한다. 이 명령은 기존 auto-write를 호출해 `status: draft` 글을 저장하고 writer handoff를 기록하지만, 예약·발행은 수행하지 않는다.
+- 수집 후 `node scripts/keyword-system/analyze.mjs`가 evidence와 record를 검증한다. `npm run keywords:brief`는 `ready-to-write`와 같은 키워드의 NAVER 근거를 결합해 Markdown과 writer 입력용 JSON 브리프를 만든다. `npm run keywords:auto-publish -- --dry-run`은 전체 ready 후보에 대해 글·메인 이미지·서브 이미지·게시 계획을 만든다. 실제 자동 게시가 승인된 환경에서는 `npm run keywords:auto-publish -- --publish`를 실행한다. 이 명령은 글마다 메인 이미지 1장과 서브 이미지 1~2장을 생성하고, 품질검사와 이미지 검사를 통과한 번들만 Git push·Deploy Hook 대상으로 삼는다. 저수준 수동 실행이 필요할 때만 `npm run keywords:draft`를 사용한다.
 - `raw/`는 로컬 evidence 출력 경계다. 정적 사이트 빌드에는 `data/keywords`와 내부 keyword-system 산출물이 포함되지 않으며, 빌드 경계 검사는 `npm run check:build`에서 확인한다.
+- `scripts/keyword-system/automation-policy.json`은 자동 writer·이미지·게시 범위를 버전 관리한다.
+- 자동 게시에는 Codex OAuth 로그인, Git push 권한, `DEPLOY_HOOK_URL` 설정이 필요하다.

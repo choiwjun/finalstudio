@@ -12,6 +12,8 @@
     "keywords:brief": "node scripts/keyword-system/brief.mjs",
     "keywords:auto": "node scripts/keyword-system/auto-discover.mjs",
     "keywords:draft": "node scripts/keyword-system/draft.mjs",
+    "keywords:batch-draft": "node scripts/keyword-system/persona-batch.mjs",
+    "keywords:auto-publish": "node scripts/keyword-system/auto-publish.mjs",
     "check:writing": "node scripts/check-writing.mjs",
     "auto:eval": "node scripts/run-evals.mjs",
     "check:build": "node scripts/check-build.mjs",

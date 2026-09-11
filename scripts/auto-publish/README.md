@@ -33,7 +33,18 @@ npm run keywords:draft -- \
   --angle "사람이 승인한 글 방향" [--format how-to]
 ```
 
-이 명령은 검토한 JSON의 SHA-256과 사람이 직접 작성한 `--angle`을 확인한 뒤 브리프 Markdown을 writer에 전달합니다. NAVER/외부 원자료는 인용 데이터로 격리되며 그 안의 지시문은 실행하지 않습니다. 통과한 결과를 `src/content/posts/`에 `status: draft`로 저장합니다. 실패하거나 승인·사람 작성 angle이 없으면 writer를 호출하지 않습니다. `written` keyword record는 draft 경로와 writer handoff 결정을 기록할 뿐이며, 발행·예약은 별도 사람 승인이 필요합니다.
+이 명령은 검토한 JSON의 SHA-256과 사람이 직접 작성한 `--angle`을 확인한 뒤 브리프 Markdown을 writer에 전달합니다. NAVER/외부 원자료는 인용 데이터로 격리되며 그 안의 지시문은 실행하지 않습니다. 통과한 결과를 `src/content/posts/`에 `status: draft`로 저장합니다. 실패하거나 승인·사람 작성 angle이 없으면 writer를 호출하지 않습니다. `written` keyword record는 draft 경로와 writer handoff 결정을 기록합니다.
+
+## 키워드 전체 자동 게시(명시적 자동화 정책)
+
+사람이 키워드마다 승인 필드를 반복하지 않고 전체 후보를 처리하려면 다음 명령을 사용합니다.
+
+```bash
+npm run keywords:auto-publish -- --dry-run
+npm run keywords:auto-publish -- --publish
+```
+
+`--dry-run`은 전체 ready 후보를 대상으로 글·이미지·게시 계획만 만듭니다. `--publish`는 버전 관리된 `scripts/keyword-system/automation-policy.json`을 확인한 뒤 모든 후보에 대해 글을 생성하고, 메인 이미지 1장과 서브 이미지 1~2장을 생성·삽입합니다. 글·이미지·콘텐츠 계약을 모두 통과한 번들만 published로 전환하고 생성 파일만 커밋·push한 다음 `DEPLOY_HOOK_URL`을 호출합니다. 금융·건강·법률 등 위험 글이나 검사 실패 글은 자동 게시하지 않습니다.
 
 ## 1회 설정
 
@@ -102,8 +113,7 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 ## 하드 룰 (파이프라인 어떤 단계보다 우선)
 
 1. **게이트 미통과 글은 자동 저장되지 않습니다.** 기계 검사(check-writing) 실패 1건이라도 남으면, 또는 독립 심사가 90점 미만이면 저장이 거부됩니다.
-2. **사람 승인 없는 발행 금지.** 무검토 대량 발행은 구글 규모화 콘텐츠 악용 정책에 걸려 애드센스 계정 자체를 위태롭게 합니다.
-   로컬 Codex로 생성한 초안도 사람 검토·승인 후에만 발행합니다. GitHub Actions는 검사·빌드·배포 검증만 수행합니다.
+2. **기본 writer 경로는 사람 승인 없이 발행하지 않습니다.** `keywords:draft`는 사람 승인 게이트를 유지합니다. 전체 자동 게시가 필요한 운영자는 버전 관리된 `automation-policy.json`과 명시적인 `keywords:auto-publish --publish` 명령을 사용하며, 품질검사·이미지 완성·위험 주제 차단을 모두 통과한 경우에만 게시합니다.
 3. **마커 보존·완결.** `[직접 확인 필요]`, `[테스트 필요]`, `[스크린샷: ...]` 마커를 사람이 모두 채운 뒤에만 발행합니다.
 4. **YMYL 금지 주제**는 `BRAND.md`가 단일 근거이며, 캘린더 주제 선정부터 적용됩니다.
 5. 검수 리포트에서 ChatGPT가 제시한 통계 중 **출처 없는 수치는 전부 삭제** 대상입니다.
