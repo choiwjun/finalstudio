@@ -186,12 +186,15 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
       continue;
     }
     const safeKey = deriveSafeKey(item.source, item.request);
-    const relativeRaw = evidenceRelativePath({ collectedAt, runId, source: item.source, safeKey });
+    // Category scopes the filename because automatic discovery can produce the
+    // same topic in multiple approved categories in one run.
+    const scopedSafeKey = `${candidate.category} ${safeKey}`;
+    const relativeRaw = evidenceRelativePath({ collectedAt, runId, source: item.source, safeKey: scopedSafeKey });
     const target = resolve(rawRoot, relativeRaw);
-    const targetKey = `${item.source}\u0000${normalizeKeywordKey(safeKey)}`;
-    if (seenTargets.has(targetKey)) fail(`duplicate evidence target in one run: ${item.source}/${safeKey}`);
+    const targetKey = `${item.source}\u0000${normalizeKeywordKey(scopedSafeKey)}`;
+    if (seenTargets.has(targetKey)) fail(`duplicate evidence target in one run: ${item.source}/${scopedSafeKey}`);
     seenTargets.add(targetKey);
-    if (await pathExists(target)) fail(`evidence target already exists for this run: ${item.source}/${safeKey}`);
+    if (await pathExists(target)) fail(`evidence target already exists for this run: ${item.source}/${scopedSafeKey}`);
     let persisted;
     try {
       persisted = (failed || empty)
@@ -206,8 +209,9 @@ async function collectOne({ provider, candidate, collectedAt, runId, rawRoot, ou
           runId,
           rootDir: rawRoot,
           redactValues: redactionValues,
+          safeKey: scopedSafeKey,
         })
-        : await writeEvidence({ source: item.source, endpoint: item.endpoint, method: item.method, request: item.request, response: result, http: { status: 200, ok: true }, collectedAt, runId, rootDir: rawRoot, redactValues: redactionValues });
+        : await writeEvidence({ source: item.source, endpoint: item.endpoint, method: item.method, request: item.request, response: result, http: { status: 200, ok: true }, collectedAt, runId, rootDir: rawRoot, redactValues: redactionValues, safeKey: scopedSafeKey });
       const indexEntry = { ...persisted.indexEntry, path: repositoryRelativePath(persisted.path, outDir) };
       const indexPath = await assertContainedPath(resolve(outDir, 'evidence-index.jsonl'), outDir);
       await appendEvidenceIndexEntry({ path: indexPath, entry: indexEntry });

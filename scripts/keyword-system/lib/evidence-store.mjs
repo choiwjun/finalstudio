@@ -2,7 +2,7 @@ import { link, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { basename, dirname, join, resolve } from 'node:path';
 import { normalizeRawEvidenceEnvelope } from './contracts.mjs';
-import { directoryFdPath, openVerifiedDirectory, openVerifiedNestedDirectory, withExclusiveFileLock } from './file-lock.mjs';
+import { directoryFdPath, openVerifiedDirectory, openVerifiedNestedDirectory } from './file-lock.mjs';
 
 export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/u;
 
@@ -210,7 +210,7 @@ export function makeEvidenceIndexEntry({ envelope, path, runId }) {
   return entry;
 }
 
-async function persist({ source, endpoint, method, request, response, error, http, collectedAt, runId, rootDir, redactValues }) {
+async function persist({ source, endpoint, method, request, response, error, http, collectedAt, runId, rootDir, redactValues, safeKey: safeKeyOverride }) {
   assertRunId(runId);
   const envelopeInput = {
     schema_version: 1,
@@ -231,7 +231,9 @@ async function persist({ source, endpoint, method, request, response, error, htt
   // evidence throws before any directory or file is created.
   const envelope = normalizeRawEvidenceEnvelope(envelopeInput, { redactValues });
   const root = resolveRawRoot(rootDir);
-  const safeKey = deriveSafeKey(envelope.source, envelope.request);
+  const safeKey = typeof safeKeyOverride === 'string' && safeKeyOverride.trim() !== ''
+    ? safeKeyOverride
+    : deriveSafeKey(envelope.source, envelope.request);
   const relativePath = evidenceRelativePath({
     collectedAt: envelope.collected_at,
     runId,
@@ -267,7 +269,7 @@ export async function writeEvidence(input) {
 export async function writeFailureEvidence({ http, redactValues, ...rest }) {
   const status = http?.status;
   const errorKind = rest?.error?.kind;
-  const resolvedStatus = status !== undefined ? status : KIND_STATUS[errorKind] ?? 0;
+  const resolvedStatus = status === undefined ? KIND_STATUS[errorKind] ?? 0 : status;
   return persist({
     ...rest,
     http: { status: resolvedStatus, ok: false },
