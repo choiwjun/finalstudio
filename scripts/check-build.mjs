@@ -1,12 +1,19 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
-const dist = join(process.cwd(), 'dist');
+const dist = join(process.cwd(), "dist");
 if (!existsSync(dist)) {
-  console.error('dist/ does not exist; run npm run build first');
+  console.error("dist/ does not exist; run npm run build first");
   process.exit(1);
 }
-const forbidden = ['.planning/', '.planning\\', 'data/keywords', 'keyword-system', 'sourceIds', 'TBD'];
+const forbidden = [
+  ".planning/",
+  ".planning\\",
+  "data/keywords",
+  "keyword-system",
+  "sourceIds",
+  "TBD",
+];
 const files = [];
 const pathHits = [];
 function walk(dir) {
@@ -14,8 +21,12 @@ function walk(dir) {
     const full = join(dir, name.name);
     if (name.isDirectory()) walk(full);
     else {
-      const relative = full.slice(dist.length + 1).replaceAll('\\', '/');
-      if (relative.includes('keyword-system') || relative.includes('data/keywords')) pathHits.push(`${full}: forbidden keyword artifact path`);
+      const relative = full.slice(dist.length + 1).replaceAll("\\", "/");
+      if (
+        relative.includes("keyword-system") ||
+        relative.includes("data/keywords")
+      )
+        pathHits.push(`${full}: forbidden keyword artifact path`);
       files.push(full);
     }
   }
@@ -24,10 +35,11 @@ walk(dist);
 const hits = [...pathHits];
 for (const file of files) {
   const text = readFileSync(file);
-  for (const token of forbidden) if (text.includes(token)) hits.push(`${file}: ${token}`);
+  for (const token of forbidden)
+    if (text.includes(token)) hits.push(`${file}: ${token}`);
 }
 if (hits.length) {
-  console.error('Build boundary check failed\n' + hits.join('\n'));
+  console.error("Build boundary check failed\n" + hits.join("\n"));
   process.exit(1);
 }
 console.log(`Build boundary OK: ${files.length} output file(s)`);
