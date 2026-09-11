@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "check:content": "node scripts/check-content.mjs",
     "check:prompts": "node scripts/check-prompts.mjs",
+    "test:keywords": "node --test scripts/keyword-system/*.test.mjs",
     "check:writing": "node scripts/check-writing.mjs",
     "auto:eval": "node scripts/run-evals.mjs",
     "check:build": "node scripts/check-build.mjs",

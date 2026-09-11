@@ -24,6 +24,7 @@ Astro 기반으로 만든 나만의 정적 블로그입니다. 카테고리와 �
 
 ```bash
 npm install
+npm run test:keywords
 npm run check:content
 npm run build
 npm run check:build

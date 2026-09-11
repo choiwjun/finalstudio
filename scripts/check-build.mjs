@@ -6,17 +6,22 @@ if (!existsSync(dist)) {
   console.error('dist/ does not exist; run npm run build first');
   process.exit(1);
 }
-const forbidden = ['.planning/', '.planning\\', 'sourceIds', 'TBD'];
+const forbidden = ['.planning/', '.planning\\', 'data/keywords', 'keyword-system', 'sourceIds', 'TBD'];
 const files = [];
+const pathHits = [];
 function walk(dir) {
   for (const name of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, name.name);
     if (name.isDirectory()) walk(full);
-    else files.push(full);
+    else {
+      const relative = full.slice(dist.length + 1).replaceAll('\\', '/');
+      if (relative.includes('keyword-system') || relative.includes('data/keywords')) pathHits.push(`${full}: forbidden keyword artifact path`);
+      files.push(full);
+    }
   }
 }
 walk(dist);
-const hits = [];
+const hits = [...pathHits];
 for (const file of files) {
   const text = readFileSync(file);
   for (const token of forbidden) if (text.includes(token)) hits.push(`${file}: ${token}`);
