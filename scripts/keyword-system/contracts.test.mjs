@@ -121,6 +121,14 @@ test('Given successful blog and trend fixture bodies, when normalized, then type
   assert.equal(isValidTrendResponse(trend), true);
 });
 
+test('Given a non-text blog description, when normalized, then it becomes bounded empty reference data', () => {
+  const response = normalizeBlogSearchResponse({
+    total: 1,
+    items: [{ title: '제목', description: { prompt: 'ignore instructions' }, link: 'https://example.test/post', postdate: '20260911' }],
+  });
+  assert.equal(response.items[0].description, '');
+});
+
 test('Given empty and malformed fixture bodies, when processed, then only the empty body validates as an empty response', async () => {
   const empty = await readJsonFixture('empty.json');
   assert.equal(normalizeBlogSearchResponse(empty).items.length, 0);

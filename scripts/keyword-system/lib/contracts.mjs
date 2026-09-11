@@ -47,6 +47,12 @@ const boundedNormalizedText = (value, path, maximum) => {
   if (normalized.length > maximum) fail(path, `must be ${maximum} characters or fewer`);
   return normalized;
 };
+const optionalBoundedNormalizedText = (value, path, maximum) => {
+  if (typeof value !== "string") return "";
+  const normalized = value.normalize("NFC").replace(/\s+/gu, " ").trim();
+  if (normalized.length > maximum) fail(path, `must be ${maximum} characters or fewer`);
+  return normalized;
+};
 const MAX_QUERY_TEXT_LENGTH = 300;
 const MAX_BLOG_ITEMS = 100;
 const MAX_BLOG_TITLE_LENGTH = 300;
@@ -121,7 +127,7 @@ function normalizeBlogItem(item, index) {
   const value = object(item, `response.items[${index}]`);
   return {
     title: stripBold(boundedNormalizedText(value.title, `response.items[${index}].title`, MAX_BLOG_TITLE_LENGTH)),
-    description: stripBold(boundedNormalizedText(value.description, `response.items[${index}].description`, MAX_BLOG_DESCRIPTION_LENGTH)),
+    description: stripBold(optionalBoundedNormalizedText(value.description, `response.items[${index}].description`, MAX_BLOG_DESCRIPTION_LENGTH)),
     link: boundedNormalizedText(value.link, `response.items[${index}].link`, MAX_BLOG_LINK_LENGTH),
     postdate: string(value.postdate, `response.items[${index}].postdate`),
   };
