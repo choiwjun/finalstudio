@@ -9,6 +9,8 @@ Astro 기반으로 만든 나만의 정적 블로그입니다. 카테고리와 �
 - 콘텐츠 원본: Git/Markdown
 - 공개 읽기 경로: 정적 HTML
 - 자동화: 사람 승인 이후에만 예약 빌드·배포
+- 키워드 콘텐츠 기준: `docs/keyword-content-pipeline.md`
+- 키워드 축: 경제·비즈니스, AI, 여행. 세부 키워드는 사용자 확정 목록만 seed로 등록한다.
 
 ## 블로그 UI/UX v2 — Signal Archive
 
