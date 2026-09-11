@@ -58,13 +58,13 @@ NAVER 수집 데이터는 키워드 자체를 대신하지 않는다. 수집 결
 - records/decision rollback 및 path/symlink/TOCTOU 방어
 - `ready-to-write` 수동 handoff gate
 - `npm run test:keywords`
+- `npm run keywords:brief`로 ready record와 같은 키워드의 raw evidence를 결합한 결정론적 사람 검토용 브리프 생성
 - CI에서 keyword regression test, content/prompt/build boundary 검사
 
 ### 다음 구현
 
 - 이 문서의 세부 키워드 목록을 `data/keywords/seeds.json`에 반영
-- ready record와 raw evidence를 결합한 결정론적 글 브리프 생성
-- 브리프를 기존 `scripts/auto-publish/auto-write.mjs`의 승인된 입력으로 전달
+- 검토 승인된 브리프를 기존 `scripts/auto-publish/auto-write.mjs`의 승인된 입력으로 전달
 - 생성 결과를 `draft`로 저장하고 keyword record와 slug·초안 경로를 연결
 - 실제 NAVER 수집과 사람 승인 후에만 위 흐름을 실행
 

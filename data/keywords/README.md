@@ -6,7 +6,8 @@ This directory contains the keyword-system boundary data used by the WJ blog.
 
 - `version` is `1`.
 - `inputs` contains one or more objects with a lowercase kebab-case `category` and a non-empty `seeds` array.
-- The initial categories are `ai-it`, `economy`, and `health`; additional categories must remain lowercase kebab-case.
+- Canonical category decisions are documented in `docs/keyword-content-pipeline.md`; the current direction is `economy-business`, `ai`, and `travel`.
+- The committed seed file still contains a legacy fixture baseline and must be replaced with the user-approved detailed keyword list before live collection.
 - `title`, `description`, and explicit `intent` are optional. Intent must be one of `방법`, `개념`, `비교`, `문제 해결`, or `최신 이슈`.
 
 Keyword candidates and records are evidence-led. A successful API response with a non-empty, shape-valid body is required before a record can become `ready-to-write`; empty, malformed, and failed responses remain unavailable evidence. Trend `ratio` values are relative values within one request and must not be stored as absolute search volume or converted into a score.
@@ -26,5 +27,5 @@ The status values are `candidate`, `researching`, `ready-to-write`, `written`, a
 - `node scripts/keyword-system/discover.mjs --dry-run`은 seed 입력만 검증하고 파일을 쓰지 않는다.
 - fixture 검증은 `node scripts/keyword-system/collect.mjs --fixture scripts/keyword-system/fixtures/naver-api-hub`를 사용한다. fixture와 `--dry-run` 경로는 provider/network를 호출하지 않는다.
 - 실제 수집은 공식 NAVER API HUB만 사용하며, `NCP_NAVER_API_HUB_CLIENT_ID`와 `NCP_NAVER_API_HUB_CLIENT_SECRET`를 로컬 환경에만 설정한다. 값은 로그·fixture·커밋에 남기지 않는다.
-- 수집 후 `node scripts/keyword-system/analyze.mjs`가 evidence와 record를 검증한다. `ready-to-write`에서 작성 대상으로 넘기는 것은 별도 사람 승인 단계이며 자동 작성·예약·발행을 수행하지 않는다.
+- 수집 후 `node scripts/keyword-system/analyze.mjs`가 evidence와 record를 검증한다. `npm run keywords:brief`는 `ready-to-write`와 같은 키워드의 NAVER 근거를 결합한 사람 검토용 브리프만 만든다. 자동 작성·예약·발행은 수행하지 않는다.
 - `raw/`는 로컬 evidence 출력 경계다. 정적 사이트 빌드에는 `data/keywords`와 내부 keyword-system 산출물이 포함되지 않으며, 빌드 경계 검사는 `npm run check:build`에서 확인한다.
