@@ -8,7 +8,8 @@ Astro 기반으로 만든 나만의 정적 블로그입니다. 카테고리와 �
 - 현재 첫 카테고리: 업무도구 실전 (새 카테고리는 글 frontmatter의 `topic`으로 추가)
 - 콘텐츠 원본: Git/Markdown
 - 공개 읽기 경로: 정적 HTML
-- 자동화: 사람 승인 이후에만 예약 빌드·배포
+- 배포: Cloudflare Workers 정적 자산 + Neon PostgreSQL health API
+- 자동화: 정책 기반 자동 게시 또는 사람 승인형 예약 빌드·배포
 - 키워드 콘텐츠 기준: `docs/keyword-content-pipeline.md`
 - 키워드 축: 경제·비즈니스, AI, 여행. 세부 키워드는 사용자 확정 목록만 seed로 등록한다.
 
@@ -30,10 +31,18 @@ npm run test:keywords
 npm run check:content
 npm run build
 npm run check:build
+npm run test:worker
 npm run dev
 ```
 
 실제 도메인을 승인하기 전까지는 `PUBLIC_SITE_URL`을 설정하지 않아도 로컬 빌드가 가능합니다. `.planning/`은 내부 기획 문서이며 사이트 콘텐츠가 아닙니다.
+
+### Cloudflare + Neon
+
+- Cloudflare Worker가 `dist/` 정적 자산을 제공하고 `/api/health/db`에서 Neon 연결 상태를 확인합니다.
+- 로컬 테스트는 `npm run test:worker`로 실행합니다.
+- 운영 환경에서는 Cloudflare Worker secret `DATABASE_URL`만 사용합니다. 연결 문자열은 Git이나 `.env.example`에 기록하지 않습니다.
+- 공개 DB 상태 확인 주소: `/api/health/db` (연결 실패 세부 원인은 외부에 노출하지 않습니다).
 
 ## 자동 글발행 파이프라인
 

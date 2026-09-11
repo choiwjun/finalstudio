@@ -17,6 +17,7 @@
     "check:writing": "node scripts/check-writing.mjs",
     "auto:eval": "node scripts/run-evals.mjs",
     "check:build": "node scripts/check-build.mjs",
+    "test:worker": "node --test worker/index.test.mjs",
     "auto:write": "node scripts/auto-publish/auto-write.mjs",
     "auto:improve": "node scripts/auto-publish/prompt-improve.mjs",
     "image": "node scripts/auto-publish/generate-image.mjs",
@@ -24,6 +25,10 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@neondatabase/serverless": "^1.1.0",
     "astro": "^7.3.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.131.1"
   }
 }
