@@ -1,12 +1,13 @@
-import { mkdir, readdir, readFile, stat as statPath } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { lstat, mkdir, readdir } from 'node:fs/promises';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { analyzeCandidate } from './lib/analysis.mjs';
 import { discoverCandidates } from './lib/discovery.mjs';
 import { normalizeKeywordKey, normalizeRawEvidenceEnvelope } from './lib/contracts.mjs';
 import { readRecords, upsertRecords, writeReadyToWriteExport } from './lib/records-store.mjs';
 import { readSeedFile } from './discover.mjs';
-import { appendFileAtDirectory, openVerifiedDirectory, removeVerifiedFile } from './lib/file-lock.mjs';
+import { appendFileAtDirectory, assertDirectoryHandleIdentity, assertFileHandleIdentity, assertFilePathIdentity, directoryFdPath, openReadOnlyFileAtDirectory, openVerifiedChildDirectory, openVerifiedDirectory, removeVerifiedFile, snapshotFileIdentity } from './lib/file-lock.mjs';
+import { isCanonicalRunId } from './lib/evidence-store.mjs';
 import { assertContainedPath, assertSafeOutputDir } from './lib/output-boundary.mjs';
 
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -46,40 +47,87 @@ export function parseAnalyzeArgs(argv = []) {
   return result;
 }
 
+async function readVerifiedText(path, label, optional = false) {
+  const filePath = resolve(path);
+  const expected = await snapshotFileIdentity(filePath);
+  if (expected.parentIdentity === undefined || expected.fileIdentity === undefined) {
+    if (optional) return undefined;
+    fail(`${label} could not be read`);
+  }
+  let directoryHandle;
+  try { directoryHandle = await openVerifiedDirectory(dirname(filePath), { create: false }); }
+  catch { fail(`${label} could not be read`); }
+  let file;
+  try {
+    await assertDirectoryHandleIdentity(directoryHandle, expected.parentIdentity);
+    try { file = await openReadOnlyFileAtDirectory(directoryHandle, basename(filePath), { expectedIdentity: expected.fileIdentity }); }
+    catch { fail(`${label} could not be read`); }
+    await assertFileHandleIdentity(file);
+    await assertFilePathIdentity(directoryHandle, basename(filePath), file.identity);
+    const text = await file.handle.readFile('utf8');
+    await assertFileHandleIdentity(file);
+    await assertFilePathIdentity(directoryHandle, basename(filePath), file.identity);
+    return text;
+  } finally {
+    await file?.handle.close().catch(() => {});
+    await directoryHandle.close().catch(() => {});
+  }
+}
 async function readJson(path, label) {
-  let text;
-  try { text = await readFile(path, 'utf8'); } catch { fail(`${label} could not be read`); }
+  const text = await readVerifiedText(path, label);
   try { return JSON.parse(text); } catch { fail(`${label} is not valid JSON`); }
 }
 async function readOptionalJson(path, label) {
-  let text;
-  try { text = await readFile(path, 'utf8'); } catch (error) {
-    if (error?.code === 'ENOENT') return undefined;
-    fail(`${label} could not be read`);
-  }
+  const text = await readVerifiedText(path, label, true);
+  if (text === undefined) return undefined;
   try { return JSON.parse(text); } catch { fail(`${label} is not valid JSON`); }
 }
 
 async function filesUnder(path) {
-  let info;
-  try { info = await statPath(path); } catch (error) {
-    if (error?.code === 'ENOENT') return [];
-    fail('raw evidence path could not be inspected');
+  const rootPath = resolve(path);
+  let rootHandle;
+  try { rootHandle = await openVerifiedDirectory(rootPath, { create: false }); }
+  catch (error) {
+    if (error?.code === 'ENOENT') return { files: [], directories: [] };
+    if (error?.code !== 'ENOTDIR') fail('raw evidence path could not be inspected');
+    let parentHandle;
+    try { parentHandle = await openVerifiedDirectory(dirname(rootPath), { create: false }); }
+    catch (parentError) { if (parentError?.code === 'ENOENT') return { files: [], directories: [] }; throw parentError; }
+    try {
+      const file = await openReadOnlyFileAtDirectory(parentHandle, basename(rootPath));
+      return { files: [{ path: rootPath, parentHandle, file }], directories: [parentHandle] };
+    } catch (fileError) {
+      await parentHandle.close().catch(() => {});
+      if (fileError?.code === 'ENOENT') return { files: [], directories: [] };
+      throw fileError;
+    }
   }
-  if (info.isFile()) return [path];
-  if (!info.isDirectory()) fail('raw evidence path must be a file or directory');
-  const entries = await readdir(path, { withFileTypes: true });
-  const result = [];
-  for (const entry of entries) {
-    const child = join(path, entry.name);
-    if (entry.isDirectory()) result.push(...await filesUnder(child));
-    else if (entry.isFile()) {
-      if (entry.name === '.gitkeep') continue;
-      if (!entry.name.endsWith('.json')) fail('raw evidence directory contains a non-JSON file');
-      result.push(child);
-    } else fail('raw evidence directory contains an unsupported entry');
+  const directories = [rootHandle];
+  const files = [];
+  async function walk(directoryHandle, directoryPath) {
+    const entries = await readdir(directoryFdPath(directoryHandle), { withFileTypes: true });
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of entries) {
+      const childPath = join(directoryPath, entry.name);
+      if (entry.isDirectory()) {
+        const childHandle = await openVerifiedChildDirectory(directoryHandle, entry.name);
+        directories.push(childHandle);
+        await walk(childHandle, childPath);
+      } else if (entry.isFile()) {
+        if (entry.name === '.gitkeep') continue;
+        if (!entry.name.endsWith('.json')) fail('raw evidence directory contains a non-JSON file');
+        const expectedIdentity = await lstat(join(directoryFdPath(directoryHandle), entry.name));
+        if (expectedIdentity.isSymbolicLink() || !expectedIdentity.isFile()) fail('raw evidence directory contains an unsupported entry');
+        files.push({ path: childPath, parentHandle: directoryHandle, file: await openReadOnlyFileAtDirectory(directoryHandle, entry.name, { expectedIdentity }) });
+      } else fail('raw evidence directory contains an unsupported entry');
+    }
   }
-  return result.sort();
+  try { await walk(rootHandle, rootPath); return { files, directories }; }
+  catch (error) {
+    await Promise.all(files.map((entry) => entry.file.handle.close().catch(() => {})));
+    await Promise.all(directories.map((entry) => entry.close().catch(() => {})));
+    throw error;
+  }
 }
 
 function candidateKey(candidate) { return `${normalizeKeywordKey(candidate.category)}\u0000${normalizeKeywordKey(candidate.head_keyword)}`; }
@@ -99,8 +147,8 @@ async function loadCandidates(args) {
 }
 
 function runIdFromPath(path) {
-  const match = path.match(/(?:^|[/\\])([0-9]{8}T[0-9]{6}Z-[0-9a-f]{8})(?:[/\\]|$)/iu);
-  return match?.[1];
+  const match = path.match(/(?:^|[/\\])([0-9]{8}T[0-9]{6}Z-[0-9a-f]{8})(?:[/\\]|$)/u);
+  return match?.[1] && isCanonicalRunId(match[1]) ? match[1] : undefined;
 }
 
 async function loadCollectionManifest(outDir) {
@@ -129,21 +177,31 @@ function resolveManifestPath(value, outDir, raw) {
   return resolve(dirname(raw), value);
 }
 
-async function loadRawEnvelopes(paths) {
+async function loadRawEnvelopes(rawFiles) {
   const result = new Map();
-  for (const path of paths) {
-    let parsed;
-    try { parsed = JSON.parse(await readFile(path, 'utf8')); } catch { fail('raw evidence contains malformed JSON'); }
-    let envelope;
-    try { envelope = normalizeRawEvidenceEnvelope(parsed); } catch { fail('raw evidence contains an invalid envelope'); }
-    result.set(resolve(path), { envelope, path: resolve(path), runId: runIdFromPath(resolve(path)) });
+  try {
+    for (const entry of rawFiles.files) {
+      await assertFileHandleIdentity(entry.file);
+      await assertFilePathIdentity(entry.parentHandle, basename(entry.path), entry.file.identity);
+      let parsed;
+      try { parsed = JSON.parse(await entry.file.handle.readFile('utf8')); } catch { fail('raw evidence contains malformed JSON'); }
+      await assertFileHandleIdentity(entry.file);
+      await assertFilePathIdentity(entry.parentHandle, basename(entry.path), entry.file.identity);
+      let envelope;
+      try { envelope = normalizeRawEvidenceEnvelope(parsed); } catch { fail('raw evidence contains an invalid envelope'); }
+      const path = resolve(entry.path);
+      result.set(path, { envelope, path, runId: runIdFromPath(path) });
+    }
+    return result;
+  } finally {
+    await Promise.all(rawFiles.files.map((entry) => entry.file.handle.close().catch(() => {})));
+    await Promise.all(rawFiles.directories.map((entry) => entry.close().catch(() => {})));
   }
-  return result;
 }
 
 function matchesEnvelope(envelope, candidate) {
   if (envelope.source === 'naver-api-hub-blog') return normalizeKeywordKey(envelope.request?.query) === normalizeKeywordKey(candidate.head_keyword);
-  return Array.isArray(envelope.request?.keywordGroups) && envelope.request.keywordGroups.some((group) => normalizeKeywordKey(group.groupName) === normalizeKeywordKey(candidate.head_keyword) || group.keywords?.some((keyword) => normalizeKeywordKey(keyword) === normalizeKeywordKey(candidate.head_keyword)));
+  return Array.isArray(envelope.request?.keywordGroups) && envelope.request.keywordGroups.some((group) => normalizeKeywordKey(group.groupName) === normalizeKeywordKey(candidate.head_keyword));
 }
 
 function outcomeForEnvelope(envelope) { return envelope.http.ok ? 'success' : 'failure'; }
@@ -153,6 +211,12 @@ function assertEvidencePathUnderRaw(path, raw) {
   if (suffix === '..' || suffix.startsWith(`..${requireSep()}`) || isAbsolute(suffix)) fail('collection evidence path is outside raw evidence');
 }
 function requireSep() { return process.platform === 'win32' ? '\\' : '/'; }
+function canonicalEvidencePath(value, outDir, raw) {
+  const path = resolveManifestPath(value, outDir, raw);
+  assertEvidencePathUnderRaw(path, raw);
+  return resolve(path);
+}
+function samePathSet(left, right) { return left.size === right.size && [...left].every((path) => right.has(path)); }
 
 function validateRawSet(candidates, rawEnvelopes, { requireRunId = false } = {}) {
   if (rawEnvelopes.size === 0) fail('raw evidence set is empty');
@@ -164,8 +228,7 @@ function validateRawSet(candidates, rawEnvelopes, { requireRunId = false } = {})
 }
 
 async function loadEvidenceIndex(path) {
-  let text;
-  try { text = await readFile(path, 'utf8'); } catch { fail('evidence index is required for collected analysis'); }
+  const text = await readVerifiedText(path, 'evidence index');
   const entries = [];
   for (const [index, line] of text.split(/\r?\n/u).entries()) {
     if (line.trim() === '') continue;
@@ -175,16 +238,25 @@ async function loadEvidenceIndex(path) {
   return entries;
 }
 
-function validateManifestIndex(manifest, entries) {
+function validateManifestIndex(manifest, entries, args, rawEnvelopes) {
   const byPath = new Map();
   for (const entry of entries) {
-    if (typeof entry.path !== 'string' || isAbsolute(entry.path) || entry.path.includes('\\') || entry.path.startsWith('../') || entry.path.includes('/../') || byPath.has(entry.path)) fail('evidence index contains duplicate or invalid paths');
-    byPath.set(entry.path, entry);
+    if (typeof entry.path !== 'string' || isAbsolute(entry.path) || entry.path.includes('\\') || entry.path.startsWith('../') || entry.path.includes('/../')) fail('evidence index contains duplicate or invalid paths');
+    const path = canonicalEvidencePath(entry.path, args.outDir, args.raw);
+    if (byPath.has(path) || entry.run_id !== runIdFromPath(path)) fail('evidence index contains duplicate or non-canonical paths');
+    byPath.set(path, entry);
   }
+  const assignedPaths = new Set();
   for (const mapping of manifest.candidates) for (const evidence of mapping.evidence) {
-    const indexed = byPath.get(evidence.path);
+    const path = canonicalEvidencePath(evidence.path, args.outDir, args.raw);
+    if (assignedPaths.has(path)) fail('collection manifest reuses raw evidence path across candidates');
+    assignedPaths.add(path);
+    const indexed = byPath.get(path);
     if (!indexed || indexed.source !== evidence.source || indexed.outcome !== evidence.outcome || indexed.run_id !== evidence.run_id || indexed.collected_at !== evidence.collected_at) fail('collection manifest evidence is not backed by a consistent evidence index');
   }
+  const currentIndexPaths = new Set([...byPath.entries()].filter(([, entry]) => entry.run_id === manifest.run_id).map(([path]) => path));
+  const currentRawPaths = new Set([...rawEnvelopes.values()].filter((item) => item.runId === manifest.run_id).map((item) => item.path));
+  if (!samePathSet(assignedPaths, currentIndexPaths) || !samePathSet(assignedPaths, currentRawPaths)) fail('current collection run contains unreferenced or missing evidence');
 }
 
 async function evidenceForCandidate(candidate, manifest, args, rawEnvelopes) {
@@ -211,7 +283,7 @@ async function evidenceForCandidate(candidate, manifest, args, rawEnvelopes) {
   const matched = [...rawEnvelopes.values()].filter((item) => matchesEnvelope(item.envelope, candidate));
   const sources = new Set(matched.map((item) => item.envelope.source));
   const runs = new Set(matched.map((item) => item.runId));
-  if (matched.length !== 2 || sources.size !== 2 || runs.size > 1) fail('raw evidence set is incomplete for candidate');
+  if (matched.length !== 2 || sources.size !== 2 || matched.some((item) => !item.runId) || runs.size !== 1) fail('raw evidence set is incomplete for candidate');
   return matched.map((item) => item.envelope);
 }
 
@@ -260,8 +332,8 @@ export async function main(argv = process.argv.slice(2)) {
   }
   const rawFiles = await filesUnder(rawPath);
   const rawEnvelopes = await loadRawEnvelopes(rawFiles);
-  if (manifest === undefined) validateRawSet(candidates, rawEnvelopes);
-  if (manifest !== undefined) validateManifestIndex(manifest, await loadEvidenceIndex(indexPath));
+  if (manifest === undefined) validateRawSet(candidates, rawEnvelopes, { requireRunId: args.rawExplicit });
+  if (manifest !== undefined) validateManifestIndex(manifest, await loadEvidenceIndex(indexPath), args, rawEnvelopes);
   const existing = await readRecords(recordsPath);
   const existingMap = new Map(existing.map((record) => [candidateKey(record), record]));
   for (const candidate of candidates) {

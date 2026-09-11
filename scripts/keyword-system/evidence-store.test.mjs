@@ -86,6 +86,7 @@ test('Given a fixed clock and random, when makeRunId runs, then the documented U
   assert.equal(makeRunId({ clock: FIXED_CLOCK, random: FIXED_RANDOM }), '20260909T000000Z-01234567');
   const id = makeRunId({ clock: FIXED_CLOCK });
   assert.match(id, /^\d{8}T\d{6}Z-[0-9a-f]{8}$/u);
+  assert.throws(() => makeRunId({ clock: FIXED_CLOCK, random: () => 'ABCDEF12' }), /runId/iu);
 });
 
 test('Given hostile or empty keyword text, when slugified, then a safe deterministic path segment is produced', () => {
@@ -130,6 +131,11 @@ test('Given a request per source, when deriving a safe key and relative path, th
     evidenceRelativePath({ collectedAt: COLLECTED_AT, runId: RUN_ID, source: 'naver-api-hub-trend', safeKey: '../../etc/passwd' }),
     '2026/09/09/20260909T000000Z-01234567/naver-api-hub-trend-etc-passwd.json',
   );
+});
+
+test('Given malformed run ids, when evidence paths are derived, then non-canonical dates and uppercase hex are rejected', () => {
+  assert.throws(() => evidenceRelativePath({ collectedAt: COLLECTED_AT, runId: '20260909T000000Z-ABCDEF12', source: 'naver-api-hub-blog', safeKey: '엑셀 자동화' }), /runId/iu);
+  assert.throws(() => evidenceRelativePath({ collectedAt: COLLECTED_AT, runId: '20261399T999999Z-abcdef12', source: 'naver-api-hub-blog', safeKey: '엑셀 자동화' }), /runId/iu);
 });
 
 test('Given a successful blog fixture, when evidence is written, then canonical dirs, envelope, and stable 2-space JSON result', async () => {

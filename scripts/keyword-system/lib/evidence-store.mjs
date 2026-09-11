@@ -4,7 +4,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { normalizeRawEvidenceEnvelope } from './contracts.mjs';
 import { directoryFdPath, openVerifiedDirectory, openVerifiedNestedDirectory, withExclusiveFileLock } from './file-lock.mjs';
 
-export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/iu;
+export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/u;
 
 const ISO_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u;
 const DEFAULT_SAFE_KEY = 'keyword';
@@ -36,9 +36,15 @@ export class EvidenceStoreError extends TypeError {
 
 const fail = (message) => { throw new EvidenceStoreError(message); };
 
+export function isCanonicalRunId(runId) {
+  if (typeof runId !== 'string' || !RUN_ID_PATTERN.test(runId)) return false;
+  const timestamp = `${runId.slice(0, 4)}-${runId.slice(4, 6)}-${runId.slice(6, 8)}T${runId.slice(9, 11)}:${runId.slice(11, 13)}:${runId.slice(13, 15)}Z`;
+  return isRealUtcDateTime(timestamp);
+}
+
 function assertRunId(runId) {
-  if (typeof runId !== 'string' || !RUN_ID_PATTERN.test(runId)) {
-    fail(`runId must match ${RUN_ID_PATTERN}; received ${JSON.stringify(runId)}`);
+  if (!isCanonicalRunId(runId)) {
+    fail(`runId must match a canonical UTC timestamp and lowercase hex suffix; received ${JSON.stringify(runId)}`);
   }
   return runId;
 }
@@ -102,7 +108,9 @@ export function deriveSafeKey(source, request) {
 /** UTC run-id: YYYYMMDDTHHMMSSZ-<8-char-random> with injectable clock/random. */
 export function makeRunId({ clock = () => new Date(), random = () => randomBytes(4).toString('hex') } = {}) {
   const stamp = new Date(clock().getTime()).toISOString().replace(/[-:]/gu, '').replace(/\.\d{3}/u, '');
-  return `${stamp}-${random()}`;
+  const runId = `${stamp}-${random()}`;
+  assertRunId(runId);
+  return runId;
 }
 
 /**
@@ -144,7 +152,9 @@ export async function writeStableJson(filePath, value, options = {}) {
 
 /** Canonical raw evidence path relative to the raw root: YYYY/MM/DD/run-id/<source>-<safe-key>.json */
 function isRealUtcDateTime(value) {
-  const canonical = new Date(value).toISOString();
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const canonical = date.toISOString();
   const expected = value.includes('.') ? canonical : canonical.replace('.000Z', 'Z');
   return expected === value;
 }

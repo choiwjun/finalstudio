@@ -29,6 +29,15 @@ test('records store reads a missing file as an empty stable collection and upser
   assert.equal((await readFile(paths.records, 'utf8')).endsWith('\n'), true);
 });
 
+test('records store refuses a symlinked records file instead of following it', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const outside = join(paths.root, 'outside-records.json');
+  await mkdir(join(paths.root, 'data/keywords'), { recursive: true });
+  await writeFile(outside, '[]\n');
+  await symlink(outside, paths.records);
+  await assert.rejects(() => readRecords(paths.records), /regular file|symlink|identity/iu);
+});
+
 test('upsert replaces one category/head key without duplicates and ready export includes only ready records', async (t) => {
   const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
   const candidate = makeValidRecord({ status: 'candidate', evidence_available: false, freshness: 'unknown', risk_flags: [], source: ['naver-api-hub-blog'] });
@@ -225,6 +234,23 @@ test('malformed persisted decisions never authorize terminal status changes', as
   assert.equal(JSON.parse(await readFile(paths.records, 'utf8'))[0].status, 'ready-to-write');
 });
 
+
+test('a symlinked decisions file cannot authorize a written transition', async (t) => {
+  const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));
+  const ready = makeValidRecord({ status: 'ready-to-write' });
+  const written = makeValidRecord({ status: 'written' });
+  await mkdir(join(paths.root, 'data/keywords'), { recursive: true });
+  await writeFile(paths.records, JSON.stringify([ready]) + '\n');
+  const outside = join(paths.root, 'outside-decisions');
+  await writeFile(outside, JSON.stringify({ type: 'writer_handoff', category: written.category, head_keyword: written.head_keyword, reference: 'draft.md', reason: 'human review' }) + '\n');
+  await symlink(outside, paths.decisions);
+  await assert.rejects(() => upsertRecords([written], {
+    path: paths.records,
+    decisionsPath: paths.decisions,
+    event: { type: 'writer_handoff', reference: 'draft.md', reason: 'human review' },
+  }), /symlink|decision|lock/iu);
+  assert.equal(JSON.parse(await readFile(paths.records, 'utf8'))[0].status, 'ready-to-write');
+});
 
 test('decision append failure rolls records back before any terminal state can survive', async (t) => {
   const paths = await temp(); t.after(() => rm(paths.root, { recursive: true, force: true }));

@@ -137,6 +137,31 @@ test('explicit raw evidence path is authoritative over a stale collection manife
   assert.equal(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8').catch(() => '[]'), '[]\n');
 });
 
+test('explicit raw analysis requires a valid run binding even when both sources are present', async (t) => {
+  const paths = await setup(t);
+  const oneSeed = join(paths.root, 'one-seed.json');
+  await writeFile(oneSeed, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', oneSeed, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  const alternate = join(paths.out, 'alternate-raw'); await mkdir(alternate);
+  const rawFiles = [];
+  async function find(dir) {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const child = join(dir, entry.name);
+      if (entry.isDirectory()) await find(child);
+      else if (entry.name.endsWith('.json')) rawFiles.push(child);
+    }
+  }
+  await find(join(paths.out, 'raw'));
+  assert.equal(rawFiles.length, 2);
+  for (const [index, file] of rawFiles.entries()) await cp(file, join(alternate, `evidence-${index}.json`));
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', oneSeed, '--raw-evidence', alternate, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0);
+  let ready = [];
+  try { ready = JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')); }
+  catch (error) { assert.equal(error.code, 'ENOENT'); }
+  assert.deepEqual(ready, []);
+});
+
 test('malformed collection manifests and malformed raw files fail closed and invalidate stale ready output', async (t) => {
   const paths = await setup(t);
   const oneSeed = join(paths.root, 'one-seed.json');
@@ -229,6 +254,17 @@ test('collected analysis requires complete manifest and explicit raw requires bo
   assert.notEqual(incomplete.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
 });
 
+test('manifest analysis rejects unreferenced raw evidence from the current run', async (t) => {
+  const paths = await setup(t);
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', paths.seeds, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  const manifest = JSON.parse(await readFile(join(paths.out, 'collection.json'), 'utf8'));
+  const blogPath = resolve(paths.out, manifest.candidates[0].evidence.find((entry) => entry.source === 'naver-api-hub-blog').path.slice('data/keywords/'.length));
+  await cp(blogPath, join(resolve(blogPath, '..'), 'orphan.json'));
+  const analyzed = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', paths.seeds, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(analyzed.code, 0);
+  assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
+
 test('canonical key merges mixed-case and composed/decomposed Unicode candidates', async (t) => {
   const paths = await setup(t);
   const decomposed = join(paths.root, 'decomposed.json');
@@ -256,6 +292,29 @@ test('manifest mappings are candidate-bound and conflicting raw requests cannot 
   assert.notEqual(analyzed.code, 0); assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
 });
 
+
+test('manifest evidence must keep trend groups and raw paths uniquely bound to one candidate', async (t) => {
+  const paths = await setup(t);
+  const seeds = join(paths.root, 'two-seeds.json');
+  await writeFile(seeds, JSON.stringify({ version: 1, inputs: [{ category: 'ai-it', seeds: ['엑셀 자동화'], title: '엑셀 자동화 방법' }, { category: 'economy', seeds: ['생활 물가'], title: '생활 물가 방법' }] }));
+  assert.equal((await runNode(SCRIPT('collect.mjs'), ['--seed-file', seeds, '--out-dir', paths.out, '--fixture', FIXTURE_DIR])).code, 0);
+  const manifestPath = join(paths.out, 'collection.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const first = manifest.candidates[0];
+  const second = manifest.candidates[1];
+  const secondTrend = resolve(paths.out, second.evidence.find((entry) => entry.source === 'naver-api-hub-trend').path.slice('data/keywords/'.length));
+  const trendEnvelope = JSON.parse(await readFile(secondTrend, 'utf8'));
+  trendEnvelope.request.keywordGroups[0].groupName = first.candidate.head_keyword;
+  await writeFile(secondTrend, JSON.stringify(trendEnvelope));
+  const crossCandidate = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', seeds, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(crossCandidate.code, 0);
+  const firstBlog = first.evidence.find((entry) => entry.source === 'naver-api-hub-blog');
+  second.evidence[0] = { ...firstBlog, path: firstBlog.path.replace('data/keywords/', 'raw/') };
+  await writeFile(manifestPath, JSON.stringify(manifest));
+  const duplicatePath = await runNode(SCRIPT('analyze.mjs'), ['--seed-file', seeds, '--records', join(paths.out, 'records.json'), '--out-dir', paths.out]);
+  assert.notEqual(duplicatePath.code, 0);
+  assert.deepEqual(JSON.parse(await readFile(join(paths.out, 'ready-to-write.json'), 'utf8')), []);
+});
 
 test('explicit multi-candidate analysis is all-or-nothing on a partial raw set', async (t) => {
   const paths = await setup(t);
