@@ -72,7 +72,7 @@ async function login(request, env) {
     recordLoginFailure(request, now);
     return json({ ok: false, error: "invalid_credentials" }, 401);
   }
-  if (body.password !== env.ADMIN_PASSWORD) {
+  if (!(await secureEqualText(body.password, env.ADMIN_PASSWORD))) {
     recordLoginFailure(request, now);
     return json({ ok: false, error: "invalid_credentials" }, 401);
   }
@@ -154,6 +154,18 @@ async function saveAdminPost(request, sql) {
     RETURNING slug, title, description, pub_date, publish_at, status, topic, angle, author, body_markdown, payload, updated_at
   `;
   return json({ ok: true, data: adminPostRow(rows[0]) });
+}
+
+async function secureEqualText(left, right) {
+  const [leftHash, rightHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", new TextEncoder().encode(left)),
+    crypto.subtle.digest("SHA-256", new TextEncoder().encode(right)),
+  ]);
+  const leftBytes = new Uint8Array(leftHash);
+  const rightBytes = new Uint8Array(rightHash);
+  let difference = 0;
+  for (let index = 0; index < leftBytes.length; index += 1) difference |= leftBytes[index] ^ rightBytes[index];
+  return difference === 0;
 }
 
 async function hash(value) {
