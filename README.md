@@ -39,10 +39,15 @@ npm run dev
 
 ### Cloudflare + Neon
 
-- Cloudflare Worker가 `dist/` 정적 자산을 제공하고 `/api/health/db`에서 Neon 연결 상태를 확인합니다.
-- 로컬 테스트는 `npm run test:worker`로 실행합니다.
-- 운영 환경에서는 Cloudflare Worker secret `DATABASE_URL`만 사용합니다. 연결 문자열은 Git이나 `.env.example`에 기록하지 않습니다.
-- 공개 DB 상태 확인 주소: `/api/health/db` (연결 실패 세부 원인은 외부에 노출하지 않습니다).
+- Cloudflare Worker가 `dist/` 정적 자산과 읽기 전용 API를 제공합니다.
+- `/api/health/db`에서 Neon 연결 상태를 확인합니다.
+- `/api/posts`는 `published` 글 목록, `/api/posts/<slug>`는 공개 글 본문을 반환합니다.
+- `/api/keywords`는 `ready-to-write` 키워드만 반환하며 `category=economy-business|ai|travel` 필터를 지원합니다.
+- `db/migrations/001_initial.sql`이 `posts`와 `keyword_records` 테이블을 정의합니다.
+- `npm run neon:migrate`로 스키마를 적용하고 `npm run neon:sync`로 Git/Markdown 데이터를 upsert합니다.
+- 로컬 검증은 `npm run test:worker`, `npm run test:neon`, `npm run neon:sync:check`로 실행합니다.
+- 운영 환경에서는 Cloudflare Worker와 GitHub Actions secret `DATABASE_URL`만 사용합니다. 연결 문자열은 Git이나 `.env.example`에 기록하지 않습니다.
+- GitHub `main` push 시 secret이 설정되어 있으면 마이그레이션과 동기화를 자동 실행합니다.
 
 ## 자동 글발행 파이프라인
 
