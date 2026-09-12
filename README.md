@@ -48,6 +48,7 @@ npm run dev
 - 로컬 검증은 `npm run test:worker`, `npm run test:neon`, `npm run neon:sync:check`로 실행합니다.
 - 운영 환경에서는 Cloudflare Worker와 GitHub Actions secret `DATABASE_URL`만 사용합니다. 연결 문자열은 Git이나 `.env.example`에 기록하지 않습니다.
 - GitHub `main` push 시 secret이 설정되어 있으면 마이그레이션과 동기화를 자동 실행합니다.
+- `/admin/` 운영 관리자에서는 `ADMIN_PASSWORD` secret으로 로그인한 뒤 Neon의 초안·예약·공개 글을 관리합니다. 비밀번호는 16자 이상으로 설정하고 Git에 저장하지 않습니다.
 
 ## 자동 글발행 파이프라인
 

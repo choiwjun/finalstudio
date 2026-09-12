@@ -383,11 +383,70 @@ const reviewSignals = (post: (typeof posts)[number]) => {
     </div>
   </div>
   ) : (
-    <article class="article article--narrow admin-guard">
-      <p class="eyebrow">관리자 영역</p>
-      <h1>관리 화면은 외부에 공개하지 않습니다.</h1>
-      <p>이 대시보드는 개발 환경에서만 사용할 수 있습니다. 운영 환경에서는 관리자 인증을 연결한 별도 비공개 도구를 사용하세요.</p>
-      <p><a href="/">사이트로 돌아가기</a></p>
+    <article class="article production-admin" id="production-admin">
+      <div id="admin-login-view">
+        <p class="eyebrow">WJ Blog Admin</p>
+        <h1>관리자 로그인</h1>
+        <p class="admin-lede">운영 콘텐츠와 키워드 기록을 관리합니다. 세션은 보안 쿠키로 유지됩니다.</p>
+        <form id="admin-login-form" class="admin-card">
+          <label for="admin-password">관리자 비밀번호</label>
+          <input id="admin-password" name="password" type="password" minlength="16" autocomplete="current-password" required />
+          <button class="btn btn--primary" type="submit">로그인</button>
+          <p id="admin-login-error" class="admin-error" hidden></p>
+        </form>
+      </div>
+
+      <div id="admin-dashboard-view" hidden>
+        <header class="admin-production-header">
+          <div>
+            <p class="eyebrow">WJ Blog Admin</p>
+            <h1>콘텐츠 관리자</h1>
+          </div>
+          <div class="admin-production-actions">
+            <button id="admin-refresh" class="btn btn--ghost" type="button">새로고침</button>
+            <button id="admin-logout" class="btn btn--ghost" type="button">로그아웃</button>
+          </div>
+        </header>
+        <p id="admin-dashboard-status" class="admin-status" role="status"></p>
+        <p id="admin-dashboard-error" class="admin-error" hidden></p>
+
+        <section class="admin-card" aria-labelledby="production-posts-heading">
+          <div class="admin-card-heading">
+            <div><p class="eyebrow">Posts</p><h2 id="production-posts-heading">글 관리</h2></div>
+            <button id="admin-new-post" class="btn btn--primary" type="button">새 글</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-production-table">
+              <thead><tr><th>제목</th><th>상태</th><th>주제</th><th>수정일</th><th>작업</th></tr></thead>
+              <tbody id="admin-post-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <form id="admin-post-form" class="admin-card" hidden>
+          <div class="admin-card-heading"><div><p class="eyebrow">Editor</p><h2 id="admin-form-heading">글 편집</h2></div></div>
+          <div class="admin-form-grid">
+            <label>슬러그<input id="admin-slug" required pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,127}" /></label>
+            <label>상태<select id="admin-status"><option value="draft">draft</option><option value="scheduled">scheduled</option><option value="published">published</option></select></label>
+            <label>제목<input id="admin-title" required maxlength="300" /></label>
+            <label>주제<input id="admin-topic" required maxlength="100" /></label>
+            <label class="admin-form-wide">설명<input id="admin-description" required maxlength="1000" /></label>
+            <label>발행일<input id="admin-pub-date" type="date" required /></label>
+            <label>예약일<input id="admin-publish-at" type="datetime-local" /></label>
+            <label>작성자<input id="admin-author" required maxlength="100" /></label>
+            <label>테스트 날짜<input id="admin-tested-at" type="date" /></label>
+            <label class="admin-form-wide">글 각도<input id="admin-angle" required maxlength="1000" /></label>
+            <label class="admin-form-wide">Markdown 본문<textarea id="admin-body" rows="18" required></textarea></label>
+          </div>
+          <div class="admin-production-actions"><button id="admin-cancel-edit" class="btn btn--ghost" type="button">취소</button><button class="btn btn--primary" type="submit">저장</button></div>
+          <p id="admin-form-error" class="admin-error" hidden></p>
+        </form>
+
+        <section class="admin-card" aria-labelledby="production-keywords-heading">
+          <div class="admin-card-heading"><div><p class="eyebrow">Keywords</p><h2 id="production-keywords-heading">키워드 기록</h2></div></div>
+          <div class="admin-table-wrap"><table class="admin-production-table"><thead><tr><th>카테고리</th><th>대표 키워드</th><th>상태</th><th>수집일</th></tr></thead><tbody id="admin-keyword-rows"></tbody></table></div>
+        </section>
+      </div>
     </article>
   )}
 
@@ -397,4 +456,33 @@ const reviewSignals = (post: (typeof posts)[number]) => {
       import('/src/scripts/admin-dashboard.ts');
     </script>
   )}
+  {!import.meta.env.DEV && (
+    <script type="module">
+      import '../../scripts/production-admin.ts';
+    </script>
+  )}
+
+  <style>
+    .production-admin { max-width: 1180px; }
+    .admin-lede { max-width: 58rem; }
+    .admin-card { margin-top: 1.5rem; padding: 1.25rem; border: 1px solid var(--color-line, #d8d7d1); border-radius: 1rem; background: var(--color-surface, #fff); }
+    .admin-login-view { max-width: 32rem; }
+    .admin-production-header, .admin-card-heading, .admin-production-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .admin-card-heading { margin-bottom: 1rem; }
+    .admin-card-heading h2, .admin-production-header h1 { margin: 0; }
+    .admin-production-actions { justify-content: flex-end; flex-wrap: wrap; }
+    .admin-card label { display: grid; gap: .4rem; font-weight: 650; }
+    .admin-card input, .admin-card select, .admin-card textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--color-line, #d8d7d1); border-radius: .55rem; padding: .65rem .75rem; font: inherit; background: #fff; }
+    .admin-card textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; line-height: 1.5; }
+    .admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .admin-form-wide { grid-column: 1 / -1; }
+    .admin-table-wrap { overflow-x: auto; }
+    .admin-production-table { width: 100%; border-collapse: collapse; }
+    .admin-production-table th, .admin-production-table td { padding: .7rem .5rem; border-bottom: 1px solid var(--color-line, #d8d7d1); text-align: left; vertical-align: top; }
+    .admin-production-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+    .admin-production-table button { border: 0; background: transparent; color: inherit; text-decoration: underline; cursor: pointer; }
+    .admin-status { min-height: 1.4rem; color: #39624b; }
+    .admin-error { color: #9b2c2c; }
+    @media (max-width: 700px) { .admin-form-grid { grid-template-columns: 1fr; } .admin-form-wide { grid-column: auto; } .admin-production-header { align-items: flex-start; flex-direction: column; } }
+  </style>
 </BaseLayout>

@@ -1,19 +1,11 @@
 import { neon } from "@neondatabase/serverless";
-
-const JSON_HEADERS = Object.freeze({
-  "content-type": "application/json; charset=utf-8",
-  "cache-control": "no-store",
-});
-
-function json(body, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: JSON_HEADERS,
-  });
-}
+import { handleAdminRequest } from "./admin-api.mjs";
+import { json } from "./http.mjs";
 
 function hasDatabaseUrl(env) {
-  return typeof env?.DATABASE_URL === "string" && env.DATABASE_URL.trim() !== "";
+  return (
+    typeof env?.DATABASE_URL === "string" && env.DATABASE_URL.trim() !== ""
+  );
 }
 
 function parseLimit(url) {
@@ -25,7 +17,9 @@ function parseLimit(url) {
 }
 
 function validCategory(category) {
-  return category === null || ["economy-business", "ai", "travel"].includes(category);
+  return (
+    category === null || ["economy-business", "ai", "travel"].includes(category)
+  );
 }
 
 function publicPost(row, includeBody = false) {
@@ -56,7 +50,8 @@ function publicKeyword(row) {
 }
 
 async function databaseResponse({ env, connect, query, errorLabel }) {
-  if (!hasDatabaseUrl(env)) return json({ ok: false, error: "database_not_configured" }, 503);
+  if (!hasDatabaseUrl(env))
+    return json({ ok: false, error: "database_not_configured" }, 503);
   try {
     return await query(connect(env.DATABASE_URL));
   } catch (error) {
@@ -85,7 +80,11 @@ async function postsResponse(url, env, connect) {
         ORDER BY COALESCE(publish_at, pub_date::timestamptz) DESC, slug ASC
         LIMIT ${limit}
       `;
-      return json({ ok: true, data: rows.map((row) => publicPost(row)), meta: { limit, count: rows.length } });
+      return json({
+        ok: true,
+        data: rows.map((row) => publicPost(row)),
+        meta: { limit, count: rows.length },
+      });
     },
   });
 }
@@ -102,7 +101,8 @@ async function postResponse(slug, env, connect) {
         WHERE slug = ${slug} AND status = 'published'
         LIMIT 1
       `;
-      if (rows.length === 0) return json({ ok: false, error: "post_not_found" }, 404);
+      if (rows.length === 0)
+        return json({ ok: false, error: "post_not_found" }, 404);
       return json({ ok: true, data: publicPost(rows[0], true) });
     },
   });
@@ -112,13 +112,15 @@ async function keywordsResponse(url, env, connect) {
   const limit = parseLimit(url);
   const category = url.searchParams.get("category");
   if (limit === null) return json({ ok: false, error: "invalid_limit" }, 400);
-  if (!validCategory(category)) return json({ ok: false, error: "invalid_category" }, 400);
+  if (!validCategory(category))
+    return json({ ok: false, error: "invalid_category" }, 400);
   return databaseResponse({
     env,
     connect,
     errorLabel: "Neon keywords query",
     query: async (sql) => {
-      const categoryFilter = category === null ? sql`` : sql` AND category = ${category}`;
+      const categoryFilter =
+        category === null ? sql`` : sql` AND category = ${category}`;
       const rows = await sql`
         SELECT record_key, category, head_keyword, status, collected_at, payload
         FROM keyword_records
@@ -126,7 +128,11 @@ async function keywordsResponse(url, env, connect) {
         ORDER BY collected_at DESC, head_keyword ASC
         LIMIT ${limit}
       `;
-      return json({ ok: true, data: rows.map(publicKeyword), meta: { limit, count: rows.length } });
+      return json({
+        ok: true,
+        data: rows.map(publicKeyword),
+        meta: { limit, count: rows.length },
+      });
     },
   });
 }
@@ -153,7 +159,10 @@ export function createWorker({ connect = neon } = {}) {
       } catch {
         return json({ ok: false, error: "invalid_request_url" }, 400);
       }
-      if (request.method !== "GET") return json({ ok: false, error: "method_not_allowed" }, 405);
+      const adminResponse = await handleAdminRequest({ request, url, env, connect });
+      if (adminResponse) return adminResponse;
+      if (request.method !== "GET")
+        return json({ ok: false, error: "method_not_allowed" }, 405);
       if (url.pathname === "/api/health/db") {
         return databaseResponse({
           env,
@@ -161,15 +170,22 @@ export function createWorker({ connect = neon } = {}) {
           errorLabel: "Neon health check",
           query: async (sql) => {
             const rows = await sql`SELECT 1 AS ok`;
-            return json({ ok: rows?.[0]?.ok === 1, service: "wjblog", database: "connected" });
+            return json({
+              ok: rows?.[0]?.ok === 1,
+              service: "wjblog",
+              database: "connected",
+            });
           },
         });
       }
-      if (url.pathname === "/api/posts") return postsResponse(url, env, connect);
-      if (url.pathname === "/api/keywords") return keywordsResponse(url, env, connect);
+      if (url.pathname === "/api/posts")
+        return postsResponse(url, env, connect);
+      if (url.pathname === "/api/keywords")
+        return keywordsResponse(url, env, connect);
       const slug = parseSlug(url.pathname);
       if (slug !== null) return postResponse(slug, env, connect);
-      if (!env?.ASSETS?.fetch) return json({ ok: false, error: "assets_not_configured" }, 500);
+      if (!env?.ASSETS?.fetch)
+        return json({ ok: false, error: "assets_not_configured" }, 500);
       return env.ASSETS.fetch(request);
     },
   };
