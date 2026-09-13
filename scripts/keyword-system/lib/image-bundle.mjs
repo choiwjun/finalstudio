@@ -277,15 +277,25 @@ export async function generateImageBundle(options) {
   return withExclusiveFileLock(
     join(paths.postsRoot, `.${options.slug}.images.lock`),
     async () => {
-      const directory = await openVerifiedDirectory(paths.outputRoot, {
-        create: true,
-      });
-      const imagesDirectory = await openVerifiedDirectory(paths.imagesRoot, {
-        create: true,
-      });
-      const postsDirectory = await openVerifiedDirectory(paths.postsRoot, {
-        create: false,
-      });
+      const opened = [];
+      let directory, imagesDirectory, postsDirectory;
+      try {
+        directory = await openVerifiedDirectory(paths.outputRoot, {
+          create: true,
+        });
+        opened.push(directory);
+        imagesDirectory = await openVerifiedDirectory(paths.imagesRoot, {
+          create: true,
+        });
+        opened.push(imagesDirectory);
+        postsDirectory = await openVerifiedDirectory(paths.postsRoot, {
+          create: false,
+        });
+        opened.push(postsDirectory);
+      } catch (error) {
+        for (const handle of opened) await handle.close().catch(() => {});
+        throw error;
+      }
       try {
         const sourceText = (
           await readBoundedAt(postsDirectory, basename(paths.postPath))

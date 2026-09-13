@@ -24,6 +24,8 @@
     "neon:sync:check": "node scripts/neon/sync.mjs --dry-run",
     "auto:write": "node scripts/auto-publish/auto-write.mjs",
     "auto:improve": "node scripts/auto-publish/prompt-improve.mjs",
+    "verify": "node scripts/verify/run.mjs",
+    "test:verify": "node --test scripts/verify/*.test.mjs",
     "image": "node scripts/auto-publish/generate-image.mjs",
     "admin": "node scripts/admin-server.mjs"
   },

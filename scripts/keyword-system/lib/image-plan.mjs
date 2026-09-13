@@ -104,7 +104,12 @@ export function planArticleImages(
     [...text.matchAll(/!\[([^\]\n]*)\]\(([^)\n]+)\)/gu)]
       .filter(
         (match) =>
+          match.index >= header.length &&
           !isProtectedOffset(protectedRanges, match.index) &&
+          !isProtectedOffset(
+            protectedRanges,
+            match.index + match[0].length - 1,
+          ) &&
           !existingImages.includes(match[2]) &&
           /placeholder|스크린샷|화면|screenshot/iu.test(match[0]),
       )
@@ -179,7 +184,7 @@ export function attachSubImages(text, { slug, images, plan } = {}) {
         .map((scene) => ({
           start: scene.end,
           end: scene.end,
-          value: `\n<!-- wj-image-section:${scene.anchor} -->\n![AI 생성 일러스트 — ${scene.heading.slice(3)}](${images.find((i) => i.role === scene.role).publicPath})\n\n`,
+          value: `\n<!-- wj-image-section:${scene.anchor} -->\n![AI 생성 일러스트 — ${scene.heading.slice(3).replace(/[<>![\]()]/gu, "").trim()}](${images.find((i) => i.role === scene.role).publicPath})\n\n`,
         })),
     ];
     const body = edits

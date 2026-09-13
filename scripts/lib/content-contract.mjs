@@ -13,7 +13,7 @@ export const MIN_BODY_CHARS = 1500;
 /** 사람이 채워야 하는 검증 마커. 공개되는 글에 남아 있으면 발행 게이트가 차단한다 (draft는 자유). */
 export const UNRESOLVED_MARKER_RE =
   /\[(?:직접 확인 필요|출처 URL 확인 필요|테스트 필요|스크린샷)[^\]]*\]/;
-const EDITORIAL_LEAK_RE = /(?:슬러그 제안|내부 링크 후보|스크린샷 필요|발행 전 실제|후속 글 후보)/;
+const EDITORIAL_LEAK_RE = /(?:슬러그 제안|내부 링크 후보|스크린샷 필요|발행 전 실제|후속 글 후보|윤문 대상|SELECTED_FORMAT|SELECTED_PERSONA)/;
 const VISUAL_TOPIC_RE = /(?:엑셀|Excel|구글 스프레드시트|수식|메뉴|시트)/i;
 
 /** frontmatter 블록 파싱. 없으면 null. */

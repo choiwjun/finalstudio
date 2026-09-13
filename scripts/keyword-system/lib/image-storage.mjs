@@ -77,6 +77,8 @@ export async function decodePng(bytes) {
     if (
       metadata.format !== "png" ||
       metadata.pages > 1 ||
+      !Number.isInteger(metadata.width) ||
+      !Number.isInteger(metadata.height) ||
       metadata.width < 16 ||
       metadata.height < 16 ||
       metadata.width > 8192 ||

@@ -462,7 +462,12 @@ test("oil report archive is reversible, judged final bytes exclude metadata, fai
     },
   });
   const installed = await readFile(options.postPath, "utf8");
-  assert.equal(installed, judged);
+  assert.equal(
+    installed.replace(/^---\n[\s\S]*?\n---/, "").trim(),
+    judged,
+    "the judge must score the exact installed body bytes, without frontmatter metadata",
+  );
+  assert.ok(!judged.startsWith("---"));
   assert.equal(result.quality.candidateHash, hashText(installed));
   assert.equal(result.plan.articleText + result.plan.reportArchive.text, oil);
   assert.ok(!installed.includes("변경률: 18%"));

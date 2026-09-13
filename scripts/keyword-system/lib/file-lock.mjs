@@ -418,9 +418,8 @@ async function acquireGuard(parentHandle, lockInstallPath, timeoutMs, staleMs) {
         const owner = await readLockOwner(guardPath);
         if (
           owner?.state === "released" ||
-          (owner !== undefined &&
-            !processAlive(owner.pid) &&
-            Date.now() - info.mtimeMs > staleMs)
+          (Date.now() - info.mtimeMs > staleMs &&
+            (owner === undefined || !processAlive(owner.pid)))
         )
           await rm(guardPath, { force: true });
       } catch (inspectError) {
@@ -522,10 +521,10 @@ export async function withExclusiveFileLock(filePath, task, options = {}) {
             );
           const owner = info ? await readLockOwner(lockInstallPath) : undefined;
           if (
-            owner?.state === "released" ||
-            (owner !== undefined &&
-              !processAlive(owner.pid) &&
-              Date.now() - info.mtimeMs > staleMs)
+            info &&
+            (owner?.state === "released" ||
+              (Date.now() - info.mtimeMs > staleMs &&
+                (owner === undefined || !processAlive(owner.pid))))
           )
             await rm(lockInstallPath, { force: true });
         }

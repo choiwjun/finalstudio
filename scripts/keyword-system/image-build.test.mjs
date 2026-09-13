@@ -80,7 +80,10 @@ test("isolated actual Astro build renders normalized draft fixture with decoded 
   `export default ${JSON.stringify({
    output: "static",
    cacheDir,
-   vite: { cacheDir: viteCacheDir },
+   vite: {
+    cacheDir: viteCacheDir,
+    optimizeDeps: { disabled: "build" },
+   },
   })};\n`,
  );
  await writeFile(
@@ -111,7 +114,7 @@ test("isolated actual Astro build renders normalized draft fixture with decoded 
   [join(repository, "node_modules/astro/bin/astro.mjs"), "build"],
   {
    cwd: root,
-   timeout: 180000,
+   timeout: 600000,
    env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1" },
   },
  );

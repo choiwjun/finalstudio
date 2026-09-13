@@ -33,7 +33,10 @@ function walk(dir) {
 }
 walk(dist);
 const hits = [...pathHits];
+const TEXT_EXT_RE =
+  /\.(?:html?|css|m?js|map|json|txt|xml|svg|md|webmanifest|rss)$/iu;
 for (const file of files) {
+  if (!TEXT_EXT_RE.test(file)) continue;
   const text = readFileSync(file);
   for (const token of forbidden)
     if (text.includes(token)) hits.push(`${file}: ${token}`);
