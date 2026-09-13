@@ -12,7 +12,12 @@ toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0"
 manualReview: required
 manualReviewReasons: ["금융·투자"]
 aiAssisted: true
+image: /images/economy-stock-chart-signals-main.png
 ---
+
+<!-- wj-auto-images:economy-stock-chart-signals:221b818703e8054f376b9eed37d4b9e11dae831f49815112ecba7ed23bd04d6b -->
+대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
+
 `주가 전망 차트분석` 검색 결과를 볼 때는 제목과 숫자를 투자 근거로 삼지 말고, 검색 추세와 블로그 주장을 분리한 뒤 DART·한국거래소 자료를 기준일과 함께 대조해야 합니다.
 
 이 글은 특정 종목의 목표가격이나 매수·매도 의견을 제시하지 않습니다. 검색 자료를 초보자가 확인 가능한 질문으로 바꾸는 순서만 설명합니다.
@@ -36,6 +41,10 @@ aiAssisted: true
 ```
 
 위 숫자와 날짜는 수집 시점의 기록입니다. 재현 가능한 근거로 사용하려면 `[직접 확인 필요: NAVER API HUB 원응답의 요청 조건과 응답 전문]`을 같은 범위로 다시 받아 대조해야 합니다.
+
+
+<!-- wj-image-section:3e76635b54a013f6 -->
+![AI 생성 일러스트 — 핵심 요약](/images/economy-stock-chart-signals-sub-1.png)
 
 ## 블로그 결과와 검색 추세를 분리합니다
 
@@ -77,6 +86,10 @@ NAVER API HUB는 검색어를 주제어 그룹으로 묶어 통합검색 추이�
 | 원응답 | 응답 ID 또는 저장 파일 위치 |
 
 제공된 원자료 기록에는 `주가 전망 차트분석` 그룹의 최신 상대 지표가 2026년 9월 10일에 `56.47058`로 적혀 있습니다. “검색량이 56.47058건이다” 또는 “검색량이 56% 늘었다”고 바꾸어 쓰면 안 됩니다.
+
+
+<!-- wj-image-section:19f8154a4ba77ade -->
+![AI 생성 일러스트 — 블로그 결과와 검색 추세를 분리합니다](/images/economy-stock-chart-signals-sub-2.png)
 
 ## 검색 결과 제목 하나를 안전하게 읽는 예시
 

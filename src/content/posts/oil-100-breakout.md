@@ -12,7 +12,12 @@ toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0"
 manualReview: required
 manualReviewReasons: ["금융·투자", "피해·논란 주장"]
 aiAssisted: true
+image: /images/oil-100-breakout-main.png
 ---
+
+<!-- wj-auto-images:oil-100-breakout:81f05022636fe805b78b9cbde5e1af50b6d9d84c273bbfca7361356d2393bf8f -->
+대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
+
 유가 100달러 돌파 소식을 봤다면 먼저 브렌트유인지 WTI인지 확인합니다. NAVER API HUB 블로그 검색 결과는 사람들이 어떤 영향을 이야기하는지 보여주지만, 실제 가격이나 경제 효과를 확정하는 자료는 아닙니다.
 
 이 글에서는 제공된 NAVER 자료를 기준으로 `유가 가격`, `블로그 검색 결과`, `검색 추세`를 나누어 읽는 방법을 정리합니다.
@@ -31,6 +36,10 @@ aiAssisted: true
 
 공식 자료의 기준이 다르면 “100달러를 넘었다”는 문장도 서로 다르게 보일 수 있습니다.
 
+
+<!-- wj-image-section:72f303051ee29928 -->
+![AI 생성 일러스트 — 핵심 요약: 100달러 돌파는 무엇부터 확인하나](/images/oil-100-breakout-sub-1.png)
+
 ## 100달러의 기준부터 고정하기
 
 `유가 100달러`는 어떤 원유와 거래 가격을 선택했는지에 따라 달라지는 표현입니다.
@@ -40,6 +49,10 @@ aiAssisted: true
 현물 가격은 즉시 인도되는 거래의 가격입니다. 선물 가격은 특정한 미래 인도 시점의 계약 가격입니다. 같은 날짜에도 현물과 선물 가격은 다를 수 있습니다. [EIA 가격 용어 설명](https://www.eia.gov/dnav/pet/tbldefs/pet_pri_spt_tbldef2.asp)
 
 제공된 자료와 공식 가격을 비교하면 기준 차이가 드러날 수 있습니다. 작성 시점에 참고한 EIA 일일 가격 자료에는 2026년 9월 9일 종가 기준으로 WTI 현물 가격이 배럴당 97.26달러, 브렌트 현물 가격이 109.51달러로 표시되어 있었습니다. 같은 “국제유가”라는 표현이라도 브렌트는 100달러를 넘고 WTI는 넘지 않은 사례입니다. 단, 아래 링크는 최신 가격만 보여주는 실시간 페이지이므로 과거 날짜의 종가는 [직접 확인 필요: EIA 일일 가격 페이지 또는 날짜별 데이터의 2026-09-09 원자료]에서 따로 확인해야 합니다. [EIA 일일 가격 페이지](https://www.eia.gov/todayinenergy/prices.php)
+
+
+<!-- wj-image-section:c2228877d5657cd2 -->
+![AI 생성 일러스트 — 100달러의 기준부터 고정하기](/images/oil-100-breakout-sub-2.png)
 
 ## NAVER API HUB와 검색 추세는 따로 읽기
 

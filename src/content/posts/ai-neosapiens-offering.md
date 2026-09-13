@@ -12,7 +12,12 @@ toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0"
 manualReview: required
 manualReviewReasons: ["금융·투자"]
 aiAssisted: true
+image: /images/ai-neosapiens-offering-main.png
 ---
+
+<!-- wj-auto-images:ai-neosapiens-offering:4019658ea1cec12477c2369719da32e2846941c5494a3dc9b33d3d6c5faaf3ff -->
+대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
+
 네오사피엔스 공모주 청약을 검색했다면 먼저 블로그 글과 검색 추세 지표를 구분해야 합니다. 블로그 결과는 어떤 주제가 검색 화면에 노출됐는지를 보여주고, 검색 추세에서 100으로 표시된 값은 절대 검색량이 아니라 상대값입니다.
 
 이 글은 청약 참여 여부를 추천하지 않습니다. NAVER API HUB에서 확인된 자료를 바탕으로, 초보자가 다음에 어떤 공식 정보를 확인해야 하는지 정리합니다.
@@ -29,6 +34,10 @@ aiAssisted: true
 
 [직접 확인 필요: 금융감독원 전자공시와 대표주관사 공식 공지에서 청약 관련 정보를 확인해야 합니다.]
 
+
+<!-- wj-image-section:420babe2d9235e39 -->
+![AI 생성 일러스트 — 핵심 요약](/images/ai-neosapiens-offering-sub-1.png)
+
 ## NAVER 블로그 결과와 검색 추세는 어떻게 다른가요?
 
 NAVER 블로그 결과는 검색된 글의 제목과 설명을 보여주는 자료이고, 검색 추세는 특정 검색어가 비교 기간 안에서 얼마나 높았는지를 나타내는 상대 지표입니다.
@@ -40,6 +49,10 @@ NAVER 블로그 결과는 검색된 글의 제목과 설명을 보여주는 자�
 - 공식 자료: 실제 청약 조건과 일정은 무엇인가?
 
 블로그 글이 많이 보인다는 이유만으로 공모주의 조건이나 투자성을 확정하면 안 됩니다.
+
+
+<!-- wj-image-section:5e41ca829bc2d54d -->
+![AI 생성 일러스트 — NAVER 블로그 결과와 검색 추세는 어떻게 다른가요?](/images/ai-neosapiens-offering-sub-2.png)
 
 ## 블로그 결과에서는 어떤 주제가 반복됐나요?
 

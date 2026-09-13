@@ -199,7 +199,7 @@ export function attachSubImages(text, { slug, images, plan } = {}) {
       images.find((i) => i.role === "main").publicPath,
     );
     const header = withMain.match(/^---\r?\n[\s\S]*?\r?\n---/u)[0];
-    return `${header}\n\n${marker}\n대표·본문 이미지: AI 생성 일러스트이며 실제 사진·스크린샷이 아닙니다.\n${withMain.slice(header.length)}`;
+    return `${header}\n\n${marker}\n대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.\n${withMain.slice(header.length)}`;
   };
   const candidate = build();
   if (text !== plan.sourceText && text !== candidate)

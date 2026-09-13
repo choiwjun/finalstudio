@@ -12,7 +12,12 @@ toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0"
 manualReview: required
 manualReviewReasons: ["금융·투자", "피해·논란 주장"]
 aiAssisted: true
+image: /images/economy-business-1ba21e1c7f-main.png
 ---
+
+<!-- wj-auto-images:economy-business-1ba21e1c7f:0e6e425f75b5d24b66e13793fb5cf57112f3ed04a901f8b05272f6909a315161 -->
+대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
+
 
 주가 전망을 처음 찾아볼 때는 블로그 글의 제목과 검색 지표를 같은 의미로 읽지 않아야 합니다. NAVER 블로그 결과는 사람들이 어떤 종목과 주제를 이야기하는지 보여줍니다. NAVER API HUB 검색 추세는 정해진 조건 안에서 관심이 어떻게 움직였는지 보여줍니다.
 
@@ -32,6 +37,10 @@ aiAssisted: true
 
 NAVER API HUB의 검색어 트렌드 API는 주제어로 묶은 네이버 통합검색의 추이를 조회하는 도구입니다. 자세한 요청 형식은 [NAVER API HUB 검색어 트렌드 공식 문서](https://api.ncloud-docs.com/docs/naver-api-hub-search-trend)에서 확인할 수 있습니다.
 
+
+<!-- wj-image-section:367ad70839ee0675 -->
+![AI 생성 일러스트 — 핵심 요약: 세 자료를 따로 읽습니다](/images/economy-business-1ba21e1c7f-sub-1.png)
+
 ## 제공된 결과에서 무엇을 관찰할까요?
 
 제공된 NAVER 블로그 목록은 특정 종목의 전망을 확정하는 자료가 아닙니다. 검색 결과에 어떤 설명 방식이 나타났는지 살펴보는 참고 자료입니다.
@@ -45,6 +54,10 @@ NAVER API HUB의 검색어 트렌드 API는 주제어로 묶은 네이버 통합
 | 로보티즈·아이렌의 AI 성장성 | AI·인프라 관련 성장 서사가 나타남 | 해당 사업의 매출과 공식 발표를 확인했는가? |
 
 `목표주가 60만원`, `수주잔고 4조원`, `AI 인프라 전환` 같은 표현은 제목이나 설명에 등장했다는 사실과 실제 사실 여부를 분리해야 합니다. 원문 내용, 작성자의 근거, 작성 시점은 [직접 확인 필요: 각 블로그 원문·게시일·인용 자료]입니다.
+
+
+<!-- wj-image-section:d03c1e8d0785bf30 -->
+![AI 생성 일러스트 — 제공된 결과에서 무엇을 관찰할까요?](/images/economy-business-1ba21e1c7f-sub-2.png)
 
 ## 주가 전망을 도구로 확인하는 4단계
 

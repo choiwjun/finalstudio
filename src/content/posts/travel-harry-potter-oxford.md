@@ -12,7 +12,12 @@ toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0"
 manualReview: none
 manualReviewReasons: []
 aiAssisted: true
+image: /images/travel-harry-potter-oxford-main.png
 ---
+
+<!-- wj-auto-images:travel-harry-potter-oxford:3acef9c56853bf170f77a051a87e2e38d851b2fc5c941ebc9bd554e48600a6df -->
+대표·본문 이미지: AI 생성 일러스트이며 실제 사진·스크린샷이 아닙니다.
+
 
 해리포터 스튜디오 옥스포드 일정을 처음 고를 때는 상품명보다 이동 순서와 방문 장소를 먼저 확인해야 합니다. 제공된 NAVER 원자료에는 `런던 중심지 → 해리포터 스튜디오 → 옥스포드 → 런던` 순서의 일일 일정과 전용 버스 또는 미니밴 이동이 설명되어 있습니다.
 
@@ -27,6 +32,10 @@ aiAssisted: true
 | 옥스포드 촬영지에 집중하려는 경우 | 보들리안 도서관, 크라이스트 처치, 듀크 도서관 등 장소가 언급됩니다. | 실제 방문 장소, 입장 가능 여부, 장소별 이동 방법 |
 | 스튜디오와 옥스포드를 나누려는 경우 | 한 원자료 설명에는 스튜디오 방문 다음날 옥스포드로 이동한 사례가 나옵니다. | 날짜를 나누는지, 숙박 위치, 다음날 이동 경로 |
 
+
+<!-- wj-image-section:ae15f3d10cb48ce2 -->
+![AI 생성 일러스트 — 핵심 요약](/images/travel-harry-potter-oxford-sub-1.png)
+
 ## NAVER 원자료에서 확인된 이동과 장소
 
 제공된 자료에서 가장 구체적으로 확인되는 일일 이동은 런던 중심지에서 출발해 해리포터 스튜디오와 옥스포드를 방문한 뒤 런던으로 돌아오는 방식입니다. 해당 설명에는 전용 버스 또는 미니밴이 이동 수단으로 적혀 있습니다.
@@ -38,6 +47,10 @@ aiAssisted: true
 | 옥스포드 방문 장소로 보들리안 도서관이 언급됩니다. 해리포터 촬영 장면과 연결된 설명도 있습니다. | 보들리안 도서관이 실제 일정에 포함되는지 확인합니다. | [런던 해리포터 스튜디오 → 옥스포드 투어](https://blog.naver.com/mgr11234/224382391267) |
 | 크라이스트 처치가 옥스포드 방문의 주요 목적이었다는 개인 사례가 소개됩니다. | 크라이스트 처치 방문이 포함되는지, 별도 입장이 필요한지 확인합니다. | [런던 해리포터 스튜디오 + 옥스포드](https://blog.naver.com/justlikehannah/224391635082) |
 | 옥스포드 촬영지 설명에서 듀크 도서관과 투명망토 장면이 언급됩니다. | 장소명이 비슷해도 실제 방문 지점과 관람 범위를 구분합니다. | [런던 가볼만한곳 당일치기 옥스포드 투어](https://blog.naver.com/wkwmd81/224380000382) |
+
+
+<!-- wj-image-section:d510504935b5720b -->
+![AI 생성 일러스트 — NAVER 원자료에서 확인된 이동과 장소](/images/travel-harry-potter-oxford-sub-2.png)
 
 ## 세 가지 일정 경로 비교
 
