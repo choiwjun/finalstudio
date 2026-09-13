@@ -81,6 +81,7 @@ a:hover { color: var(--color-link-hover); text-decoration-thickness: 2px; }
 
 .visually-hidden {
   position: absolute;
+  inset-inline-start: 0;             /* 스크롤 컨테이너 밖 정적 위치로 새지 않도록 고정 */
   width: 1px;
   height: 1px;
   padding: 0;
@@ -658,6 +659,7 @@ main {
 .admin-field { display: grid; gap: var(--space-1); margin-bottom: var(--space-3); }
 .admin-field label { font-size: var(--text-sm); color: var(--site-ink-soft); }
 .admin-field input, .admin-field select {
+  min-height: 2.75rem;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--site-line-strong);
   border-radius: var(--radius-md, 8px);
@@ -703,3 +705,8 @@ main {
   .workflow-grid { grid-template-columns: repeat(3, 1fr); }
   .workflow-grid--pipeline { grid-template-columns: repeat(5, 1fr); }
 }
+
+/* [hidden]은 항상 display 규칙을 이겨야 한다 — grid/flex 클래스가
+   붙은 요소(.admin-field, .admin-login-screen 등)가 hidden 토글 후에도
+   계속 보이는 버그 방지. */
+[hidden] { display: none !important; }
