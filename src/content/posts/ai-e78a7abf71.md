@@ -5,9 +5,10 @@ pubDate: 2026-09-12
 status: draft
 topic: ai
 angle: "NAVER API HUB 블로그 결과와 검색 추세의 상대 지표를 분리해 설명하고, 공식 확인이 필요한 범위와 독자의 다음 판단 기준을 제시합니다"
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-ai-LG-AI연구원, naver-api-hub-trend-ai-LG-AI연구원]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: required
 manualReviewReasons: ["금융·투자", "피해·논란 주장"]
 aiAssisted: true

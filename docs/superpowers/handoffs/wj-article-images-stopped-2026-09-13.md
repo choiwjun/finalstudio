@@ -1,16 +1,32 @@
 # WJ Blog — 글 기반 이미지 작업 중단·복구 핸드오프
 
-기록일: 2026-09-13 (Asia/Seoul)
+기록일: 2026-09-13 (Asia/Seoul), 2차 갱신 동일 일자
 
-## 현재 상태: STOPPED / NOT ACCEPTED
+## 현재 상태: PIPELINE VERIFIED — BACKFILL PENDING HUMAN APPROVAL
 
-**공통 이미지 파이프라인은 부분 구현 상태다. 구현 완료·검증 통과·발행 가능 상태가 아니다.** 이번 사용자 요청은 핸드오프 기록과 커밋·푸시이며, 중단된 구현·테스트·빌드·이미지 실행을 재개하라는 승인이 아니다.
+**2026-09-13 2차 갱신:** §5 재개 계획의 1–5단계가 완료되어 현재 바이트 기준으로 파이프라인 검증이 통과했다.
+단, 발행·DB 쓰기·배포·나머지 15편 backfill은 여전히 사람 승인 대기다. 아래 §7에 fresh-run 결과를 추가했다.
+
+## §0. 이번 갱신의 범위
+
+- 분리된 `scripts/verify/` harness(preflight veto → 조건부 executor)와 회귀 테스트 추가.
+- 독립 correctness/security review 수행: CRITICAL/HIGH 없음. MEDIUM 2건 + LOW 다수를 현재 바이트에서 수정.
+- Fresh bounded verification `verification-2026-09-13-0316-fresh-fixes3-20260913` — **11개 단계 전부 exit 0, `ok: true`**.
+- Q1 closure: fixture가 shared cache를 건드리지 않음을 byte-snapshot으로 확인.
+- 실제 스크린샷 2장 캡처·삽입 (§7-3), 15개 메타데이터 정리(author WJ, testedAt, sourceIds, toolVersions).
+
+## 0-1. 1차 기록 당시 상태 (역사적 기록, 보존)
+
+아래는 1차 작성 시점의 상태 문장과 보존 경계다. 2차 갱신 기준으로는 파이프라인 검증이 완료되었으므로
+"부분 구현·미검증"은 더 이상 현재 상태가 아니지만, 발행 승인·DB·배포 권한 분리 규칙은 그대로 유효하다.
+
+**1차 기록 당시:** 공통 이미지 파이프라인은 부분 구현 상태였다. 당시 사용자 요청은 핸드오프 기록과 커밋·푸시였으며, 중단된 구현·테스트·빌드·이미지 실행을 재개하라는 승인이 아니었다.
 
 - 저장소: `choiwjun/finalstudio`; 문서 작성 전 브랜치/HEAD: `main` / `e672e93bd5a6f9810db479cf52a580ea2811f144`.
-- 이 체크포인트는 **문서만 커밋**한다. 구현, 테스트, 패키지, 키워드 데이터, 관리자/Worker/Neon 변경, 초안 15개와 기존 staged 삭제 7건은 포함하지 않는다. 원격에서 이 문서만 받아서는 로컬 미커밋 구현을 복구할 수 없다.
-- `main` 푸시는 `.github/workflows/quality.yml`에서 `DATABASE_URL`이 설정되어 있으면 `neon:migrate`와 `neon:sync`를 실행할 수 있다. DB 쓰기는 별도 승인 대상이므로 **main 푸시는 보류**하고, 문서 전용 브랜치 푸시 또는 자동 DB 반영 승인 여부를 먼저 확인한다. CI skip, hook 우회, workflow 수정으로 회피하지 않는다.
+- 1차 체크포인트는 **문서만 커밋**했다. 구현, 테스트, 패키지, 키워드 데이터, 관리자/Worker/Neon 변경, 초안 15개와 기존 staged 삭제 7건은 포함하지 않았다.
+- `main` 푸시는 `.github/workflows/quality.yml`에서 `DATABASE_URL`이 설정되어 있으면 `neon:migrate`와 `neon:sync`를 실행할 수 있다. DB 쓰기는 별도 승인 대상이므로 **main 푸시는 계속 보류**한다. CI skip, hook 우회, workflow 수정으로 회피하지 않는다.
 - 예약 배포 workflow는 schedule/manual 트리거다. 외부 호스팅 Git 연동·자동 배포 설정은 확인되지 않았다. 수동 배포·실제 Neon 동기화·발행을 수행하지 않는다.
-- 과거 `194 tests passed` 등의 컨텍스트, 예전 90점 이상 심사, 아래 역사적 통과 기록은 **현재 이미지 구현의 승인 근거가 아니다**.
+- 과거 `194 tests passed` 등의 컨텍스트, 예전 90점 이상 심사, 아래 역사적 통과 기록은 승인 근거가 아니다. **단, §7의 `verification-2026-09-13-0316-fresh-fixes3-20260913`은 현재 바이트에 대한 신선한 승인 근거다.**
 
 기존 `HANDOFF.md`와 `HANDOVER.md`의 역사적 현재 상태보다 이 문서의 해당 작업 상태가 우선한다. 규칙과 편집 기준은 기존 canonical 문서를 유지한다.
 
@@ -143,3 +159,71 @@ canary PNG SHA: `7a9065b272531d629f6ffe63f7eb2b7456045711c917a5670288b767262bc4e
 - [ ] todo 13/14를 해결하기 전에는 todo 10의 검증/rollout을 재개하지 않는다.
 - [ ] 최신 바이트 검증과 독립 review가 없음을 유지한다. 과거 성공 숫자로 완료 표시하지 않는다.
 - [ ] 문서 전용 푸시와 운영 main/DB/배포 권한을 분리한다.
+
+## 7. 2026-09-13 2차 갱신 — 신선 검증 결과
+
+### 7-1. 실행 제어 수정 (계획 2단계)
+
+`scripts/verify/`를 새로 만들어 preflight와 executor를 분리했다.
+
+- `preflight.mjs`: 자원/플랫폼/fixture 격리 등 veto 가능 검사만 수행. 실행 가능한 verify hook 없음.
+- `orchestrator.mjs`: `preflightResult?.ok !== true`이면 executor를 호출하지 않고 record 반환.
+- `executor.mjs`: 고정된 preflight 결과를 받는 bounded chain. 단계별 timeout + POSIX process group 종료.
+- `run.mjs`: `out/verification-<시각>-<label>/`을 먼저 만들고 전 log/현재 바이트 hash/최종 record를 보존. orchestration 예외 시에도 `orchestrationError`를 포함한 record를 기록한다.
+- `verification-gate.test.mjs`: 회귀 5건 — `ok:true` 1회 호출, `ok:false` 0회, 누락 결과 0회, truthy 비불리언(`{ok:"no"}`) 0회, 격리/frozen 인자 확인.
+
+### 7-2. Fresh bounded verification (계획 4단계)
+
+- 명령: `npm run verify -- --label fresh-fixes3-20260913`
+- record: `out/verification-2026-09-13-0316-fresh-fixes3-20260913/record.json`
+- 결과: **`ok: true`**, `executorCalls: 1`, `memoized: false`, preflight 통과.
+
+| 단계 | exit | 비고 |
+| --- | --- | --- |
+| keywords | 0 | 297/297 (image-build fixture의 실제 Astro build 포함) |
+| worker | 0 | 18/18 |
+| neon | 0 | 4/4 |
+| content | 0 | 15개 Markdown 계약 통과 |
+| prompts | 0 | 편집 프롬프트 검사 통과 |
+| neon-sync-check | 0 | DB-free, 20 record / 15 post 일치 |
+| verification-gate | 0 | 5/5 회귀 |
+| image-coverage | 0 | **97.02% lines / 83.66% branches / 82.28% funcs** (모두 ≥80%) |
+| build | 0 | 실제 `npm run build` (Astro) |
+| check-build | 0 | 산출물 계약 통과 |
+| diff-check | 0 | `git diff --check` clean |
+
+- `preservationDiff`: run 중 post 변경 0건, tracked diff 변경 없음, untracked 변경 없음.
+- 첫 실패 중단 계약 검증: 중간 run `fresh-fixes-20260913`과 `fresh-fixes2-20260913`은 각각 keywords 실패 지점에서 정지하고 record를 남겼다 — 두 기록 모두 보존되어 있으며 resume하지 않았다.
+
+### 7-3. 독립 correctness/security review (계획 5단계)
+
+CRITICAL/HIGH 없음. 현재 바이트에서 수정한 사항:
+
+- MEDIUM: `run.mjs`가 preflight veto/예외 시 record를 쓰지 못하던 문제 → outDir 선생성 + try/catch로 최종 record 항상 보존.
+- MEDIUM: `image-plan.mjs`가 heading 원문을 alt text에 그대로 넣어 `](` 포함 heading이 외부 이미지 URL을 만들 수 있던 문제 → heading 정제 + 보호 범위 확장.
+- MEDIUM: judge 입력 전체를 codex argv로 넘겨 Linux 인자 크기 제한(E2BIG)에 걸릴 수 있던 문제 → 짧은 지시만 argv, 본문은 stdin(`runDeadlineProcess`에 `stdinText` 추가).
+- LOW: `file-lock.mjs`의 파싱 불가 stale lock/guard가 owner 없이 영구 차단 → `staleMs` 초과 시 제거.
+- LOW: `image-bundle.mjs` 디렉터리 handle 누수 → catch 경로에서 열린 handle 정리.
+- LOW: `image-storage.mjs` PNG 크기가 정수인지 검사 추가.
+- TEST: `image-build.test.mjs` fixture의 `optimizeDeps.disabled: "build"` + build timeout 180s→600s — 느린 drvfs 마운트에서의 시간 초과 플레이크 해소(검사 강도는 유지).
+
+### 7-4. Q1 closure (계획 3단계)
+
+- fixture `node_modules`는 fixture-local 디렉터리 + 패키지별 symlink(dot entry 제외). `.astro`/`.vite`/`.vite-temp`는 fixture `.build-cache/` 아래.
+- 검증 run 전후 shared `node_modules/.astro`, `.vite` 38개 파일 byte-snapshot 비교: fixture-only 콘텐츠 0건, fixture build는 shared cache를 변경하지 않음.
+- `npm run build` 단계 자체가 저장소 `.astro`/`.vite`에 쓰는 것은 정상 동작이다 — Q1의 대상은 fixture 격리이며 이는 확인됐다.
+- cache 삭제·복원은 수행하지 않았다.
+
+### 7-5. 콘텐츠 현재 상태
+
+- 실제 스크린샷 2장: `public/images/screenshot-naver-blog-data-center-power.png`, `screenshot-naver-blog-ipo-subscription.png` (Playwright 1.62.0 + Chromium 151, NAVER 블로그 탭, 1440×900). `ai-25b2358bd7.md`, `ai-51ab90d425.md` 본문 삽입 + `sourceIds`에 `screenshot-…-20260913` provenance 추가. 나머지 `[직접 확인 필요]` 마커는 스크린샷 의무가 아닌 API 요청 조건 확인용으로 의도적으로 유지.
+- 15개 전체: `author: WJ`, `testedAt: 2026-09-13`, nonempty `sourceIds`(150개 raw evidence와 대조 확인), `toolVersions` 기록 완료.
+- **중복 주제 클러스터 (사람 판단 필요)**: `ai-ea50505be2`↔`ai-neosapiens-offering` (네오사피엔스 공모주, 구조까지 유사), `economy-search-signals`↔`economy-stock-chart-signals` (차트분석), `brent-oil-100`↔`oil-100-breakout` (유가 100달러), `travel-f7e6b35043`↔`travel-studio-oxford`↔`travel-harry-potter-oxford` (스튜디오·옥스포드 3중). 발행 전 클러스터당 1편 선택 또는 차별화가 필요하다.
+- 사람의 사실·출처 검토는 아직 완료되지 않았다 — 메타데이터 정리는 기계 확인이며 본문 정확성 검토를 대신하지 않는다.
+
+### 7-6. 남은 승인 게이트
+
+- `travel-studio-oxford.md` 단독 bundle(사용자 승인 범위) → 사람 문구·시각 QA → 나머지 15편 순차 backfill(편별 승인).
+- `travel-harry-potter-oxford.md` 첫 공개 후보 — 4개 `[직접 확인 필요]` 마커(가격·시간·티켓·상품 조건) 해소 + 본문 검토 + 브라우저/접근성 QA 후 사람이 status 결정.
+- Cloudflare Pages 배포: `docs/DEPLOYMENT.md` 절차 문서화 완료. 실제 도메인·Deploy Hook URL·`PUBLIC_SITE_URL`은 사용자 입력 대기.
+- DB 쓰기·발행·배포는 별도 승인 없이 수행하지 않는다.

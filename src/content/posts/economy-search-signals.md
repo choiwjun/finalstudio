@@ -5,9 +5,10 @@ pubDate: 2026-09-12
 status: draft
 topic: economy-business
 angle: "NAVER 블로그 결과와 검색 추세의 상대 지표를 분리해 해석하고, 공식 확인이 필요한 범위와 독자의 다음 판단 기준을 제시합니다."
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-economy-business-전망-차트분석, naver-api-hub-trend-economy-business-전망-차트분석]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: required
 manualReviewReasons: ["금융·투자"]
 aiAssisted: true

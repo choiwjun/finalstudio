@@ -5,9 +5,10 @@ pubDate: 2026-09-12
 status: draft
 topic: economy-business
 angle: "NAVER API HUB 블로그 결과와 검색 추세의 상대 지표를 분리해 설명하고, 공식 확인이 필요한 범위와 독자의 다음 판단 기준을 제시합니다"
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-economy-business-주가-전망-차트분석, naver-api-hub-trend-economy-business-주가-전망-차트분석]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: required
 manualReviewReasons: ["금융·투자"]
 aiAssisted: true
@@ -34,7 +35,7 @@ aiAssisted: true
 다음 판단: 주장-출처-기준일-반대 조건을 기록
 ```
 
-현재 frontmatter의 `sourceIds: []`에는 원응답 식별자가 없고, 원자료 저장 위치도 제시되지 않았습니다. 따라서 위 숫자와 날짜는 제공된 초안의 기록으로 표시하며, 재현 가능한 근거로 사용하기 전 원응답을 다시 확인해야 합니다.
+위 숫자와 날짜는 수집 시점의 기록입니다. 재현 가능한 근거로 사용하려면 `[직접 확인 필요: NAVER API HUB 원응답의 요청 조건과 응답 전문]`을 같은 범위로 다시 받아 대조해야 합니다.
 
 ## 블로그 결과와 검색 추세를 분리합니다
 

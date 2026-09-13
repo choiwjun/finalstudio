@@ -5,9 +5,10 @@ pubDate: 2026-09-12
 status: draft
 topic: economy-business
 angle: "유가 100달러 돌파라는 표현을 가격 기준과 검색 신호로 나누어 해석하고, 독자가 공식 자료를 확인하는 순서를 제시합니다."
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-economy-business-100달러-돌파, naver-api-hub-trend-economy-business-100달러-돌파]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: required
 manualReviewReasons: ["금융·투자", "피해·논란 주장"]
 aiAssisted: true
@@ -38,7 +39,7 @@ aiAssisted: true
 
 현물 가격은 즉시 인도되는 거래의 가격입니다. 선물 가격은 특정한 미래 인도 시점의 계약 가격입니다. 같은 날짜에도 현물과 선물 가격은 다를 수 있습니다. [EIA 가격 용어 설명](https://www.eia.gov/dnav/pet/tbldefs/pet_pri_spt_tbldef2.asp)
 
-제공된 자료와 공식 가격을 비교하면 기준 차이가 드러납니다. EIA의 2026년 9월 9일 종가 기준 자료에는 WTI 현물 가격이 배럴당 97.26달러, 브렌트 현물 가격이 109.51달러로 표시됩니다. 같은 “국제유가”라는 표현이라도 브렌트는 100달러를 넘고 WTI는 넘지 않은 사례입니다. [EIA 2026년 9월 9일 일일 가격](https://www.eia.gov/todayinenergy/prices.php)
+제공된 자료와 공식 가격을 비교하면 기준 차이가 드러날 수 있습니다. 작성 시점에 참고한 EIA 일일 가격 자료에는 2026년 9월 9일 종가 기준으로 WTI 현물 가격이 배럴당 97.26달러, 브렌트 현물 가격이 109.51달러로 표시되어 있었습니다. 같은 “국제유가”라는 표현이라도 브렌트는 100달러를 넘고 WTI는 넘지 않은 사례입니다. 단, 아래 링크는 최신 가격만 보여주는 실시간 페이지이므로 과거 날짜의 종가는 [직접 확인 필요: EIA 일일 가격 페이지 또는 날짜별 데이터의 2026-09-09 원자료]에서 따로 확인해야 합니다. [EIA 일일 가격 페이지](https://www.eia.gov/todayinenergy/prices.php)
 
 ## NAVER API HUB와 검색 추세는 따로 읽기
 

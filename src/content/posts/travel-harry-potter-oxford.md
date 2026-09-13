@@ -5,14 +5,14 @@ pubDate: 2026-09-12
 status: draft
 topic: travel
 angle: "NAVER 원자료에 있는 실제 이동 순서·교통수단·방문 장소 관찰을 출처 URL과 연결해 표로 정리하고, 일일 결합형·스튜디오 단독형·옥스포드 중심형을 근거 범위 안에서 비교합니다."
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-travel-해리포터-스튜디오-옥스포드, naver-api-hub-trend-travel-해리포터-스튜디오-옥스포드]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: none
 manualReviewReasons: []
 aiAssisted: true
 ---
-# 해리포터 스튜디오 옥스포드 일정 비교법
 
 해리포터 스튜디오 옥스포드 일정을 처음 고를 때는 상품명보다 이동 순서와 방문 장소를 먼저 확인해야 합니다. 제공된 NAVER 원자료에는 `런던 중심지 → 해리포터 스튜디오 → 옥스포드 → 런던` 순서의 일일 일정과 전용 버스 또는 미니밴 이동이 설명되어 있습니다.
 

@@ -5,11 +5,12 @@ pubDate: 2026-09-12
 status: draft
 topic: economy-business
 angle: "브렌트유 100달러 관련 검색 결과와 상대 지표를 분리해 읽고, 공식 확인 뒤 다음 판단 기준을 세우도록 돕습니다."
-author: TBD
-sourceIds: []
-toolVersions: {}
-manualReview: none
-manualReviewReasons: []
+author: WJ
+sourceIds: [naver-api-hub-blog-economy-business-브렌트유-100달러, naver-api-hub-trend-economy-business-브렌트유-100달러]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
+manualReview: required
+manualReviewReasons: ["금융·투자"]
 aiAssisted: true
 ---
 브렌트유 100달러를 검색했다면 가격 숫자와 검색 관심도 숫자를 먼저 나눠 봐야 합니다. 제공된 자료에는 브렌트유 101.21달러, 107.63달러, 109달러 안팎이라는 가격 표현과 NAVER 트렌드 상대 지표 56.47058이 함께 나타납니다. 이 숫자들은 같은 종류의 정보가 아닙니다.

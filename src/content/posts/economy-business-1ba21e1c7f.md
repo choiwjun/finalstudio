@@ -5,14 +5,14 @@ pubDate: 2026-09-12
 status: draft
 topic: economy-business
 angle: "NAVER API HUB 블로그 결과와 검색 추세의 상대 지표를 분리해 설명하고, 공식 확인이 필요한 범위와 독자의 다음 판단 기준을 제시합니다"
-author: TBD
-sourceIds: []
-toolVersions: {}
+author: WJ
+sourceIds: [naver-api-hub-blog-economy-business-주가-전망, naver-api-hub-trend-economy-business-주가-전망]
+testedAt: 2026-09-13
+toolVersions: { auto-write: "2.1.0", engine: "codex-oauth", codex-cli: "0.154.0" }
 manualReview: required
 manualReviewReasons: ["금융·투자", "피해·논란 주장"]
 aiAssisted: true
 ---
-# 주가 전망 보는 법 — 검색 추세와 공시 구분하기
 
 주가 전망을 처음 찾아볼 때는 블로그 글의 제목과 검색 지표를 같은 의미로 읽지 않아야 합니다. NAVER 블로그 결과는 사람들이 어떤 종목과 주제를 이야기하는지 보여줍니다. NAVER API HUB 검색 추세는 정해진 조건 안에서 관심이 어떻게 움직였는지 보여줍니다.
 
