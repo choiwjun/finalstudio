@@ -158,6 +158,36 @@ export function buildImagePrompts({ plan } = {}) {
   );
 }
 
+export function buildVisualImagePrompts({ brief, roles } = {}) {
+  if (!brief?.imageRoles || !Array.isArray(roles) || !roles.length)
+    throw Error("visual brief and image roles are required");
+  return Object.freeze(
+    Object.fromEntries(
+      roles.map((role) => {
+        const scene = brief.imageRoles[role];
+        if (!scene) throw Error(`visual brief missing scene for ${role}`);
+        return [
+          role,
+          [
+            "Original editorial illustration for a Korean personal blog, not documentary evidence.",
+            "Use native image generation only. No API/paid fallback, retries, or unrelated file changes.",
+            "Depict THIS specific scene — at least 80% of the image must show these concrete elements and their relationship:",
+            scene,
+            `Core elements that MUST appear: ${brief.mustShow.join("; ")}.`,
+            "Render each required element as a large, unambiguous, recognizable object — prefer a few big clear elements over a crowded collage of tiny icons.",
+            `Relationship/order to convey: ${brief.relations.join("; ")}.`,
+            `Do NOT include: ${brief.mustAvoid.join("; ")}; decorative magnifiers, bar/pie/line charts, graphs, abstract diagram shapes, dot patterns, paper textures as the main subject — show real objects and scenes, not data visualizations.`,
+            "Absolutely no letters, words, numbers, punctuation marks (including question marks and exclamation marks), symbols that read as text, logos, watermarks, readable screens, fake UI, fictional product pages, fictional prices, or human faces. If a person is essential, draw only the back of the head, hands, or a clearly faceless silhouette — never eyes, nose, mouth, or a face shape.",
+            "No smartphone screens, phone displays, monitor screens, app interfaces, or icon grids — screens always risk looking like fake UI; express 'checking' through objects like a corded handset, paper calendar, wristwatch, or printed map instead. No street signs, parking signs, shop signs, or badges — signs always risk readable letters.",
+            `Factual constraints — do not invent beyond these: ${brief.factualConstraints.join("; ")}.`,
+            "Style: clean editorial illustration, warm paper-white palette as secondary styling only, 3:2 landscape, central composition that survives a tight center crop.",
+          ].join("\n"),
+        ];
+      }),
+    ),
+  );
+}
+
 export function attachSubImages(text, { slug, images, plan } = {}) {
   assertImageSlug(slug);
   if (!plan || plan.slug !== slug)

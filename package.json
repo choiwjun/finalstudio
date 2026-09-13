@@ -27,7 +27,8 @@
     "verify": "node scripts/verify/run.mjs",
     "test:verify": "node --test scripts/verify/*.test.mjs",
     "image": "node scripts/auto-publish/generate-image.mjs",
-    "admin": "node scripts/admin-server.mjs"
+    "admin": "node scripts/admin-server.mjs",
+    "image:regen": "node scripts/keyword-system/image-regen.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
