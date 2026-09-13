@@ -79,6 +79,7 @@ export function parseDraftArgs(
     reviewer: undefined,
     reason: undefined,
     angle: undefined,
+    slug: undefined,
     briefSha256: undefined,
     automationPolicy: undefined,
     automationPolicySha256: undefined,
@@ -93,6 +94,7 @@ export function parseDraftArgs(
     ["--reviewer", "reviewer"],
     ["--reason", "reason"],
     ["--angle", "angle"],
+    ["--slug", "slug"],
     ["--brief-sha256", "briefSha256"],
     ["--automation-policy", "automationPolicy"],
     ["--automation-policy-sha256", "automationPolicySha256"],
@@ -113,6 +115,7 @@ export function parseDraftArgs(
         "reason",
         "briefSha256",
         "angle",
+        "slug",
         "automationPolicySha256",
       ].includes(key)
     ) {
@@ -360,6 +363,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     outputDir: stagingDir,
     format: args.format,
     humanAngle,
+    slug: args.slug,
     briefSha256: briefHash,
     approvalArtifact: approvalArtifactPath,
   });

@@ -4,7 +4,10 @@ import { dirname, resolve } from "node:path";
 import { connectDatabase } from "./lib/db.mjs";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
-const migrationPath = resolve(currentDir, "../../db/migrations/001_initial.sql");
+const migrationPath = resolve(
+  currentDir,
+  "../../db/migrations/001_initial.sql",
+);
 const migrationVersion = "001_initial";
 
 function splitStatements(source) {
@@ -30,17 +33,27 @@ export async function migrateDatabase({ sql, migrationSource }) {
   const statements = splitStatements(migrationSource);
   await sql.transaction([
     ...statements.map((statement) => sql.query(statement, [])),
-    sql.query("INSERT INTO schema_migrations (version) VALUES ($1)", [migrationVersion]),
+    sql.query("INSERT INTO schema_migrations (version) VALUES ($1)", [
+      migrationVersion,
+    ]),
   ]);
   return { applied: true, version: migrationVersion };
 }
 
 async function main() {
   const migrationSource = await readFile(migrationPath, "utf8");
-  const result = await migrateDatabase({ sql: connectDatabase(), migrationSource });
-  process.stdout.write(`${result.applied ? `Applied Neon migration ${result.version}` : `Neon migration ${result.version} already applied`}\n`);
+  const result = await migrateDatabase({
+    sql: connectDatabase(),
+    migrationSource,
+  });
+  process.stdout.write(
+    `${result.applied ? `Applied Neon migration ${result.version}` : `Neon migration ${result.version} already applied`}\n`,
+  );
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === resolve(process.argv[1])
+) {
   await main();
 }

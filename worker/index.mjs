@@ -159,7 +159,12 @@ export function createWorker({ connect = neon } = {}) {
       } catch {
         return json({ ok: false, error: "invalid_request_url" }, 400);
       }
-      const adminResponse = await handleAdminRequest({ request, url, env, connect });
+      const adminResponse = await handleAdminRequest({
+        request,
+        url,
+        env,
+        connect,
+      });
       if (adminResponse) return adminResponse;
       if (request.method !== "GET")
         return json({ ok: false, error: "method_not_allowed" }, 405);

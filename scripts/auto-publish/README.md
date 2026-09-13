@@ -44,7 +44,7 @@ npm run keywords:auto-publish -- --dry-run
 npm run keywords:auto-publish -- --publish
 ```
 
-`--dry-run`은 전체 ready 후보를 대상으로 글·이미지·게시 계획만 만듭니다. `--publish`는 버전 관리된 `scripts/keyword-system/automation-policy.json`을 확인한 뒤 모든 후보에 대해 글을 생성하고, 메인 이미지 1장과 서브 이미지 1~2장을 생성·삽입합니다. 글·이미지·콘텐츠 계약을 모두 통과한 번들만 published로 전환하고 생성 파일만 커밋·push한 다음 `DEPLOY_HOOK_URL`을 호출합니다. 금융·건강·법률 등 위험 글이나 검사 실패 글은 자동 게시하지 않습니다.
+`--dry-run`은 전체 ready 후보를 대상으로 글·이미지·게시 계획만 만듭니다. `--publish`는 버전 관리된 `scripts/keyword-system/automation-policy.json`을 확인한 뒤 모든 후보에 대해 글을 생성하고, 메인 이미지 1장과 서브 이미지 2~3장을 생성·삽입합니다. 글·이미지·콘텐츠 계약을 모두 통과한 번들만 published로 전환하고 생성 파일만 커밋·push한 다음 `DEPLOY_HOOK_URL`을 호출합니다. 금융·건강·법률 등 위험 글이나 검사 실패 글은 자동 게시하지 않습니다.
 
 ## 1회 설정
 
@@ -125,3 +125,25 @@ npm run image -- --slug 글슬러그 --attach "받은이미지.png"  # 받은 �
 - 1단계 초안: `.planning/prompts/content-writer-prompt.md` · 2단계 윤문: `chatgpt-humanize-prompt.md` · 3단계 검수: `chatgpt-review-prompt.md`
 - 고정 편집 헌법·문체·구조: `.editorial/constitution.md`, `.editorial/style-guide.md`, `.editorial/blueprints/`
 - 페르소나·평가 사례·버전: `.editorial/manifest.json`, `scripts/auto-publish/persona/`, `.editorial/evals/`
+
+## 완성 글 기반 이미지 번들 / 기존 초안 보강
+
+`keywords:draft`와 `auto:write`는 **텍스트 초안**입니다. 단독 `image` 명령도 커버만 다루며 완성 번들을 증명하지 않습니다. 정상 신규 글 경로는 `npm run keywords:auto-publish` (발행 플래그 없음)입니다. 글 작성 전에 시작한 하나의 900초 예산 안에서 저장된 본문 스냅샷, 근거 notes, 메인 1장 + 기본 서브 2장(정책으로 3장), 기계 검사, 독립 90점 심사, 설치를 마칩니다. 첫 실패에서 중단하며, 비발행 모드는 Git을 되돌리지 않고 저장된 텍스트 초안과 keyword handoff를 검토용으로 남깁니다. POSIX 프로세스 그룹 취소가 필요하며 현재 Windows 직접 실행은 fail-closed입니다.
+
+기존 초안은 별도 redraft/키워드 전이 없이 아래 경로만 사용합니다. **현재 복구 개발 단계에서는 실제 실행/생성 금지**이며 아래 설치 명령은 별도의 명시적 운영 승인 후에만 사용합니다.
+
+```sh
+# 승인자가 직접 준비한 목록으로 읽기 전용 계획/해시/기계 검사
+node scripts/keyword-system/image-backfill.mjs --approved out/keyword-recovery/approved-images.json --dry-run
+# 아래 명령은 이 개발 작업에서 실행하지 않음: 승인된 실제 생성/설치
+node scripts/keyword-system/image-backfill.mjs --approved out/keyword-recovery/approved-images.json
+# 서브 3장을 명시하려면 두 명령 모두 --sub-count 3 사용
+```
+
+목록은 `{ "posts": [{ "path": "src/content/posts/slug.md", "sha256": "원본64자리SHA256", "notesPath": "out/keyword-briefs/원자료.md", "notesSha256": "원자료64자리SHA256", "format": "how-to" }] }` 형식입니다. 경로/해시는 승인자가 실제 파일에서 확인해야 하며 예시 값을 사용하면 거부됩니다. 1~15개 명시적 초안만 허용합니다. notes 경로와 해시는 함께 제공해야 합니다. `out/keyword-briefs` 또는 `out/keyword-recovery`의 검증된 일반 파일만 읽으며, JSON 브리프는 기존 canonical normalize/render 계약을 재사용합니다. 동일한 스냅샷 notes가 기계 검사와 독립 심사에 전달됩니다. notes가 없으면 실제 검사를 그대로 수행하며 실패를 면제하지 않습니다.
+
+본문 중앙 논지와 서로 다른 섹션 원문/오프셋/앵커가 `out/image-bundles/<slug>/plan.json`에 보존됩니다. 설치 PNG는 실제 디코딩, 20MB/40MP 이하, 각 변 16~8192 픽셀 검사를 통과해야 합니다. 삽입은 AI 일러스트임을 명시하며 실제 UI 스크린샷을 만들었다고 주장하지 않습니다. 누락된 screenshot/placeholder 임베드는 원문 문법·설명을 provenance에 남기고 독자에게 보이는 실제 화면 확인 의무로 바꿉니다. 코드 예제와 확인 마커는 삭제하지 않습니다.
+
+명백한 **말미의 구조화된 윤문 리포트**만 공통 `scripts/lib/generated-report.mjs` 계약으로 분리합니다. 경계·필드·변경 건수·자체검증 구조가 정확해야 하며 모호하거나 검증 마커가 들어 있으면 중단합니다. 원문/위치/원본 및 후보 해시를 보존하고, 일반 본문·백분율·코드 예제는 그대로 둡니다. 작성 경로는 raw humanizer 출력과 별도 report JSON을 저장하고, 이미지 경로는 immutable source/plan에 보관합니다. **두 실제 품질 게이트 전에** 분리하며 리포트를 근거 notes에 섞지 않습니다. 기존 실패 리포트/92점 중간 심사는 소급해서 통과가 되지 않습니다.
+
+최종 후보 해시·기계 결과·독립 원문 심사는 `quality.json`, `judge.md`에 기록됩니다. 실패 기록과 직전 시도 산출물은 `history/`에 보존합니다. `transaction.json`은 독점 잠금, 소유 자산, 원본/최종 해시를 결합합니다. 정상 재실행은 검증된 완료 번들만 무생성 no-op입니다. 준비 중 충돌 없는 실패는 소유 파일만 복구하지만 외부 수정·불명확한 crash 상태는 자동 덮어쓰기 없이 수동 검토를 요구합니다. 출판/DB sync/Git staging/커밋/배포는 backfill에 없습니다. 이미지 생성 성공도 사람의 시각·문구·출판 검토를 대체하지 않습니다.

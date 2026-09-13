@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildKeywordRow, buildPostRow, buildSyncQueries, collectSyncRows } from "./sync.mjs";
+import {
+  buildKeywordRow,
+  buildPostRow,
+  buildSyncQueries,
+  collectSyncRows,
+} from "./sync.mjs";
 
 const draft = `---
 title: "Neon sync test"
@@ -42,8 +47,32 @@ test("converts a Markdown post into a database row", () => {
 
 test("builds parameterized upsert queries for keywords and posts", () => {
   const queries = buildSyncQueries(
-    [{ recordKey: "key", category: "ai", headKeyword: "AI", status: "ready-to-write", collectedAt: "2026-09-11T00:00:00.000Z", payload: "{}" }],
-    [{ slug: "post", title: "Title", description: "Description", pubDate: "2026-09-11", publishAt: null, status: "draft", topic: "ai", angle: "Angle", author: "Author", bodyMarkdown: "Body", contentHash: "hash", payload: "{}" }],
+    [
+      {
+        recordKey: "key",
+        category: "ai",
+        headKeyword: "AI",
+        status: "ready-to-write",
+        collectedAt: "2026-09-11T00:00:00.000Z",
+        payload: "{}",
+      },
+    ],
+    [
+      {
+        slug: "post",
+        title: "Title",
+        description: "Description",
+        pubDate: "2026-09-11",
+        publishAt: null,
+        status: "draft",
+        topic: "ai",
+        angle: "Angle",
+        author: "Author",
+        bodyMarkdown: "Body",
+        contentHash: "hash",
+        payload: "{}",
+      },
+    ],
     { query: (text, values) => ({ text, values }) },
   );
 

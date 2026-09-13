@@ -72,9 +72,7 @@ export function parseArgs(argv = []) {
 }
 
 function hashDiscoveryResponse(response) {
-  return createHash("sha256")
-    .update(JSON.stringify(response))
-    .digest("hex");
+  return createHash("sha256").update(JSON.stringify(response)).digest("hex");
 }
 
 function providerFor(args) {
@@ -113,7 +111,10 @@ async function discoverFromNaver(args) {
     const topics = extractTopicCandidates(
       { ...categoryQuery, response },
       { limit: args.maxCandidates },
-    ).map((topic) => ({ ...topic, discovery_response_sha256: discoveryResponseSha256 }));
+    ).map((topic) => ({
+      ...topic,
+      discovery_response_sha256: discoveryResponseSha256,
+    }));
     if (topics.length === 0)
       fail(
         `NAVER returned no usable topic candidates for ${categoryQuery.category}`,

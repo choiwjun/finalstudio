@@ -23,7 +23,7 @@
 ## 2. 기술 스택 (마지막 확인 버전)
 
 | 구성 | 버전 | 비고 |
-|---|---|---|
+| --- | --- | --- |
 | Node.js | v24.19.0 | |
 | Astro | 7.3.1 | 콘텐츠 레이어(glob loader), 정적 빌드 |
 | Codex CLI | 0.153.4 | `npm install -g @openai/codex` — ChatGPT 구독 OAuth 엔진 |
@@ -77,7 +77,7 @@
 ### 블로그 본체
 
 | 경로 | 역할 |
-|---|---|
+| --- | --- |
 | `src/content.config.ts` | 글 스키마(Zod). 필드: title, description, pubDate, publishAt, status(draft/scheduled/published), topic(자유 문자열 카테고리), angle, author, sourceIds, testedAt, toolVersions, aiAssisted, canonical, **image**(2026-09 추가) |
 | `src/content/posts/*.md` | 글 원본 (Markdown + frontmatter). 현재: `excel-linked-picture.md`(첫 실전 초안), `sample-draft.md`(템플릿 샘플) |
 | `src/lib/posts.ts` | 공개 글 판정: `isPublicPost` — published는 publishAt≤now, scheduled는 publishAt≤now일 때 공개 |
@@ -90,7 +90,7 @@
 ### 자동화·스크립트
 
 | 경로 | 역할 |
-|---|---|
+| --- | --- |
 | `scripts/auto-publish/auto-write.mjs` | **자동화 코어** — Codex OAuth로 1~4단계 한 줄 실행. 캘린더 모드, --input, --from-final. 재검수 후 수정본을 유지하고 `pubDate`를 변환한다. |
 | `scripts/auto-publish/convert-post.mjs` | ChatGPT 출력 → 우리 스키마 변환. `status: draft`·`aiAssisted: true` 강제, 스키마 밖 필드(coverImage/tags) 제거, 마커·FAQ·"안 될 때" 존재 경고 |
 | `scripts/auto-publish/generate-image.mjs` | 썸네일 생성 (Codex `$imagegen` / ChatGPT Images 수동 프롬프트 / --attach 등록) |
@@ -106,7 +106,7 @@
 ### 프롬프트·브랜드 (ChatGPT에 붙여넣는 것들)
 
 | 경로 | 역할 |
-|---|---|
+| --- | --- |
 | `BRAND.md` (루트) | 브랜드 컨텍스트: 주제 범위, YMYL 하드 블록, 발행 리듬, 탭 프레이즈 금지 목록 |
 | `VOICE.md` (루트) | 문체 계약: 해요체, 소제목 첫 문장=답(AEO), GEO 계약, **마커 절대 보존**, 제목 프레임 3종, 스캔 밀도 |
 | `.planning/prompts/content-writer-prompt.md` | 1단계 초안 페르소나 (v3 — 11개 섹션, 윤문·검수 필수 지정) |
@@ -118,7 +118,7 @@
 ### CI·환경
 
 | 경로 | 역할 |
-|---|---|
+| --- | --- |
 | `.github/workflows/quality.yml` | PR/push → check:content + build + check:build. 초안 생성은 로컬 Codex OAuth에서 수행 |
 | `.github/workflows/scheduled-publish.yml` | 15분마다 콘텐츠 계약·빌드 검증 후 `DEPLOY_HOOK_URL`이 있으면 정적 호스팅 재빌드 요청. 예약 공개에는 호스팅 Deploy Hook 설정 필요 |
 | `.env.example` | 환경변수 문서 (§9) |
@@ -166,6 +166,7 @@ npm run auto:write "주제" --topic t --best-of 2               # 초안 2개 �
 ### e. 발행 게이트 (기계 강제 — 사람 편의가 아닌 정책)
 
 `scripts/lib/content-contract.mjs`가 관리 서버·체커가 공유하는 단일 구현:
+
 - 공개(status != draft) 글: **공백 제외 본문 1,500자 이상** + `testedAt`(실제 테스트 날짜) + 실명 `author`(정확히 `TBD`만 차단 — "테스터" 같은 임시명은 기계가 못 잡으므로 **사람 체크리스트**로 관리) + **검증 마커 잔존 0건**(`[직접 확인 필요]`·`[출처 URL 확인 필요]`·`[테스트 필요 ...]`·`[스크린샷 ...]`이 하나라도 남으면 발행 차단 — draft는 자유). 마커 게이트는 2026-09-05 2차 리뷰에서 추가, 같은 리뷰에서 출처 URL 마커 누락을 보강했다.
 - `toolVersions`·`sourceIds`는 게이트가 검사하지 않는다 — **사람 체크리스트**에서 필수 요구.
 - `scheduled`는 `publishAt` 필수. `pubDate`가 미래면 글 페이지는 noindex로 보호.
@@ -176,7 +177,7 @@ npm run auto:write "주제" --topic t --best-of 2               # 초안 2개 �
 > 두 클론 모두 `tools/` 아래 **참고 자료**로만 보관(gitignore — 커밋 안 됨). 런타임 의존성이 아니다.
 
 | 출처 | 가져온 것 | 커스텀 방식 |
-|---|---|---|
+| --- | --- | --- |
 | **epoko77-ai/im-not-ai** (GitHub) | 한국어 AI 티 제거 규칙 — `skills/humanize-korean/references/quick-rules.md`, `agents/humanize-monolith.md` | 카테고리 A~J 패턴 + 과윤문 가드 + Do-NOT 목록을 `.planning/prompts/chatgpt-humanize-prompt.md`로 재편해 2단계 필수 게이트에 이식 |
 | **AgriciDaniel/claude-blog** (GitHub) | 품질 스코어링 — `skills/blog/references/quality-scoring.md`(100점 루브릭), `skills/blog-write/SKILL.md`(frontmatter 스펙), `skills/blog-brand/SKILL.md`, 자동발행 아이디어 | 루브릭을 우리 브랜드 기준으로 재조정(콘텐츠30/SEO25/E-E-A-T15/AEO15/GEO15, 치명적 결함 목록에 YMYL·마커·분량 추가). 관리자 페이지 "자동 글발행" 메뉴 + draft 강제 변환기로 재구현. 대용 CLI가 아닌 "필요한 로직만 이식" 전략 — Claude Code 구독 없이 ChatGPT로 동작하도록 |
 
@@ -199,6 +200,7 @@ npm run auto:write "주제" --topic t --best-of 2               # 초안 2개 �
 ## 8. 일상 운영 매뉴얼 (주간 리듬)
 
 **첫 설정 (한 번)**:
+
 ```bash
 npm install
 npm install -g @openai/codex
@@ -207,6 +209,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 ```
 
 **주간 흐름 (권장: 주 3~5편, 고정 시간 발행)**:
+
 1. 대기열 확인: `scripts/auto-publish/calendar.md` (시리즈 단위로 채워둔다)
 2. 초안 생성: `npm run auto:write --calendar scripts/auto-publish/calendar.md`
 3. (선택) 썸네일: `npm run image -- --slug <슬러그>` — 키 없으면 출력된 프롬프트로 ChatGPT에서 생성 후 `--attach`
@@ -220,7 +223,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 ## 9. 환경변수 & 비용 구조
 
 | 변수 | 기본 | 설명 |
-|---|---|---|
+| --- | --- | --- |
 | `AUTO_ENGINE` | codex | ChatGPT OAuth Codex 엔진 고정 |
 | `CODEX_MODEL` | (플랜 기본) | Codex 모델 선택(선택) |
 | `AUTO_MAX_PASSES` | 2 | 검수 최대 라운드 |
@@ -232,7 +235,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 ## 10. 알려진 이슈·트러블슈팅 (Windows 특이점 포함)
 
 | 증상 | 원인 | 해결 |
-|---|---|---|
+| --- | --- | --- |
 | 관리자에서 글 수정했는데 블로그에 반영 안 됨 | 개발 서버가 콘텐츠를 감시하지 않음 | `npm run admin`으로 감독 모드 사용. 이미 떠 있으면 정상(변경마다 자동 재시작) |
 | `EADDRINUSE 4322` | npm 래퍼 종료 후 node 고아 프로세스 잔존 | `netstat -ano \| grep LISTENING`으로 PID 찾고 `taskkill //PID <pid> //T //F` |
 | codex 엔진이 codex를 못 찾음 | Windows .cmd 셔미는 spawn으로 직접 실행 불가하거나 standalone 경로가 다름 | 스크립트가 Windows JS 진입점을 우선 사용하고, 그 외에는 PATH의 `codex` standalone 실행 파일을 찾음 |
@@ -271,6 +274,7 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 동기화 자체(서버 측 콘텐츠 반영)는 실측상 정상이었고, 위 세 건은 클라이언트·계약·대기열 층의 결함이었다.
 
 **2차 리뷰 후 실측으로 확인한 것 (2026-09-05)**:
+
 - 위 3건 수정 완료. 마커 게이트 4시나리오 실측: 마커 없는 공개 글 통과 / 마커 남은 공개 글 차단(남은 마커 명시) / 분량 미달 차단 / 마커 있는 초안은 자유 통과
 - `node --check` — auto-write.mjs·content-contract.mjs 통과
 - `npm run check:content` — 통과 (3개 파일)
@@ -283,5 +287,6 @@ npm run admin      # 관리 서버(4322) + 개발 서버(4321) 기동 → http:/
 - 이번 수정 후 정적 검증: auto-write/generate-image `node --check` 통과, `npm run check:content` 통과, `npm run build`와 `npm run check:build` 통과. WSL(`/mnt/c`)에서도 현재 설치된 Linux 바인딩으로 빌드가 완료됐다.
 
 **아직 실측하지 못한 것 (거짓말 방지 목록)**:
+
 - 관리자 자동 새로고침의 브라우저 실측(다음 저장 시 눈으로 확인할 것), 실제 배포
 - 예약 발행의 실제 호스팅 공개(호스팅 선택·Deploy Hook secret 등록 전)

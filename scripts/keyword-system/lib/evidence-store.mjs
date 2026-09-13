@@ -1,13 +1,17 @@
-import { link, mkdir, rename, rm, writeFile } from 'node:fs/promises';
-import { randomBytes } from 'node:crypto';
-import { basename, dirname, join, resolve } from 'node:path';
-import { normalizeRawEvidenceEnvelope } from './contracts.mjs';
-import { directoryFdPath, openVerifiedDirectory, openVerifiedNestedDirectory } from './file-lock.mjs';
+import { link, mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { basename, dirname, join, resolve } from "node:path";
+import { normalizeRawEvidenceEnvelope } from "./contracts.mjs";
+import {
+  directoryFdPath,
+  openVerifiedDirectory,
+  openVerifiedNestedDirectory,
+} from "./file-lock.mjs";
 
 export const RUN_ID_PATTERN = /^\d{8}T\d{6}Z-[0-9a-f]{8}$/u;
 
 const ISO_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u;
-const DEFAULT_SAFE_KEY = 'keyword';
+const DEFAULT_SAFE_KEY = "keyword";
 const MAX_SAFE_KEY_LENGTH = 120;
 
 // Representative HTTP status used when a failure has no transport-level status.
@@ -29,29 +33,35 @@ const KIND_STATUS = Object.freeze({
 export class EvidenceStoreError extends TypeError {
   constructor(message) {
     super(message);
-    this.name = 'EvidenceStoreError';
-    this.code = 'EVIDENCE_STORE';
+    this.name = "EvidenceStoreError";
+    this.code = "EVIDENCE_STORE";
   }
 }
 
-const fail = (message) => { throw new EvidenceStoreError(message); };
+const fail = (message) => {
+  throw new EvidenceStoreError(message);
+};
 
 export function isCanonicalRunId(runId) {
-  if (typeof runId !== 'string' || !RUN_ID_PATTERN.test(runId)) return false;
+  if (typeof runId !== "string" || !RUN_ID_PATTERN.test(runId)) return false;
   const timestamp = `${runId.slice(0, 4)}-${runId.slice(4, 6)}-${runId.slice(6, 8)}T${runId.slice(9, 11)}:${runId.slice(11, 13)}:${runId.slice(13, 15)}Z`;
   return isRealUtcDateTime(timestamp);
 }
 
 function assertRunId(runId) {
   if (!isCanonicalRunId(runId)) {
-    fail(`runId must match a canonical UTC timestamp and lowercase hex suffix; received ${JSON.stringify(runId)}`);
+    fail(
+      `runId must match a canonical UTC timestamp and lowercase hex suffix; received ${JSON.stringify(runId)}`,
+    );
   }
   return runId;
 }
 
 /** Resolve the raw evidence root; defaults to <cwd>/data/keywords/raw. */
 export function resolveRawRoot(rootDir) {
-  return rootDir === undefined || rootDir === null ? resolve(process.cwd(), 'data', 'keywords', 'raw') : resolve(rootDir);
+  return rootDir === undefined || rootDir === null
+    ? resolve(process.cwd(), "data", "keywords", "raw")
+    : resolve(rootDir);
 }
 
 /**
@@ -60,10 +70,12 @@ export function resolveRawRoot(rootDir) {
  * the empty, '.', or '..' segment to reach the filesystem.
  */
 export function sanitizePathSegment(value) {
-  const cleaned = String(value ?? '')
-    .normalize('NFC')
-    .replace(/[\\/\u0000-\u001f\u007f]/gu, '');
-  return cleaned === '' || cleaned === '.' || cleaned === '..' ? 'segment' : cleaned;
+  const cleaned = String(value ?? "")
+    .normalize("NFC")
+    .replace(/[\\/\u0000-\u001f\u007f]/gu, "");
+  return cleaned === "" || cleaned === "." || cleaned === ".."
+    ? "segment"
+    : cleaned;
 }
 
 /**
@@ -73,17 +85,19 @@ export function sanitizePathSegment(value) {
  * truncated so the total filename component stays within filesystem limits.
  */
 export function slugifySafeKey(keyword) {
-  const text = String(keyword ?? '').normalize('NFC');
-  let slug = '';
+  const text = String(keyword ?? "").normalize("NFC");
+  let slug = "";
   for (const character of text) {
     if (/[\p{L}\p{N}]/u.test(character)) {
       slug += character;
-    } else if (!slug.endsWith('-')) {
-      slug += '-';
+    } else if (!slug.endsWith("-")) {
+      slug += "-";
     }
   }
-  const trimmed = slug.replace(/^-+|-+$/gu, '');
-  const bounded = [...(trimmed || DEFAULT_SAFE_KEY)].slice(0, MAX_SAFE_KEY_LENGTH).join('');
+  const trimmed = slug.replace(/^-+|-+$/gu, "");
+  const bounded = [...(trimmed || DEFAULT_SAFE_KEY)]
+    .slice(0, MAX_SAFE_KEY_LENGTH)
+    .join("");
   return bounded || DEFAULT_SAFE_KEY;
 }
 
@@ -92,22 +106,40 @@ export function slugifySafeKey(keyword) {
  * normalized request: the blog query, or the first trend keyword group name.
  */
 export function deriveSafeKey(source, request) {
-  if (source === 'naver-api-hub-blog') {
-    return typeof request?.query === 'string' && request.query.trim() !== '' ? request.query : DEFAULT_SAFE_KEY;
+  if (source === "naver-api-hub-blog") {
+    return typeof request?.query === "string" && request.query.trim() !== ""
+      ? request.query
+      : DEFAULT_SAFE_KEY;
   }
-  if (source === 'naver-api-hub-trend') {
-    const firstGroup = Array.isArray(request?.keywordGroups) ? request.keywordGroups[0] : undefined;
-    const groupName = firstGroup && typeof firstGroup.groupName === 'string' ? firstGroup.groupName.trim() : '';
-    if (groupName !== '') return groupName;
-    const firstKeyword = firstGroup && Array.isArray(firstGroup.keywords) ? firstGroup.keywords[0] : undefined;
-    return typeof firstKeyword === 'string' && firstKeyword.trim() !== '' ? firstKeyword : DEFAULT_SAFE_KEY;
+  if (source === "naver-api-hub-trend") {
+    const firstGroup = Array.isArray(request?.keywordGroups)
+      ? request.keywordGroups[0]
+      : undefined;
+    const groupName =
+      firstGroup && typeof firstGroup.groupName === "string"
+        ? firstGroup.groupName.trim()
+        : "";
+    if (groupName !== "") return groupName;
+    const firstKeyword =
+      firstGroup && Array.isArray(firstGroup.keywords)
+        ? firstGroup.keywords[0]
+        : undefined;
+    return typeof firstKeyword === "string" && firstKeyword.trim() !== ""
+      ? firstKeyword
+      : DEFAULT_SAFE_KEY;
   }
   return DEFAULT_SAFE_KEY;
 }
 
 /** UTC run-id: YYYYMMDDTHHMMSSZ-<8-char-random> with injectable clock/random. */
-export function makeRunId({ clock = () => new Date(), random = () => randomBytes(4).toString('hex') } = {}) {
-  const stamp = new Date(clock().getTime()).toISOString().replace(/[-:]/gu, '').replace(/\.\d{3}/u, '');
+export function makeRunId({
+  clock = () => new Date(),
+  random = () => randomBytes(4).toString("hex"),
+} = {}) {
+  const stamp = new Date(clock().getTime())
+    .toISOString()
+    .replace(/[-:]/gu, "")
+    .replace(/\.\d{3}/u, "");
   const runId = `${stamp}-${random()}`;
   assertRunId(runId);
   return runId;
@@ -130,12 +162,16 @@ export function stableSerialize(value) {
  */
 export async function writeStableJson(filePath, value, options = {}) {
   const file = resolve(filePath);
-  const installFile = typeof options.installPath === 'string' ? options.installPath : file;
+  const installFile =
+    typeof options.installPath === "string" ? options.installPath : file;
   const text = stableSerialize(value);
   await mkdir(dirname(installFile), { recursive: true });
-  const temporary = join(dirname(installFile), `.${basename(installFile)}.${randomBytes(6).toString('hex')}.tmp`);
+  const temporary = join(
+    dirname(installFile),
+    `.${basename(installFile)}.${randomBytes(6).toString("hex")}.tmp`,
+  );
   try {
-    await writeFile(temporary, text, 'utf8');
+    await writeFile(temporary, text, "utf8");
     if (options.exclusive === true) {
       // A hard-link install is atomic and, unlike rename, never replaces an
       // existing target. Both files are in the same directory/filesystem.
@@ -155,14 +191,22 @@ function isRealUtcDateTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return false;
   const canonical = date.toISOString();
-  const expected = value.includes('.') ? canonical : canonical.replace('.000Z', 'Z');
+  const expected = value.includes(".")
+    ? canonical
+    : canonical.replace(".000Z", "Z");
   return expected === value;
 }
 
 export function evidenceRelativePath({ collectedAt, runId, source, safeKey }) {
   assertRunId(runId);
-  if (typeof collectedAt !== 'string' || !ISO_UTC_PATTERN.test(collectedAt) || !isRealUtcDateTime(collectedAt)) {
-    fail(`collectedAt must be a real ISO UTC date-time; received ${JSON.stringify(collectedAt)}`);
+  if (
+    typeof collectedAt !== "string" ||
+    !ISO_UTC_PATTERN.test(collectedAt) ||
+    !isRealUtcDateTime(collectedAt)
+  ) {
+    fail(
+      `collectedAt must be a real ISO UTC date-time; received ${JSON.stringify(collectedAt)}`,
+    );
   }
   const year = collectedAt.slice(0, 4);
   const month = collectedAt.slice(5, 7);
@@ -177,19 +221,33 @@ export function evidenceRelativePath({ collectedAt, runId, source, safeKey }) {
  * contract normalizer rejects credential-bearing keys, redacts credential
  * values, and enforces the failure variant (ok:false, error, no response).
  */
-export function buildFailureEnvelope({ source, endpoint, method, request, http, error, collectedAt, redactValues }) {
-  const requestedStatus = Number.isInteger(http?.status) ? http.status : KIND_STATUS[error?.kind] ?? 0;
-  return normalizeRawEvidenceEnvelope({
-    schema_version: 1,
-    provider: 'naver-api-hub',
-    source,
-    endpoint,
-    method,
-    request,
-    collected_at: collectedAt,
-    http: { status: requestedStatus, ok: false },
-    error,
-  }, { redactValues });
+export function buildFailureEnvelope({
+  source,
+  endpoint,
+  method,
+  request,
+  http,
+  error,
+  collectedAt,
+  redactValues,
+}) {
+  const requestedStatus = Number.isInteger(http?.status)
+    ? http.status
+    : (KIND_STATUS[error?.kind] ?? 0);
+  return normalizeRawEvidenceEnvelope(
+    {
+      schema_version: 1,
+      provider: "naver-api-hub",
+      source,
+      endpoint,
+      method,
+      request,
+      collected_at: collectedAt,
+      http: { status: requestedStatus, ok: false },
+      error,
+    },
+    { redactValues },
+  );
 }
 
 /** Evidence index entry linking a persisted envelope to its traceable path. */
@@ -203,18 +261,31 @@ export function makeEvidenceIndexEntry({ envelope, path, runId }) {
     method: envelope.method,
     collected_at: envelope.collected_at,
     http: { status: envelope.http.status, ok: envelope.http.ok },
-    outcome: failed ? 'failure' : 'success',
+    outcome: failed ? "failure" : "success",
   };
   if (failed) entry.error_kind = envelope.error.kind;
   entry.path = String(path);
   return entry;
 }
 
-async function persist({ source, endpoint, method, request, response, error, http, collectedAt, runId, rootDir, redactValues, safeKey: safeKeyOverride }) {
+async function persist({
+  source,
+  endpoint,
+  method,
+  request,
+  response,
+  error,
+  http,
+  collectedAt,
+  runId,
+  rootDir,
+  redactValues,
+  safeKey: safeKeyOverride,
+}) {
   assertRunId(runId);
   const envelopeInput = {
     schema_version: 1,
-    provider: 'naver-api-hub',
+    provider: "naver-api-hub",
     source,
     endpoint,
     method,
@@ -229,11 +300,14 @@ async function persist({ source, endpoint, method, request, response, error, htt
   }
   // Normalizing first means invalid, empty, malformed, or secret-bearing
   // evidence throws before any directory or file is created.
-  const envelope = normalizeRawEvidenceEnvelope(envelopeInput, { redactValues });
+  const envelope = normalizeRawEvidenceEnvelope(envelopeInput, {
+    redactValues,
+  });
   const root = resolveRawRoot(rootDir);
-  const safeKey = typeof safeKeyOverride === 'string' && safeKeyOverride.trim() !== ''
-    ? safeKeyOverride
-    : deriveSafeKey(envelope.source, envelope.request);
+  const safeKey =
+    typeof safeKeyOverride === "string" && safeKeyOverride.trim() !== ""
+      ? safeKeyOverride
+      : deriveSafeKey(envelope.source, envelope.request);
   const relativePath = evidenceRelativePath({
     collectedAt: envelope.collected_at,
     runId,
@@ -244,13 +318,24 @@ async function persist({ source, endpoint, method, request, response, error, htt
   const rootHandle = await openVerifiedDirectory(root);
   let nested;
   try {
-    nested = await openVerifiedNestedDirectory(rootHandle, dirname(relativePath));
-    await writeStableJson(filePath, envelope, { exclusive: true, installPath: join(directoryFdPath(nested.handle), basename(relativePath)) });
+    nested = await openVerifiedNestedDirectory(
+      rootHandle,
+      dirname(relativePath),
+    );
+    await writeStableJson(filePath, envelope, {
+      exclusive: true,
+      installPath: join(directoryFdPath(nested.handle), basename(relativePath)),
+    });
   } finally {
-    for (const handle of nested?.owned ?? []) await handle.close().catch(() => {});
+    for (const handle of nested?.owned ?? [])
+      await handle.close().catch(() => {});
     await rootHandle.close().catch(() => {});
   }
-  const indexEntry = makeEvidenceIndexEntry({ envelope, path: filePath, runId });
+  const indexEntry = makeEvidenceIndexEntry({
+    envelope,
+    path: filePath,
+    runId,
+  });
   return { path: filePath, envelope, indexEntry };
 }
 
@@ -261,7 +346,8 @@ async function persist({ source, endpoint, method, request, response, error, htt
  * failure envelope path and requires an error.
  */
 export async function writeEvidence(input) {
-  if (input === null || typeof input !== 'object') fail('evidence input must be an object');
+  if (input === null || typeof input !== "object")
+    fail("evidence input must be an object");
   return persist(input);
 }
 
@@ -269,7 +355,8 @@ export async function writeEvidence(input) {
 export async function writeFailureEvidence({ http, redactValues, ...rest }) {
   const status = http?.status;
   const errorKind = rest?.error?.kind;
-  const resolvedStatus = status === undefined ? KIND_STATUS[errorKind] ?? 0 : status;
+  const resolvedStatus =
+    status === undefined ? (KIND_STATUS[errorKind] ?? 0) : status;
   return persist({
     ...rest,
     http: { status: resolvedStatus, ok: false },

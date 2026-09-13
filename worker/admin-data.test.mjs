@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { adminKeywordRow, adminPostRow, validateAdminPost } from "./admin-data.mjs";
+import {
+  adminKeywordRow,
+  adminPostRow,
+  validateAdminPost,
+} from "./admin-data.mjs";
 
 const validDraft = {
   slug: "new-draft",
@@ -24,14 +28,38 @@ test("validates and normalizes a draft post", () => {
 });
 
 test("requires the publication gates for non-drafts", () => {
-  assert.throws(() => validateAdminPost({ ...validDraft, status: "published" }), /testedAt and a real author/);
-  assert.throws(() => validateAdminPost({ ...validDraft, status: "scheduled", publishAt: null }), /publishAt/);
+  assert.throws(
+    () => validateAdminPost({ ...validDraft, status: "published" }),
+    /testedAt and a real author/,
+  );
+  assert.throws(
+    () =>
+      validateAdminPost({
+        ...validDraft,
+        status: "scheduled",
+        publishAt: null,
+      }),
+    /publishAt/,
+  );
 });
 
 test("rejects unsafe or malformed post input", () => {
-  assert.throws(() => validateAdminPost({ ...validDraft, slug: "../secret" }), /slug/);
-  assert.throws(() => validateAdminPost({ ...validDraft, pubDate: "tomorrow" }), /pubDate/);
-  assert.throws(() => validateAdminPost({ ...validDraft, bodyMarkdown: "" }), /bodyMarkdown/);
+  assert.throws(
+    () => validateAdminPost({ ...validDraft, topic: "productivity" }),
+    /topic must be economy-business, ai, or travel/,
+  );
+  assert.throws(
+    () => validateAdminPost({ ...validDraft, slug: "../secret" }),
+    /slug/,
+  );
+  assert.throws(
+    () => validateAdminPost({ ...validDraft, pubDate: "tomorrow" }),
+    /pubDate/,
+  );
+  assert.throws(
+    () => validateAdminPost({ ...validDraft, bodyMarkdown: "" }),
+    /bodyMarkdown/,
+  );
 });
 
 test("maps database rows for the admin UI", () => {

@@ -109,6 +109,7 @@ test("builds an approved bridge command without manual per-keyword fields", () =
   const args = buildPersonaBatchDraftArgs(
     {
       briefPath: "/repo/out/keyword-briefs/ai-topic.json",
+      slug: "ai-topic-1234567890",
       reviewer: "wj-editor persona batch",
       reason: "근거 연결 상태를 확인했습니다.",
       angle: "버전과 확인 범위를 기준으로 정리합니다.",
@@ -138,6 +139,8 @@ test("builds an approved bridge command without manual per-keyword fields", () =
     "근거 연결 상태를 확인했습니다.",
     "--angle",
     "버전과 확인 범위를 기준으로 정리합니다.",
+    "--slug",
+    "ai-topic-1234567890",
     "--format",
     "how-to",
     "--brief-sha256",
@@ -182,15 +185,23 @@ function integrationBrief() {
     outline: ["문제", "절차"],
     review_gate: "사람 검토 필요; 자동 작성·예약·발행 금지",
     evidence: {
-      blog: [{ title: "근거", description: "설명", collected_at: "2026-09-11T00:00:00.000Z" }],
-      trend: [{
-        group_name: "선정 키워드",
-        latest_period: "2026-09-11",
-        latest_ratio: 10,
-        max_ratio: 20,
-        ratio_note: "상대 지표이며 절대 검색량이 아님",
-        collected_at: "2026-09-11T00:00:00.000Z",
-      }],
+      blog: [
+        {
+          title: "근거",
+          description: "설명",
+          collected_at: "2026-09-11T00:00:00.000Z",
+        },
+      ],
+      trend: [
+        {
+          group_name: "선정 키워드",
+          latest_period: "2026-09-11",
+          latest_ratio: 10,
+          max_ratio: 20,
+          ratio_note: "상대 지표이며 절대 검색량이 아님",
+          collected_at: "2026-09-11T00:00:00.000Z",
+        },
+      ],
     },
   };
 }
@@ -202,14 +213,20 @@ async function makeBatchWorkspace() {
   await mkdir(dataDir, { recursive: true });
   await mkdir(briefDir, { recursive: true });
   await mkdir(join(root, ".editorial"), { recursive: true });
-  await writeFile(join(root, ".editorial/manifest.json"), JSON.stringify({
-    defaultPersona: "wj-editor",
-    modules: { personas: { "wj-editor": "persona.json" } },
-  }));
-  await writeFile(join(root, "persona.json"), JSON.stringify({
-    name: "wj-editor",
-    style: { default_article_format: "how-to" },
-  }));
+  await writeFile(
+    join(root, ".editorial/manifest.json"),
+    JSON.stringify({
+      defaultPersona: "wj-editor",
+      modules: { personas: { "wj-editor": "persona.json" } },
+    }),
+  );
+  await writeFile(
+    join(root, "persona.json"),
+    JSON.stringify({
+      name: "wj-editor",
+      style: { default_article_format: "how-to" },
+    }),
+  );
   const record = makeValidRecord({
     category: "ai",
     head_keyword: "선정 키워드",
@@ -217,10 +234,16 @@ async function makeBatchWorkspace() {
   });
   const recordsPath = join(dataDir, "records.json");
   await writeFile(recordsPath, `${JSON.stringify([record])}\n`);
-  await writeReadyToWriteExport([record], { path: join(dataDir, "ready-to-write.json"), recordsPath });
-  await writeFile(join(dataDir, "automatic-discovery.json"), JSON.stringify({
-    categories: [{ category: "ai", candidates: [{ topic: "선정 키워드" }] }],
-  }));
+  await writeReadyToWriteExport([record], {
+    path: join(dataDir, "ready-to-write.json"),
+    recordsPath,
+  });
+  await writeFile(
+    join(dataDir, "automatic-discovery.json"),
+    JSON.stringify({
+      categories: [{ category: "ai", candidates: [{ topic: "선정 키워드" }] }],
+    }),
+  );
   const briefPath = join(briefDir, "ai-선정-키워드.json");
   await writeFile(briefPath, `${JSON.stringify(integrationBrief())}\n`);
   return root;
@@ -240,18 +263,30 @@ test("persona batch dry-run never calls the writer and actual execution requires
   });
   assert.equal(dryRun.plan.length, 1);
   assert.equal(calls, 0);
-  assert.equal(JSON.parse(await readFile(join(root, "out/keyword-batch/latest.json"), "utf8")).mode, "dry-run");
+  assert.equal(
+    JSON.parse(
+      await readFile(join(root, "out/keyword-batch/latest.json"), "utf8"),
+    ).mode,
+    "dry-run",
+  );
 
   await assert.rejects(
-    () => personaBatchMain([], { repositoryRoot: root, runDraft: async () => ({ status: "written" }) }),
+    () =>
+      personaBatchMain([], {
+        repositoryRoot: root,
+        runDraft: async () => ({ status: "written" }),
+      }),
     /batch approval/iu,
   );
   await personaBatchMain(
     [
       "--approve-batch",
-      "--reviewer", "운영자",
-      "--reason", "배치 전체 근거와 작성 방향을 확인함",
-      "--angle", "근거와 확인 범위를 중심으로 정리함",
+      "--reviewer",
+      "운영자",
+      "--reason",
+      "배치 전체 근거와 작성 방향을 확인함",
+      "--angle",
+      "근거와 확인 범위를 중심으로 정리함",
     ],
     {
       repositoryRoot: root,
@@ -270,7 +305,10 @@ test("persona batch rejects a manifest directory outside the repository output b
   t.after(() => rm(root, { recursive: true, force: true }));
 
   await assert.rejects(
-    () => personaBatchMain(["--dry-run", "--batch-dir", "/tmp/outside-batch"], { repositoryRoot: root }),
+    () =>
+      personaBatchMain(["--dry-run", "--batch-dir", "/tmp/outside-batch"], {
+        repositoryRoot: root,
+      }),
     /remain inside its root/iu,
   );
 });

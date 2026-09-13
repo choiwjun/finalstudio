@@ -182,10 +182,7 @@ test("draft bridge requires approval and records the writer handoff after draft 
   );
   assert.match(await readFile(decisionsPath, "utf8"), /writer_handoff/u);
 
-  const existingDraft = await readFile(
-    join(postsDir, "selected.md"),
-    "utf8",
-  );
+  const existingDraft = await readFile(join(postsDir, "selected.md"), "utf8");
   const readyAgain = makeValidRecord({
     category: "ai",
     head_keyword: "선정 키워드",
@@ -235,7 +232,10 @@ test("draft bridge requires approval and records the writer handoff after draft 
       ),
     /already exists/iu,
   );
-  assert.equal(await readFile(join(postsDir, "selected.md"), "utf8"), existingDraft);
+  assert.equal(
+    await readFile(join(postsDir, "selected.md"), "utf8"),
+    existingDraft,
+  );
 });
 
 test("automation policy can authorize the bridge without per-keyword human fields", async (t) => {

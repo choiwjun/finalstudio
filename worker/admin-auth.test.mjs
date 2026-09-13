@@ -16,8 +16,14 @@ test("creates and verifies an expiring signed admin session", async () => {
   const token = await createSessionToken(secret, 1_000);
 
   assert.equal(await verifySessionToken(token, secret, 1_100), true);
-  assert.equal(await verifySessionToken(token, "wrong-password-123456", 1_100), false);
-  assert.equal(await verifySessionToken(token, secret, 1_000 + 8 * 60 * 60), false);
+  assert.equal(
+    await verifySessionToken(token, "wrong-password-123456", 1_100),
+    false,
+  );
+  assert.equal(
+    await verifySessionToken(token, secret, 1_000 + 8 * 60 * 60),
+    false,
+  );
   assert.match(sessionCookie(token), new RegExp(`^${ADMIN_COOKIE}=`));
   assert.match(clearSessionCookie(), /Max-Age=0/);
 });
@@ -30,8 +36,22 @@ test("rejects malformed or tampered sessions", async () => {
 });
 
 test("requires a same-origin request for browser writes", () => {
-  assert.equal(sameOrigin(new Request("https://wjblog.example/api/admin/posts", { headers: { Origin: "https://wjblog.example" } })), true);
-  assert.equal(sameOrigin(new Request("https://wjblog.example/api/admin/posts", { headers: { Origin: "https://evil.example" } })), false);
+  assert.equal(
+    sameOrigin(
+      new Request("https://wjblog.example/api/admin/posts", {
+        headers: { Origin: "https://wjblog.example" },
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    sameOrigin(
+      new Request("https://wjblog.example/api/admin/posts", {
+        headers: { Origin: "https://evil.example" },
+      }),
+    ),
+    false,
+  );
 });
 
 test("authenticates a request carrying the signed cookie", async () => {
@@ -40,5 +60,8 @@ test("authenticates a request carrying the signed cookie", async () => {
     headers: { Cookie: `${ADMIN_COOKIE}=${token}` },
   });
 
-  assert.equal(await isAuthenticated(request, { ADMIN_PASSWORD: secret }), true);
+  assert.equal(
+    await isAuthenticated(request, { ADMIN_PASSWORD: secret }),
+    true,
+  );
 });

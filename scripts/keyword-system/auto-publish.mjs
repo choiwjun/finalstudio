@@ -9,7 +9,13 @@ import { readReadyToWriteExport } from "./lib/records-store.mjs";
 import { assertContainedPath } from "./lib/draft-bridge.mjs";
 import { parseFrontmatter, validatePost } from "../lib/content-contract.mjs";
 import { detectContentRisks } from "../lib/content-risk.mjs";
-import { main as draftMain } from "./draft.mjs";
+import { imageRoles as bundleRoles } from "./lib/image-plan.mjs";
+import {
+  IMAGE_DEADLINE_MS,
+  checkDeadline,
+  withinDeadline,
+  runDeadlineProcess,
+} from "./lib/image-runtime.mjs";
 import {
   buildPersonaBatchDraftArgs,
   buildPersonaBatchPlan,
@@ -153,9 +159,9 @@ async function loadPolicy(path) {
   ) {
     fail("automation policy is invalid or disabled");
   }
-  if (policy.images?.main !== 1 || ![1, 2].includes(policy.images?.sub)) {
+  if (policy.images?.main !== 1 || ![2, 3].includes(policy.images?.sub)) {
     fail(
-      "automation policy must require one main image and one or two sub-images",
+      "automation policy must require one main image and two or three sub-images",
     );
   }
   return Object.freeze({
@@ -494,6 +500,48 @@ async function triggerDeployHook() {
   if (!response.ok) fail(`deploy hook failed with HTTP ${response.status}`);
 }
 
+async function runDraftProcess(draftArgs, { deadline, signal }) {
+  const result = await runDeadlineProcess({
+    executable: process.execPath,
+    args: [resolve(ROOT, "scripts/keyword-system/draft.mjs"), ...draftArgs],
+    cwd: ROOT,
+    deadline,
+    signal,
+  });
+  if (result.code !== 0)
+    throw Error(`draft process failed (exit ${result.code}); no retries`);
+  const matches = [
+    ...result.stdout.matchAll(
+      /^created draft (src\/content\/posts\/[a-z0-9-]+\.md) for /gm,
+    ),
+  ];
+  if (matches.length !== 1)
+    throw Error("draft process did not return exactly one saved draft");
+  return { draft: matches[0][1], status: "written" };
+}
+export async function runDraftImageTopic({
+  draftArgs,
+  imageOptions,
+  deadline = Date.now() + IMAGE_DEADLINE_MS,
+  runDraft = runDraftProcess,
+  runImages = generateImageBundle,
+}) {
+  const draft = await withinDeadline(
+    (signal) => runDraft(draftArgs, { deadline, signal }),
+    deadline,
+  );
+  checkDeadline(deadline);
+  const postPath = postPathFromResult(draft);
+  const imageBundle = await runImages({
+    ...imageOptions,
+    root: ROOT,
+    postPath,
+    slug: basename(postPath, ".md"),
+    deadline,
+  });
+  return { draft, imageBundle, postPath };
+}
+
 export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const args = parseAutoPublishArgs(argv);
   const policy = await loadPolicy(args.policyPath);
@@ -547,9 +595,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     return { ...args, manifest, results: [] };
   }
 
-  const runDraft =
-    dependencies.runDraft ??
-    ((draftArgs) => draftMain(draftArgs, { repositoryRoot: ROOT }));
+  const runDraft = dependencies.runDraft ?? runDraftProcess;
   const runImages = dependencies.runImages ?? generateImageBundle;
   const dataPaths = [
     resolve(DATA_DIR, "records.json"),
@@ -560,38 +606,35 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   for (const path of dataPaths) {
     state.data.set(path, await captureTextSnapshot(path));
   }
-  const imageRoles = ["main", "sub-1", "sub-2"].slice(
-    0,
-    policy.images.main + policy.images.sub,
-  );
+  const imageRoles = bundleRoles(policy.images.sub);
   const results = [];
   for (const entry of automationPlan) {
+    const deadline = Date.now() + IMAGE_DEADLINE_MS;
     try {
-      const draft = await runDraft(
-        buildPersonaBatchDraftArgs(entry, {
+      const { draft, imageBundle, postPath } = await runDraftImageTopic({
+        deadline,
+        draftArgs: buildPersonaBatchDraftArgs(entry, {
           records: resolve(DATA_DIR, "records.json"),
           ready: resolve(DATA_DIR, "ready-to-write.json"),
           decisions: resolve(DATA_DIR, "decisions.jsonl"),
           automationPolicy: args.policyPath,
           automationPolicySha256: policy.sha256,
         }),
-      );
-      const postPath = postPathFromResult(draft);
-      state.generated.set(postPath, { existed: false });
-      const slug = basename(postPath, ".md");
-      for (const role of imageRoles) {
-        await rememberGeneratedPath(
-          state,
-          join(ROOT, "public/images", `${slug}-${role}.png`),
-        );
-      }
-      const imageBundle = await runImages({
-        root: ROOT,
-        postPath,
-        slug,
-        title: entry.head_keyword,
-        topic: entry.category,
-        imageRoles,
+        imageOptions: {
+          imageRoles,
+          notesPath: entry.briefPath,
+          notesSha256: entry.briefSha256,
+        },
+        runDraft,
+        runImages: async (options) => {
+          state.generated.set(options.postPath, { existed: false });
+          for (const role of imageRoles)
+            await rememberGeneratedPath(
+              state,
+              join(ROOT, "public/images", `${options.slug}-${role}.png`),
+            );
+          return runImages(options);
+        },
       });
       results.push({ ...entry, draft, imageBundle, postPath });
     } catch (error) {
@@ -599,12 +642,18 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
         ...entry,
         error: error instanceof Error ? error.message : String(error),
       });
+      break;
     }
   }
   const failures = results.filter((result) => result.error);
   if (failures.length > 0) {
-    await rollbackRun(state);
-    await writeManifest({ ...manifest, results, rolled_back: true });
+    if (args.publish) await rollbackRun(state);
+    await writeManifest({
+      ...manifest,
+      results,
+      rolled_back: args.publish,
+      text_drafts_retained: !args.publish,
+    });
     fail(
       `article generation failed for ${failures.length} candidate(s); nothing was published`,
     );

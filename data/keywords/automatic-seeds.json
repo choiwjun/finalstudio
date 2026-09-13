@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "category": "economy-business",
+      "seeds": [
+        "주가 전망 차트분석",
+        "주가 전망",
+        "전망 차트분석",
+        "100달러 돌파",
+        "브렌트유 100달러"
+      ],
+      "title": "주가 전망 차트분석",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 주가 전망 차트분석",
+      "intent": "개념",
+      "discovery_rank": 1
+    },
+    {
+      "category": "economy-business",
+      "seeds": [
+        "주가 전망",
+        "주가 전망 차트분석",
+        "전망 차트분석",
+        "100달러 돌파",
+        "브렌트유 100달러"
+      ],
+      "title": "주가 전망",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 주가 전망",
+      "intent": "개념",
+      "discovery_rank": 2
+    },
+    {
+      "category": "economy-business",
+      "seeds": [
+        "전망 차트분석",
+        "주가 전망 차트분석",
+        "주가 전망",
+        "100달러 돌파",
+        "브렌트유 100달러"
+      ],
+      "title": "전망 차트분석",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 전망 차트분석",
+      "intent": "개념",
+      "discovery_rank": 3
+    },
+    {
+      "category": "economy-business",
+      "seeds": [
+        "100달러 돌파",
+        "주가 전망 차트분석",
+        "주가 전망",
+        "전망 차트분석",
+        "브렌트유 100달러"
+      ],
+      "title": "100달러 돌파",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 100달러 돌파",
+      "intent": "개념",
+      "discovery_rank": 4
+    },
+    {
+      "category": "economy-business",
+      "seeds": [
+        "브렌트유 100달러",
+        "주가 전망 차트분석",
+        "주가 전망",
+        "전망 차트분석",
+        "100달러 돌파"
+      ],
+      "title": "브렌트유 100달러",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 브렌트유 100달러",
+      "intent": "개념",
+      "discovery_rank": 5
+    },
+    {
+      "category": "ai",
+      "seeds": [
+        "네오사피엔스 공모주 청약",
+        "네오사피엔스 공모주",
+        "공모주 청약",
+        "LG AI연구원",
+        "데이터센터 전력"
+      ],
+      "title": "네오사피엔스 공모주 청약",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 네오사피엔스 공모주 청약",
+      "intent": "개념",
+      "discovery_rank": 1
+    },
+    {
+      "category": "ai",
+      "seeds": [
+        "네오사피엔스 공모주",
+        "네오사피엔스 공모주 청약",
+        "공모주 청약",
+        "LG AI연구원",
+        "데이터센터 전력"
+      ],
+      "title": "네오사피엔스 공모주",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 네오사피엔스 공모주",
+      "intent": "개념",
+      "discovery_rank": 2
+    },
+    {
+      "category": "ai",
+      "seeds": [
+        "공모주 청약",
+        "네오사피엔스 공모주 청약",
+        "네오사피엔스 공모주",
+        "LG AI연구원",
+        "데이터센터 전력"
+      ],
+      "title": "공모주 청약",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 공모주 청약",
+      "intent": "개념",
+      "discovery_rank": 3
+    },
+    {
+      "category": "ai",
+      "seeds": [
+        "LG AI연구원",
+        "네오사피엔스 공모주 청약",
+        "네오사피엔스 공모주",
+        "공모주 청약",
+        "데이터센터 전력"
+      ],
+      "title": "LG AI연구원",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: LG AI연구원",
+      "intent": "개념",
+      "discovery_rank": 4
+    },
+    {
+      "category": "ai",
+      "seeds": [
+        "데이터센터 전력",
+        "네오사피엔스 공모주 청약",
+        "네오사피엔스 공모주",
+        "공모주 청약",
+        "LG AI연구원"
+      ],
+      "title": "데이터센터 전력",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 데이터센터 전력",
+      "intent": "개념",
+      "discovery_rank": 5
+    },
+    {
+      "category": "travel",
+      "seeds": [
+        "제주 애월",
+        "가격 비교",
+        "스튜디오 옥스포드 일일",
+        "해리포터 스튜디오 옥스포드",
+        "스튜디오 옥스포드"
+      ],
+      "title": "제주 애월",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 제주 애월",
+      "intent": "개념",
+      "discovery_rank": 1
+    },
+    {
+      "category": "travel",
+      "seeds": [
+        "가격 비교",
+        "제주 애월",
+        "스튜디오 옥스포드 일일",
+        "해리포터 스튜디오 옥스포드",
+        "스튜디오 옥스포드"
+      ],
+      "title": "가격 비교",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 가격 비교",
+      "intent": "비교",
+      "discovery_rank": 2
+    },
+    {
+      "category": "travel",
+      "seeds": [
+        "스튜디오 옥스포드 일일",
+        "제주 애월",
+        "가격 비교",
+        "해리포터 스튜디오 옥스포드",
+        "스튜디오 옥스포드"
+      ],
+      "title": "스튜디오 옥스포드 일일",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 스튜디오 옥스포드 일일",
+      "intent": "개념",
+      "discovery_rank": 3
+    },
+    {
+      "category": "travel",
+      "seeds": [
+        "해리포터 스튜디오 옥스포드",
+        "제주 애월",
+        "가격 비교",
+        "스튜디오 옥스포드 일일",
+        "스튜디오 옥스포드"
+      ],
+      "title": "해리포터 스튜디오 옥스포드",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 해리포터 스튜디오 옥스포드",
+      "intent": "개념",
+      "discovery_rank": 4
+    },
+    {
+      "category": "travel",
+      "seeds": [
+        "스튜디오 옥스포드",
+        "제주 애월",
+        "가격 비교",
+        "스튜디오 옥스포드 일일",
+        "해리포터 스튜디오 옥스포드"
+      ],
+      "title": "스튜디오 옥스포드",
+      "description": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보: 스튜디오 옥스포드",
+      "intent": "개념",
+      "discovery_rank": 5
+    }
+  ]
+}

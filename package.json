@@ -8,7 +8,7 @@
     "preview": "astro preview",
     "check:content": "node scripts/check-content.mjs",
     "check:prompts": "node scripts/check-prompts.mjs",
-    "test:keywords": "node --test scripts/keyword-system/*.test.mjs",
+    "test:keywords": "node --test --test-concurrency=2 scripts/keyword-system/*.test.mjs",
     "keywords:brief": "node scripts/keyword-system/brief.mjs",
     "keywords:auto": "node scripts/keyword-system/auto-discover.mjs",
     "keywords:draft": "node scripts/keyword-system/draft.mjs",
@@ -31,7 +31,8 @@
     "@astrojs/sitemap": "^3.7.4",
     "@neondatabase/serverless": "^1.1.0",
     "astro": "^7.3.1",
-    "yaml": "^2.9.1"
+    "yaml": "^2.9.1",
+    "sharp": "0.35.4"
   },
   "devDependencies": {
     "wrangler": "^4.131.1"

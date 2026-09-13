@@ -27,10 +27,13 @@ function parseDocument(text, fileName) {
 }
 
 function isoDate(value, field) {
-  if (value instanceof Date && !Number.isNaN(value.valueOf())) return value.toISOString();
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00.000Z`;
+  if (value instanceof Date && !Number.isNaN(value.valueOf()))
+    return value.toISOString();
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value))
+    return `${value}T00:00:00.000Z`;
   const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) throw new Error(`${field} must be a valid date`);
+  if (Number.isNaN(date.valueOf()))
+    throw new Error(`${field} must be a valid date`);
   return date.toISOString();
 }
 
@@ -50,8 +53,10 @@ function keywordKey(record) {
 }
 
 export function buildKeywordRow(record) {
-  if (!record || typeof record !== "object") throw new Error("keyword record must be an object");
-  if (!record.category || !record.head_keyword) throw new Error("keyword record requires category and head_keyword");
+  if (!record || typeof record !== "object")
+    throw new Error("keyword record must be an object");
+  if (!record.category || !record.head_keyword)
+    throw new Error("keyword record requires category and head_keyword");
   return {
     recordKey: keywordKey(record),
     category: record.category,
@@ -69,7 +74,9 @@ export function buildPostRow(slug, text) {
     title: frontmatter.title,
     description: frontmatter.description,
     pubDate: dateOnly(frontmatter.pubDate, `${slug}.pubDate`),
-    publishAt: frontmatter.publishAt ? isoDate(frontmatter.publishAt, `${slug}.publishAt`) : null,
+    publishAt: frontmatter.publishAt
+      ? isoDate(frontmatter.publishAt, `${slug}.publishAt`)
+      : null,
     status: frontmatter.status,
     topic: frontmatter.topic,
     angle: frontmatter.angle,
@@ -82,11 +89,15 @@ export function buildPostRow(slug, text) {
 
 async function readPosts() {
   const entries = await readdir(postsDir, { withFileTypes: true });
-  const files = entries.filter((entry) => entry.isFile() && extname(entry.name) === ".md").sort((a, b) => a.name.localeCompare(b.name));
-  return Promise.all(files.map(async (entry) => {
-    const text = await readFile(join(postsDir, entry.name), "utf8");
-    return buildPostRow(entry.name.slice(0, -3), text);
-  }));
+  const files = entries
+    .filter((entry) => entry.isFile() && extname(entry.name) === ".md")
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return Promise.all(
+    files.map(async (entry) => {
+      const text = await readFile(join(postsDir, entry.name), "utf8");
+      return buildPostRow(entry.name.slice(0, -3), text);
+    }),
+  );
 }
 
 async function readKeywords() {
@@ -95,9 +106,13 @@ async function readKeywords() {
     records = JSON.parse(await readFile(recordsPath, "utf8"));
   } catch (error) {
     const message = error instanceof Error ? error.message : "invalid JSON";
-    throw new Error(`data/keywords/records.json could not be read: ${message}`, { cause: error });
+    throw new Error(
+      `data/keywords/records.json could not be read: ${message}`,
+      { cause: error },
+    );
   }
-  if (!Array.isArray(records)) throw new Error("data/keywords/records.json must contain an array");
+  if (!Array.isArray(records))
+    throw new Error("data/keywords/records.json must contain an array");
   return records.map(buildKeywordRow);
 }
 
@@ -133,48 +148,62 @@ const postUpsert = `
 
 export function buildSyncQueries(keywordRows, postRows, sql) {
   return [
-    ...keywordRows.map((row) => sql.query(keywordUpsert, [
-      row.recordKey,
-      row.category,
-      row.headKeyword,
-      row.status,
-      row.collectedAt,
-      row.payload,
-    ])),
-    ...postRows.map((row) => sql.query(postUpsert, [
-      row.slug,
-      row.title,
-      row.description,
-      row.pubDate,
-      row.publishAt,
-      row.status,
-      row.topic,
-      row.angle,
-      row.author,
-      row.bodyMarkdown,
-      row.contentHash,
-      row.payload,
-    ])),
+    ...keywordRows.map((row) =>
+      sql.query(keywordUpsert, [
+        row.recordKey,
+        row.category,
+        row.headKeyword,
+        row.status,
+        row.collectedAt,
+        row.payload,
+      ]),
+    ),
+    ...postRows.map((row) =>
+      sql.query(postUpsert, [
+        row.slug,
+        row.title,
+        row.description,
+        row.pubDate,
+        row.publishAt,
+        row.status,
+        row.topic,
+        row.angle,
+        row.author,
+        row.bodyMarkdown,
+        row.contentHash,
+        row.payload,
+      ]),
+    ),
   ];
 }
 
 export async function collectSyncRows() {
-  const [keywordRows, postRows] = await Promise.all([readKeywords(), readPosts()]);
+  const [keywordRows, postRows] = await Promise.all([
+    readKeywords(),
+    readPosts(),
+  ]);
   return { keywordRows, postRows };
 }
 
 async function main() {
   const { keywordRows, postRows } = await collectSyncRows();
   if (process.argv.includes("--dry-run")) {
-    process.stdout.write(`Validated ${keywordRows.length} keyword records and ${postRows.length} posts\n`);
+    process.stdout.write(
+      `Validated ${keywordRows.length} keyword records and ${postRows.length} posts\n`,
+    );
     return;
   }
   const sql = connectDatabase();
   const queries = buildSyncQueries(keywordRows, postRows, sql);
   if (queries.length > 0) await sql.transaction(queries);
-  process.stdout.write(`Synced ${keywordRows.length} keyword records and ${postRows.length} posts to Neon\n`);
+  process.stdout.write(
+    `Synced ${keywordRows.length} keyword records and ${postRows.length} posts to Neon\n`,
+  );
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === resolve(process.argv[1])
+) {
   await main();
 }

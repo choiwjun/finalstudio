@@ -5,7 +5,11 @@ import {
   sameOrigin,
   sessionCookie,
 } from "./admin-auth.mjs";
-import { adminKeywordRow, adminPostRow, validateAdminPost } from "./admin-data.mjs";
+import {
+  adminKeywordRow,
+  adminPostRow,
+  validateAdminPost,
+} from "./admin-data.mjs";
 import { json } from "./http.mjs";
 
 const MAX_JSON_BYTES = 300_000;
@@ -19,15 +23,20 @@ function clientKey(request) {
 
 function loginBlocked(request, now) {
   const entry = loginFailures.get(clientKey(request));
-  return entry && now - entry.startedAt < FAILURE_WINDOW_MS && entry.count >= MAX_LOGIN_FAILURES;
+  return (
+    entry &&
+    now - entry.startedAt < FAILURE_WINDOW_MS &&
+    entry.count >= MAX_LOGIN_FAILURES
+  );
 }
 
 function recordLoginFailure(request, now) {
   const key = clientKey(request);
   const previous = loginFailures.get(key);
-  const entry = previous && now - previous.startedAt < FAILURE_WINDOW_MS
-    ? { startedAt: previous.startedAt, count: previous.count + 1 }
-    : { startedAt: now, count: 1 };
+  const entry =
+    previous && now - previous.startedAt < FAILURE_WINDOW_MS
+      ? { startedAt: previous.startedAt, count: previous.count + 1 }
+      : { startedAt: now, count: 1 };
   loginFailures.set(key, entry);
 }
 
@@ -48,27 +57,38 @@ async function readJson(request) {
 }
 
 function adminNotConfigured(env) {
-  return typeof env?.ADMIN_PASSWORD !== "string" || env.ADMIN_PASSWORD.length < 16;
+  return (
+    typeof env?.ADMIN_PASSWORD !== "string" || env.ADMIN_PASSWORD.length < 16
+  );
 }
 
 function requiresSameOrigin(request) {
-  return sameOrigin(request) ? null : json({ ok: false, error: "origin_not_allowed" }, 403);
+  return sameOrigin(request)
+    ? null
+    : json({ ok: false, error: "origin_not_allowed" }, 403);
 }
 
 async function login(request, env) {
-  if (request.method !== "POST") return json({ ok: false, error: "method_not_allowed" }, 405);
+  if (request.method !== "POST")
+    return json({ ok: false, error: "method_not_allowed" }, 405);
   const originError = requiresSameOrigin(request);
   if (originError) return originError;
-  if (adminNotConfigured(env)) return json({ ok: false, error: "admin_not_configured" }, 503);
+  if (adminNotConfigured(env))
+    return json({ ok: false, error: "admin_not_configured" }, 503);
   const now = Date.now();
-  if (loginBlocked(request, now)) return json({ ok: false, error: "too_many_attempts" }, 429);
+  if (loginBlocked(request, now))
+    return json({ ok: false, error: "too_many_attempts" }, 429);
   let body;
   try {
     body = await readJson(request);
   } catch {
     return json({ ok: false, error: "invalid_request" }, 400);
   }
-  if (typeof body.password !== "string" || body.password.length < 16 || body.password.length > 256) {
+  if (
+    typeof body.password !== "string" ||
+    body.password.length < 16 ||
+    body.password.length > 256
+  ) {
     recordLoginFailure(request, now);
     return json({ ok: false, error: "invalid_credentials" }, 401);
   }
@@ -77,25 +97,32 @@ async function login(request, env) {
     return json({ ok: false, error: "invalid_credentials" }, 401);
   }
   clearLoginFailures(request);
-  const token = await createSessionToken(env.ADMIN_PASSWORD, Math.floor(now / 1000));
+  const token = await createSessionToken(
+    env.ADMIN_PASSWORD,
+    Math.floor(now / 1000),
+  );
   return json({ ok: true }, 200, { "set-cookie": sessionCookie(token) });
 }
 
 async function logout(request) {
-  if (request.method !== "POST") return json({ ok: false, error: "method_not_allowed" }, 405);
+  if (request.method !== "POST")
+    return json({ ok: false, error: "method_not_allowed" }, 405);
   const originError = requiresSameOrigin(request);
   if (originError) return originError;
   return json({ ok: true }, 200, { "set-cookie": clearSessionCookie() });
 }
 
 async function session(request, env) {
-  if (request.method !== "GET") return json({ ok: false, error: "method_not_allowed" }, 405);
+  if (request.method !== "GET")
+    return json({ ok: false, error: "method_not_allowed" }, 405);
   return json({ ok: true, authenticated: await isAuthenticated(request, env) });
 }
 
 async function requireAdmin(request, env) {
-  if (adminNotConfigured(env)) return json({ ok: false, error: "admin_not_configured" }, 503);
-  if (!(await isAuthenticated(request, env))) return json({ ok: false, error: "authentication_required" }, 401);
+  if (adminNotConfigured(env))
+    return json({ ok: false, error: "admin_not_configured" }, 503);
+  if (!(await isAuthenticated(request, env)))
+    return json({ ok: false, error: "authentication_required" }, 401);
   return null;
 }
 
@@ -105,7 +132,11 @@ async function listAdminPosts(sql) {
     FROM posts
     ORDER BY updated_at DESC, slug ASC
   `;
-  return json({ ok: true, data: rows.map(adminPostRow), meta: { count: rows.length } });
+  return json({
+    ok: true,
+    data: rows.map(adminPostRow),
+    meta: { count: rows.length },
+  });
 }
 
 async function listAdminKeywords(sql) {
@@ -114,11 +145,16 @@ async function listAdminKeywords(sql) {
     FROM keyword_records
     ORDER BY collected_at DESC, head_keyword ASC
   `;
-  return json({ ok: true, data: rows.map(adminKeywordRow), meta: { count: rows.length } });
+  return json({
+    ok: true,
+    data: rows.map(adminKeywordRow),
+    meta: { count: rows.length },
+  });
 }
 
 async function saveAdminPost(request, sql) {
-  if (request.method !== "PUT") return json({ ok: false, error: "method_not_allowed" }, 405);
+  if (request.method !== "PUT")
+    return json({ ok: false, error: "method_not_allowed" }, 405);
   let body;
   try {
     body = await readJson(request);
@@ -129,7 +165,13 @@ async function saveAdminPost(request, sql) {
   try {
     post = validateAdminPost(body);
   } catch (error) {
-    return json({ ok: false, error: error instanceof Error ? error.message : "invalid_post" }, 422);
+    return json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "invalid_post",
+      },
+      422,
+    );
   }
   const payload = JSON.stringify(post.metadata);
   const rows = await sql`
@@ -156,6 +198,21 @@ async function saveAdminPost(request, sql) {
   return json({ ok: true, data: adminPostRow(rows[0]) });
 }
 
+async function deleteAdminPost(request, sql, slug) {
+  if (request.method !== "DELETE")
+    return json({ ok: false, error: "method_not_allowed" }, 405);
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(slug))
+    return json({ ok: false, error: "invalid_slug" }, 400);
+  const rows = await sql`
+    DELETE FROM posts
+    WHERE slug = ${slug}
+    RETURNING slug
+  `;
+  if (rows.length === 0)
+    return json({ ok: false, error: "post_not_found" }, 404);
+  return json({ ok: true, data: { slug } });
+}
+
 async function secureEqualText(left, right) {
   const [leftHash, rightHash] = await Promise.all([
     crypto.subtle.digest("SHA-256", new TextEncoder().encode(left)),
@@ -164,13 +221,19 @@ async function secureEqualText(left, right) {
   const leftBytes = new Uint8Array(leftHash);
   const rightBytes = new Uint8Array(rightHash);
   let difference = 0;
-  for (let index = 0; index < leftBytes.length; index += 1) difference |= leftBytes[index] ^ rightBytes[index];
+  for (let index = 0; index < leftBytes.length; index += 1)
+    difference |= leftBytes[index] ^ rightBytes[index];
   return difference === 0;
 }
 
 async function hash(value) {
-  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  const bytes = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  return Array.from(new Uint8Array(bytes), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
 }
 
 export async function handleAdminRequest({ request, url, env, connect }) {
@@ -192,7 +255,14 @@ export async function handleAdminRequest({ request, url, env, connect }) {
       if (request.method === "GET") return listAdminPosts(sql);
       return saveAdminPost(request, sql);
     }
-    if (url.pathname === "/api/admin/keywords" && request.method === "GET") return listAdminKeywords(sql);
+    if (url.pathname.startsWith("/api/admin/posts/")) {
+      const slug = decodeURIComponent(
+        url.pathname.slice("/api/admin/posts/".length),
+      );
+      return deleteAdminPost(request, sql, slug);
+    }
+    if (url.pathname === "/api/admin/keywords" && request.method === "GET")
+      return listAdminKeywords(sql);
     return json({ ok: false, error: "not_found" }, 404);
   } catch (error) {
     console.error("Admin database request failed", error);

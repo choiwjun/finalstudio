@@ -200,6 +200,12 @@ function briefPathFor(briefDir, record) {
   );
 }
 
+function draftSlugFor(record) {
+  const key = `${record.category}\u0000${record.head_keyword}`;
+  const suffix = createHash("sha256").update(key).digest("hex").slice(0, 10);
+  return `${record.category}-${suffix}`;
+}
+
 export async function buildPersonaBatchPlan({
   readyRecords,
   discovery,
@@ -246,6 +252,7 @@ export async function buildPersonaBatchPlan({
       Object.freeze({
         category: record.category,
         head_keyword: record.head_keyword,
+        slug: draftSlugFor(record),
         briefPath: path,
         briefSha256: createHash("sha256").update(text).digest("hex"),
         ...approval,
@@ -292,6 +299,8 @@ export function buildPersonaBatchDraftArgs(entry, args) {
     ...approvalArgs,
     "--angle",
     entry.angle,
+    "--slug",
+    entry.slug,
     "--format",
     entry.format,
     "--brief-sha256",

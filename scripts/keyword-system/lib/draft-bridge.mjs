@@ -24,7 +24,10 @@ const fail = (message) => {
   throw new DraftBridgeError(message);
 };
 
-const clean = (value) => String(value ?? "").replace(/[\r\n]/gu, " ").trim();
+const clean = (value) =>
+  String(value ?? "")
+    .replace(/[\r\n]/gu, " ")
+    .trim();
 const MAX_HUMAN_ANGLE_LENGTH = 300;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
@@ -44,7 +47,9 @@ export function normalizeDraftFormat(value = "how-to") {
 
 export function requireHumanApproval({ approved, reviewer, reason } = {}) {
   if (approved !== true)
-    fail("human approval is required; pass --approve after reviewing the brief");
+    fail(
+      "human approval is required; pass --approve after reviewing the brief",
+    );
   const normalizedReviewer = clean(reviewer);
   const normalizedReason = clean(reason);
   if (normalizedReviewer === "") fail("--reviewer is required with --approve");
@@ -54,7 +59,8 @@ export function requireHumanApproval({ approved, reviewer, reason } = {}) {
 
 export function requireHumanAuthoredAngle(value) {
   const angle = clean(value);
-  if (angle === "") fail("--angle is required and must be written by the reviewer");
+  if (angle === "")
+    fail("--angle is required and must be written by the reviewer");
   if (angle.length > MAX_HUMAN_ANGLE_LENGTH)
     fail(`--angle must be ${MAX_HUMAN_ANGLE_LENGTH} characters or fewer`);
   return angle;
@@ -76,6 +82,7 @@ export function buildAutoWriteArgs(
     outputDir,
     format = "how-to",
     humanAngle,
+    slug,
     briefSha256,
     approvalArtifact,
   } = {},
@@ -85,7 +92,13 @@ export function buildAutoWriteArgs(
   if (notes === "") fail("brief Markdown path is required as writer notes");
   const selectedFormat = normalizeDraftFormat(format);
   const selectedAngle = requireHumanAuthoredAngle(humanAngle);
-  const selectedBriefSha256 = requireReviewedBriefHash(briefSha256, briefSha256);
+  const selectedSlug = clean(slug);
+  if (selectedSlug !== "" && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(selectedSlug))
+    fail("slug must use lowercase ASCII kebab-case");
+  const selectedBriefSha256 = requireReviewedBriefHash(
+    briefSha256,
+    briefSha256,
+  );
   const approvalPath = clean(approvalArtifact);
   if (approvalPath === "") fail("bridge approval artifact is required");
   const args = [
@@ -94,6 +107,7 @@ export function buildAutoWriteArgs(
     normalized.category,
     "--angle",
     selectedAngle,
+    ...(selectedSlug === "" ? [] : ["--slug", selectedSlug]),
     "--format",
     selectedFormat,
     "--notes",

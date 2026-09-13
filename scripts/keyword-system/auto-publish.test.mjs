@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import sharp from "sharp";
 import { parseAutoPublishArgs, preparePublishedPost } from "./auto-publish.mjs";
 
 test("auto-publish defaults to all ready candidates and separates dry-run from publish", () => {
@@ -40,7 +41,7 @@ test("promotes a complete safe article only after content validation", async (t)
   const body = `${"자동 게시 검사를 통과하는 본문입니다. 조건과 근거를 분리해 설명합니다. ".repeat(60)}\n`;
   await writeFile(
     postPath,
-    `---\ntitle: "자동 게시 테스트"\ndescription: "충분한 설명입니다."\npubDate: 2026-09-11\nstatus: draft\ntopic: ai\nangle: "검증 기준"\nauthor: TBD\nimage: /images/post-main.png\n---\n\n![첫 이미지](/images/post-sub-1.png)\n\n${body}`,
+    `---\ntitle: "자동 게시 테스트"\ndescription: "충분한 설명입니다."\npubDate: 2026-09-11\nstatus: draft\ntopic: ai\nangle: "검증 기준"\nauthor: TBD\nimage: /images/post-main.png\n---\n\n![첫 이미지](/images/post-sub-1.png)\n\n![두번째 이미지](/images/post-sub-2.png)\n\n${body}`,
     "utf8",
   );
   await mkdir(join(root, "public/images"), { recursive: true });
@@ -56,9 +57,19 @@ test("promotes a complete safe article only after content validation", async (t)
         path: join(root, "public/images/post-sub-1.png"),
         publicPath: "/images/post-sub-1.png",
       },
+      {
+        role: "sub-2",
+        path: join(root, "public/images/post-sub-2.png"),
+        publicPath: "/images/post-sub-2.png",
+      },
     ],
   };
-  for (const image of imageBundle.images) await writeFile(image.path, "png");
+  const png = await sharp({
+    create: { width: 32, height: 24, channels: 3, background: "white" },
+  })
+    .png()
+    .toBuffer();
+  for (const image of imageBundle.images) await writeFile(image.path, png);
   t.after(() => rm(root, { recursive: true, force: true }));
 
   imageBundle.postPath = postPath;

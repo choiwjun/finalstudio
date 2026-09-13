@@ -42,10 +42,13 @@ function databaseStub() {
 
 test("lists only published posts from Neon", async () => {
   const worker = createWorker({ connect: () => databaseStub() });
-  const response = await worker.fetch(new Request("https://wjblog.example/api/posts?topic=ai&limit=5"), {
-    DATABASE_URL: "postgresql://redacted.example/db",
-    ASSETS: { fetch: async () => new Response("asset") },
-  });
+  const response = await worker.fetch(
+    new Request("https://wjblog.example/api/posts?topic=ai&limit=5"),
+    {
+      DATABASE_URL: "postgresql://redacted.example/db",
+      ASSETS: { fetch: async () => new Response("asset") },
+    },
+  );
 
   assert.equal(response.status, 200);
   assert.deepEqual((await response.json()).data[0], {
@@ -64,10 +67,13 @@ test("lists only published posts from Neon", async () => {
 
 test("lists ready-to-write keywords by fixed category", async () => {
   const worker = createWorker({ connect: () => databaseStub() });
-  const response = await worker.fetch(new Request("https://wjblog.example/api/keywords?category=ai"), {
-    DATABASE_URL: "postgresql://redacted.example/db",
-    ASSETS: { fetch: async () => new Response("asset") },
-  });
+  const response = await worker.fetch(
+    new Request("https://wjblog.example/api/keywords?category=ai"),
+    {
+      DATABASE_URL: "postgresql://redacted.example/db",
+      ASSETS: { fetch: async () => new Response("asset") },
+    },
+  );
 
   assert.equal(response.status, 200);
   assert.equal((await response.json()).data[0].headKeyword, "AI 키워드");
@@ -75,10 +81,19 @@ test("lists ready-to-write keywords by fixed category", async () => {
 
 test("rejects invalid public API filters", async () => {
   const worker = createWorker({ connect: () => databaseStub() });
-  const env = { DATABASE_URL: "postgresql://redacted.example/db", ASSETS: { fetch: async () => new Response("asset") } };
+  const env = {
+    DATABASE_URL: "postgresql://redacted.example/db",
+    ASSETS: { fetch: async () => new Response("asset") },
+  };
 
-  const invalidCategory = await worker.fetch(new Request("https://wjblog.example/api/keywords?category=private"), env);
-  const invalidLimit = await worker.fetch(new Request("https://wjblog.example/api/posts?limit=51"), env);
+  const invalidCategory = await worker.fetch(
+    new Request("https://wjblog.example/api/keywords?category=private"),
+    env,
+  );
+  const invalidLimit = await worker.fetch(
+    new Request("https://wjblog.example/api/posts?limit=51"),
+    env,
+  );
 
   assert.equal(invalidCategory.status, 400);
   assert.equal(invalidLimit.status, 400);
@@ -86,11 +101,17 @@ test("rejects invalid public API filters", async () => {
 
 test("does not return draft posts from the public detail route", async () => {
   const worker = createWorker({ connect: () => databaseStub() });
-  const response = await worker.fetch(new Request("https://wjblog.example/api/posts/draft-post"), {
-    DATABASE_URL: "postgresql://redacted.example/db",
-    ASSETS: { fetch: async () => new Response("asset") },
-  });
+  const response = await worker.fetch(
+    new Request("https://wjblog.example/api/posts/draft-post"),
+    {
+      DATABASE_URL: "postgresql://redacted.example/db",
+      ASSETS: { fetch: async () => new Response("asset") },
+    },
+  );
 
   assert.equal(response.status, 404);
-  assert.deepEqual(await response.json(), { ok: false, error: "post_not_found" });
+  assert.deepEqual(await response.json(), {
+    ok: false,
+    error: "post_not_found",
+  });
 });

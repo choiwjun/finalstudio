@@ -263,7 +263,7 @@ export async function openReadOnlyFileAtDirectory(
   const file = await openFileAtDirectory(
     directoryHandle,
     name,
-    constants.O_RDONLY | O_NONBLOCK,
+    constants.O_RDONLY,
   );
   try {
     if (
