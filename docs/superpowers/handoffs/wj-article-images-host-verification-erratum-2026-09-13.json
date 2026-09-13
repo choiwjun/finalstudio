@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "recordedDate": "2026-09-13",
+  "status": "STOPPED_NOT_ACCEPTED",
+  "repository": "choiwjun/finalstudio",
+  "preDocumentationBranch": "main",
+  "preDocumentationHead": "e672e93bd5a6f9810db479cf52a580ea2811f144",
+  "scope": "Sanitized durable summary of the local parent-authored erratum; raw reports, status files and execution artifacts remain local and unchanged.",
+  "source": {
+    "localPath": "/tmp/blog-image-resource-reblocked.LU7dyv/host-verification-erratum.json",
+    "sha256": "c058e4a1453d9ad6f0b85b3d02c56c0e57876a38bcf89168e4f6e8b9b24cc779"
+  },
+  "correction": {
+    "incorrectClaim": "A blocked child or empty criteriaSatisfied prevented attached acceptance.verify from executing.",
+    "actualBehavior": "Attached host verification executed after all three stopped/blocked children despite rejected acceptance.",
+    "responsibility": "Parent orchestration and reporting error. No global tooling changes were made.",
+    "lesson": "Acceptance is a postcondition, not execution authorization. A veto-capable preflight must have no executable verify hook; only a separately authorized executor may follow a safe accepted preflight.",
+    "acceptanceUnchanged": "All three workflows remain rejected. Historical host exit 0 is not current safe-code acceptance."
+  },
+  "artifactRouting": {
+    "root": "Original local Pi session subagent-artifacts directory; not included in this commit.",
+    "verifyPathTemplate": "acceptance/verify/<child>/<artifactName>"
+  },
+  "observedRuns": [
+    {
+      "workflow": "02ce2298-af98-4e2a-96a7-58b36d4be877",
+      "child": "76379193-4c56-46c2-9605-d17ad3e6ab08",
+      "childFinding": "RESOURCE_BLOCKED; parent STOP delivered and acknowledged.",
+      "acceptanceStatus": "rejected",
+      "hostExecuted": true,
+      "memoized": false,
+      "durationMs": 96532,
+      "exitCode": 1,
+      "artifactName": "170aa184b90c18290fd854811f76c3215c5f64f8250fed44d6d183d7f86c58bb.json",
+      "scope": "Concurrency-2 keyword suite executed after STOP and failed; subsequent commands in the && chain did not execute.",
+      "limitation": "Truncated stdout does not establish the failure cause. Do not attribute this host failure to ENOMEM or any particular assertion."
+    },
+    {
+      "workflow": "43c8f829-53a6-4bf6-9e62-59b1203c98e6",
+      "child": "2a4a8827-0bd5-40cd-99a1-271523a6b008",
+      "childFinding": "Q1 preflight block: whole node_modules symlink exposed shared Astro/Vite caches.",
+      "acceptanceStatus": "rejected",
+      "evidenceStatus": "rejected",
+      "hostExecuted": true,
+      "memoized": false,
+      "durationMs": 80068,
+      "exitCode": 0,
+      "initialHostMemAvailableKb": 3692824,
+      "artifactName": "55897f81c6b8a78be5a786fb452cde3a9bf68e49c131536998158a641bd303de.json",
+      "commandChain": [
+        "Resource guard and post/canary/staged preservation",
+        "npm run test:keywords (concurrency 2, including the unsafe build fixture)",
+        "npm run test:worker",
+        "npm run test:neon",
+        "npm run check:content",
+        "npm run check:prompts",
+        "npm run neon:sync:check (DB-free)",
+        "Resource guard and focused helper coverage with 80% line/branch/function thresholds",
+        "git diff --check and final post/canary/staged preservation"
+      ],
+      "limitation": "The chain exit 0 is real, but stdout is truncated. Full counts and numeric coverage were not recovered. This predates cache repair and formatting and is not safe current acceptance.",
+      "potentialImpact": "Shared cache read/write effects are possible. No before/after cache-byte audit exists; no cache deletion or restoration was attempted."
+    },
+    {
+      "workflow": "afc70719-0875-48e8-b96f-f6655527d846",
+      "child": "6c353441-c5fc-4f8b-8fb6-7f623fd9fa9e",
+      "childFinding": "RESOURCE_BLOCKED: child MemAvailable 1386680 kB below required 2097152 kB.",
+      "acceptanceStatus": "rejected",
+      "evidenceStatus": "rejected",
+      "hostExecuted": true,
+      "memoized": false,
+      "durationMs": 29,
+      "exitCode": 1,
+      "artifactName": "1c1b1db23c466a54a0f65324b95c20517fee5e21746c2316cd35c417355cd1b2.json",
+      "scope": "Only the leading host resource guard executed and failed. All subsequent preservation, test, build, coverage and check commands short-circuited.",
+      "control": "Workflow and child complete/rejected. STOP steer missed the completed child; no revival, retry or review fanout occurred."
+    }
+  ],
+  "verificationCacheObservation": {
+    "workspaceKind": "git-tracked",
+    "sameDiffHashInAllThreeRuns": "8bd43328831fb3a9ed570c89f7b1f7aa37c992f6440e36aa43bc048789ca9e51",
+    "untrackedFixtureChanged": true,
+    "falseCacheHitProven": false,
+    "requirement": "Explicitly bind changed/untracked bytes and inspect fresh verifyRuns, memoized flags and retained full logs."
+  },
+  "cacheFix": {
+    "path": "scripts/keyword-system/image-build.test.mjs",
+    "red": "Root realpath assertion failed before cache writes or build.",
+    "green": "2/2 passed including actual isolated Astro build and build boundary; 33.87 seconds, no skips.",
+    "testedSha256": "f9647ee5cff2303c76af712c88423d576962d1917f4131995a3591b697eb8406",
+    "formattedSha256": "f67841484385e3750a6fc48df9f04f18b42bbf144b17837ee29b2aed399d145b",
+    "formattedBytesTested": false,
+    "independentClosure": false,
+    "sharedCacheImpactAudited": false
+  },
+  "preDocumentationPreservation": {
+    "snapshot": "/tmp/blog-handoff-commit.b9nscy",
+    "rawIndexSha256": "cb494d8ff1bf81f100eb6e96ea961239da873c60022d6f01ebdb2768bd4e80e3",
+    "stagedDiffSha256": "ec4455ee63a2a565ff77653afd2e8bb6ed1c904e26d91e30ac2d337b478f5b1c",
+    "canarySha256": "7a9065b272531d629f6ffe63f7eb2b7456045711c917a5670288b767262bc4ec",
+    "scope": "Snapshot records existing tracked diffs/index, all non-ignored untracked files in a tar, and 232 existing file hashes. It does not archive all ignored out artifacts or establish cache safety.",
+    "commitBoundary": "A documentation-only commit legitimately changes HEAD/index. Preserve the unrelated staged diff and non-document file bytes separately."
+  },
+  "diagnosticCorrection": {
+    "path": "scripts/keyword-system/test-fixtures/auto-write-subprocess-stub.cjs",
+    "sha256": "36b992c5b16a1141e3736e0d89d85174a03d027eedca684984051ce75107c5e9",
+    "evidence": "The repeated line-7 JSON.parse warning is stale: live JSON.parse at line 9 is inside try/catch at lines 8-14. No source rewrite or suppression was made for this handoff."
+  },
+  "recoveryRequirements": [
+    "Keep implementation, tests, builds and live providers stopped pending coordinated resource recovery.",
+    "Implement separate veto-capable preflight and conditional executor; prove failed preflight causes zero executor calls. Do not resume stored unsafe verify contracts.",
+    "Investigate shared-cache effects without blind deletion or restoration; obtain approval before cleanup.",
+    "After prerequisites, obtain bounded fresh latest-byte validation with full logs and nonempty expected coverage scope, then fresh independent correctness/security reviews.",
+    "Only after acceptance, validate one full article image bundle and then sequentially process the 15 drafts under the shared 900-second per-article deadline.",
+    "The current user authorized documentation commit/push, not implementation restart, DB writes, publication or deployment. Main push is blocked pending resolution of its automatic Neon migrate/sync side effect."
+  ]
+}
