@@ -161,6 +161,15 @@ test("writer args require a human-authored angle and pass reviewed notes without
       "/repo/out/.keyword-approval.json",
     ],
   );
+  assert.ok(
+    buildAutoWriteArgs(brief, {
+      notesPath: "/repo/out/keyword-briefs/ai-선정.json.md",
+      humanAngle: "사람이 승인한 글의 범위와 독자 문제를 설명합니다",
+      briefSha256: "a".repeat(64),
+      approvalArtifact: "/repo/out/.keyword-approval.json",
+      fromFinal: "/repo/out/auto-publish/run/04-final.md",
+    }).includes("--from-final"),
+  );
 });
 
 test("writer output is restricted to the content post directory", () => {

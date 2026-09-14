@@ -194,47 +194,48 @@ test("draft bridge requires approval and records the writer handoff after draft 
     path: readyPath,
     recordsPath,
   });
-  await assert.rejects(
-    () =>
-      draftMain(
-        [
-          "--brief",
-          briefPath,
-          "--records",
-          recordsPath,
-          "--ready",
-          readyPath,
-          "--decisions",
-          decisionsPath,
-          "--approve",
-          "--reviewer",
-          "운영자",
-          "--reason",
-          "재생성하지 않음",
-          "--angle",
-          "사람이 승인한 글의 범위와 독자 문제",
-          "--brief-sha256",
-          briefSha256,
-        ],
-        {
-          repositoryRoot: root,
-          runWriter: async ({ args }) => {
-            const stagingDir = args[args.indexOf("--out") + 1];
-            const stagedPath = join(stagingDir, "selected.md");
-            await writeFile(stagedPath, "---\nstatus: draft\n---\n");
-            return {
-              code: 0,
-              stdout: `[convert-post] 저장 완료: ${stagedPath}\n`,
-              stderr: "",
-            };
-          },
-        },
-      ),
-    /already exists/iu,
+  const second = await draftMain(
+    [
+      "--brief",
+      briefPath,
+      "--records",
+      recordsPath,
+      "--ready",
+      readyPath,
+      "--decisions",
+      decisionsPath,
+      "--approve",
+      "--reviewer",
+      "운영자",
+      "--reason",
+      "재생성하지 않음",
+      "--angle",
+      "사람이 승인한 글의 범위와 독자 문제",
+      "--brief-sha256",
+      briefSha256,
+    ],
+    {
+      repositoryRoot: root,
+      runWriter: async ({ args }) => {
+        const stagingDir = args[args.indexOf("--out") + 1];
+        const stagedPath = join(stagingDir, "selected.md");
+        await writeFile(stagedPath, "---\nstatus: draft\n---\n");
+        return {
+          code: 0,
+          stdout: `[convert-post] 저장 완료: ${stagedPath}\n`,
+          stderr: "",
+        };
+      },
+    },
   );
+  assert.equal(second.draft, "src/content/posts/selected-2.md");
   assert.equal(
     await readFile(join(postsDir, "selected.md"), "utf8"),
     existingDraft,
+  );
+  assert.match(
+    await readFile(join(postsDir, "selected-2.md"), "utf8"),
+    /status: draft/u,
   );
 });
 

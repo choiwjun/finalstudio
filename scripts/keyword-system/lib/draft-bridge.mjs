@@ -85,6 +85,7 @@ export function buildAutoWriteArgs(
     slug,
     briefSha256,
     approvalArtifact,
+    fromFinal,
   } = {},
 ) {
   const normalized = normalizeKeywordBrief(brief);
@@ -119,6 +120,8 @@ export function buildAutoWriteArgs(
   ];
   const output = clean(outputDir);
   if (output !== "") args.push("--out", output);
+  const finalInput = clean(fromFinal);
+  if (finalInput !== "") args.push("--from-final", finalInput);
   return Object.freeze(args);
 }
 

@@ -80,6 +80,7 @@ export function parseDraftArgs(
     reason: undefined,
     angle: undefined,
     slug: undefined,
+    fromFinal: undefined,
     briefSha256: undefined,
     automationPolicy: undefined,
     automationPolicySha256: undefined,
@@ -95,6 +96,7 @@ export function parseDraftArgs(
     ["--reason", "reason"],
     ["--angle", "angle"],
     ["--slug", "slug"],
+    ["--from-final", "fromFinal"],
     ["--brief-sha256", "briefSha256"],
     ["--automation-policy", "automationPolicy"],
     ["--automation-policy-sha256", "automationPolicySha256"],
@@ -252,6 +254,32 @@ async function assertDraftTargetAvailable(directoryHandle, fileName) {
   }
 }
 
+async function draftTargetExists(directoryHandle, fileName) {
+  try {
+    const existing = await openVerifiedFileAtDirectory(
+      directoryHandle,
+      fileName,
+    );
+    await existing.handle.close().catch(() => {});
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+async function resolveAvailableDraftFileName(directoryHandle, fileName) {
+  const dot = fileName.lastIndexOf(".");
+  const stem = dot > 0 ? fileName.slice(0, dot) : fileName;
+  const extension = dot > 0 ? fileName.slice(dot) : "";
+  let candidate = fileName;
+  for (let suffix = 2; ; suffix += 1) {
+    if (!(await draftTargetExists(directoryHandle, candidate)))
+      return candidate;
+    candidate = `${stem}-${suffix}${extension}`;
+  }
+}
+
 export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const root = resolve(dependencies.repositoryRoot ?? REPOSITORY_ROOT);
   const args = parseDraftArgs(argv, root);
@@ -366,6 +394,10 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     slug: args.slug,
     briefSha256: briefHash,
     approvalArtifact: approvalArtifactPath,
+    fromFinal:
+      args.fromFinal === undefined
+        ? undefined
+        : assertContainedPath(root, args.fromFinal, "--from-final"),
   });
   const writer = dependencies.runWriter ?? runAutoWriter;
   let createdDraftPath;
@@ -384,14 +416,22 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
       postsRoot: stagingDir,
     });
     const draftText = await readDraftFile(stagedPath);
-    const fileName = basename(stagedPath);
+    let fileName = basename(stagedPath);
     const postsRoot = resolve(root, "src/content/posts");
-    const draftPath = resolve(postsRoot, fileName);
     const postsHandle = await openVerifiedDirectory(postsRoot, {
       create: false,
     });
+    let draftPath;
     try {
-      await assertDraftTargetAvailable(postsHandle, fileName);
+      // 명시적 --slug는 convert-post와 같이 충돌을 그대로 실패시키고,
+      // 그 외(날짜 기반 post-<date>.md 등)는 -2 접미사로 같은 날짜의
+      // 두 번째 초안을 덮어쓰지 않고 설치한다.
+      if (args.slug === undefined) {
+        fileName = await resolveAvailableDraftFileName(postsHandle, fileName);
+      } else {
+        await assertDraftTargetAvailable(postsHandle, fileName);
+      }
+      draftPath = resolve(postsRoot, fileName);
       await writeStableTextAtDirectory(postsHandle, fileName, draftText);
       createdDraftPath = draftPath;
     } finally {
