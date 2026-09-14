@@ -148,22 +148,3 @@ image: /images/travel-3nights-5days-package-main.png
 ## 다음 행동
 
 비교할 상품을 정한 뒤 상품 페이지에서 일정표와 포함·불포함 항목을 복사합니다. 이후 출발지, 도시 이동, 노팁·노옵션 범위를 같은 양식에 채우고 빈칸이 남은 상품은 [직접 확인 필요]로 표시한 상태에서 문의합니다.
-
-## 출처와 기준일
-
-원자료 기준일은 `2026-09-14T01:34:34.295Z`입니다.
-
-NAVER 트렌드 자료는 [공식 NAVER API HUB 검색 트렌드 endpoint](https://naverapihub.apigw.ntruss.com/search-trend/v1/search)를 기준으로 수집했습니다. 검색 추세 지표는 요청 범위 안의 상대값이므로 절대 검색량이나 인기 순위로 읽지 않습니다.
-
-NAVER 블로그 원자료:
-
-- [방콕과 파타야를 잇는 5일 패키지 여행](https://blog.naver.com/vymjwffqmbyz/224410926627)
-- [장가계와 원가계 자연 만끽 5일 패키지](https://blog.naver.com/hqrtrsraighd/224410926543)
-- [괌 하얏트 오션프론트룸 3박5일 패키지](https://blog.naver.com/mnbcoeoufyq/224410925412)
-- [라오스 3박5일 패키지 예약](https://blog.naver.com/mamacapetown/224410920381)
-- [호이안 야경과 다낭 5성 호텔 혜택](https://blog.naver.com/uaxclvwkcnw/224410919554)
-- [노팁·노옵션 나트랑과 달랏 5일 여행](https://blog.naver.com/ftrqnilxzc6/224410918300)
-- [세부 3박 5일 자유여행 일정과 경비](https://blog.naver.com/ddohh12/224410914168)
-- [나트랑과 달랏 전 일정 5성 호텔 여행](https://blog.naver.com/qsodfcxicz/224410912938)
-- [푸꾸옥 3박5일 노팁 노옵션 패키지](https://blog.naver.com/sxdsyvozbqes/224410909520)
-- [다낭 바나힐과 호이안 역사 탐방 패키지](https://blog.naver.com/kxyelansltsb/224410904044)

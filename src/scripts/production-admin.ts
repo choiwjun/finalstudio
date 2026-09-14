@@ -1,3 +1,5 @@
+import { renderMarkdownPreview } from "./markdown-preview";
+
 type AdminMetadata = {
   testedAt?: string | null;
   sourceIds?: string[];
@@ -277,10 +279,11 @@ function renderKeywords() {
 }
 
 function updatePreview() {
-  if (editorPreview)
-    editorPreview.textContent =
-      field<HTMLTextAreaElement>("admin-body").value ||
-      "본문을 입력하면 여기에 미리 표시됩니다.";
+  if (editorPreview) {
+    editorPreview.innerHTML = renderMarkdownPreview(
+      field<HTMLTextAreaElement>("admin-body").value,
+    );
+  }
 }
 
 function openEditor(post: AdminPost | null) {
