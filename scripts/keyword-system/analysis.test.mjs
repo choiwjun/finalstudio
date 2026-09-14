@@ -89,7 +89,13 @@ function headBoundTrendBody(headKeyword, ratio = 55) {
       {
         title: headKeyword,
         keywords: [headKeyword],
-        data: [{ period: '2026-09-09', ratio }],
+        // Three measured days is the minimum demand evidence — a single
+        // point is a one-day blip, not search interest.
+        data: [
+          { period: '2026-09-07', ratio: ratio / 2 },
+          { period: '2026-09-08', ratio: ratio / 2 },
+          { period: '2026-09-09', ratio },
+        ],
       },
     ],
   };
@@ -176,18 +182,18 @@ test('Given a successful trend response, when trend signals are derived, then pe
   const [first, second] = signals.groups;
   assert.equal(first.title, '업무 자동화');
   assert.deepEqual(first.keywords, ['엑셀 자동화', '엑셀 매크로']);
-  assert.equal(first.data_count, 2);
+  assert.equal(first.data_count, 3);
   assert.equal(first.latest_period, '2026-09-09');
   assert.equal(first.latest_ratio, 100);
   assert.equal(first.max_period, '2026-09-09');
   assert.equal(first.max_ratio, 100);
-  assert.equal(first.average_ratio, (61.23 + 100) / 2);
+  assert.equal(first.average_ratio, (55.1 + 61.23 + 100) / 3);
 
   assert.equal(second.title, '개발 생산성');
-  assert.equal(second.data_count, 1);
+  assert.equal(second.data_count, 3);
   assert.equal(second.latest_ratio, 42.5);
   assert.equal(second.max_ratio, 42.5);
-  assert.equal(second.average_ratio, 42.5);
+  assert.equal(second.average_ratio, (20.1 + 33.7 + 42.5) / 3);
 });
 
 test('Given trend signals, when serialized, then no score or rank field is ever produced', () => {
@@ -316,6 +322,26 @@ test('Given the head trend group carries an empty data array, when analyzed, the
   assert.equal(record.status, 'candidate');
 });
 
+test('Given the head trend group measured only one or two days, when analyzed, then a one-day blip blocks promotion', () => {
+  // DataLab emits a data point only for days with measurable volume, so a
+  // single point in a 30-day window is an ephemeral spike, not demand.
+  const blip = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [
+      { title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [{ period: '2026-09-09', ratio: 100 }] },
+    ],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: blip })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, ['no_search_interest']);
+  assert.equal(record.status, 'candidate');
+});
+
 test('Given a usable trend response that measures no head keyword group, when analyzed, then malformed_response blocks promotion', () => {
   // Demand must be measured through a group that actually covers the head
   // keyword. A response listing only unrelated groups answers a different
@@ -362,7 +388,7 @@ test('Given the head keyword group shows demand while a related group is zero, w
     endDate: '2026-09-09',
     timeUnit: 'date',
     results: [
-      { title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [{ period: '2026-09-09', ratio: 42 }] },
+      { title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [{ period: '2026-09-07', ratio: 30 }, { period: '2026-09-08', ratio: 35 }, { period: '2026-09-09', ratio: 42 }] },
       { title: '엑셀 매크로', keywords: ['엑셀 매크로'], data: [{ period: '2026-09-09', ratio: 0 }] },
     ],
   };

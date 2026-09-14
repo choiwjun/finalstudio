@@ -386,7 +386,13 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
   // evidence, never proof of zero demand. A covered head group that reports
   // zero ratio on every data point is a measured absence of search interest.
   const newestUsable = (items) => items.reduce((best, item) => (item.collectedAt >= best.collectedAt ? item : best));
-  const isZeroGroup = (group) => group.data_count === 0 || group.max_ratio === 0;
+  // DataLab returns a data point only for days with measurable volume, so a
+  // head group carrying one or two points in a ~30-day window is a one-day
+  // blip — an ephemeral news spike, not the sustained demand a blog post
+  // needs. Three points is the minimum that still counts as interest.
+  const MIN_HEAD_DATA_POINTS = 3;
+  const isZeroGroup = (group) =>
+    group.data_count < MIN_HEAD_DATA_POINTS || group.max_ratio === 0;
   const trendUsable = usable.filter((item) => item.source === 'naver-api-hub-trend');
   if (trendUsable.length > 0) {
     const trend = deriveTrendSignals(newestUsable(trendUsable).response);

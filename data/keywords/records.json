@@ -49,11 +49,11 @@
     "category": "ai",
     "head_keyword": "개발 속도",
     "related_keywords": [
-      "다리오 아모데",
-      "앤트로픽 오픈AI xAI",
-      "오픈AI xAI",
-      "앤트로픽 CEO",
-      "올트먼 오픈AI"
+      "앤트로픽 다리오",
+      "앤트로픽 다리오 아모데",
+      "CEO 최첨단",
+      "속도 조절론",
+      "속도 조절"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 개발 속도",
@@ -61,11 +61,13 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
-    "risk_flags": [],
+    "risk_flags": [
+      "no_search_interest"
+    ],
     "evidence_available": true,
-    "status": "ready-to-write"
+    "status": "candidate"
   },
   {
     "category": "ai",
@@ -135,6 +137,54 @@
   },
   {
     "category": "ai",
+    "head_keyword": "다리오 아모데",
+    "related_keywords": [
+      "앤트로픽 다리오",
+      "CEO 최첨단",
+      "기업 앤트로픽",
+      "기업 앤트로픽 Anthropic",
+      "앤트로픽 Anthropic"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 다리오 아모데",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:34:34.295Z",
+    "freshness": "fresh",
+    "risk_flags": [
+      "no_search_interest"
+    ],
+    "evidence_available": true,
+    "status": "candidate"
+  },
+  {
+    "category": "ai",
+    "head_keyword": "다리오 아모데 CEO",
+    "related_keywords": [
+      "앤트로픽 다리오",
+      "앤트로픽 다리오 아모데",
+      "CEO 최첨단",
+      "기업 앤트로픽",
+      "기업 앤트로픽 Anthropic"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 다리오 아모데 CEO",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:34:34.295Z",
+    "freshness": "fresh",
+    "risk_flags": [
+      "no_search_interest"
+    ],
+    "evidence_available": true,
+    "status": "candidate"
+  },
+  {
+    "category": "ai",
     "head_keyword": "데이터센터 전력",
     "related_keywords": [
       "네오사피엔스 공모주 청약",
@@ -157,13 +207,37 @@
   },
   {
     "category": "ai",
+    "head_keyword": "아모데 CEO",
+    "related_keywords": [
+      "앤트로픽 다리오",
+      "앤트로픽 다리오 아모데",
+      "CEO 최첨단",
+      "기업 앤트로픽",
+      "기업 앤트로픽 Anthropic"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 아모데 CEO",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:34:34.295Z",
+    "freshness": "fresh",
+    "risk_flags": [
+      "no_search_interest"
+    ],
+    "evidence_available": true,
+    "status": "candidate"
+  },
+  {
+    "category": "ai",
     "head_keyword": "앤트로픽 오픈AI",
     "related_keywords": [
       "오픈AI xAI",
-      "다리오 아모데",
-      "올트먼 오픈AI",
-      "빅테크 수장들",
-      "기술 잠재적"
+      "앤트로픽 다리오",
+      "앤트로픽 다리오 아모데",
+      "개발 속도 조절",
+      "속도 조절"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 앤트로픽 오픈AI",
@@ -171,7 +245,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -263,7 +337,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -287,7 +361,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -333,7 +407,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -401,7 +475,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -425,7 +499,53 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
+    "freshness": "fresh",
+    "risk_flags": [
+      "no_search_interest"
+    ],
+    "evidence_available": true,
+    "status": "candidate"
+  },
+  {
+    "category": "travel",
+    "head_keyword": "3박 5일",
+    "related_keywords": [
+      "기간 3박",
+      "5일 출발지",
+      "출발지 인천",
+      "5일 출발지 인천",
+      "내용 여행사 모두투어"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 3박 5일",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:34:34.295Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "written"
+  },
+  {
+    "category": "travel",
+    "head_keyword": "5일 패키지",
+    "related_keywords": [
+      "기간 3박",
+      "기간 3박 5일",
+      "3박 5일 출발지",
+      "5일 출발지",
+      "출발지 인천"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 5일 패키지",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -505,11 +625,11 @@
     "category": "travel",
     "head_keyword": "내용 여행사",
     "related_keywords": [
-      "도시 호놀룰루",
-      "도시 호놀룰루 성인",
-      "방문 도시",
-      "방문 도시 호놀룰루",
-      "여행사 모두투어"
+      "기간 3박",
+      "기간 3박 5일",
+      "3박 5일 출발지",
+      "5일 출발지",
+      "출발지 인천"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 내용 여행사",
@@ -517,7 +637,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -661,11 +781,11 @@
     "category": "travel",
     "head_keyword": "항목 내용",
     "related_keywords": [
-      "내용 여행사",
-      "2박 3일",
-      "자연 도시",
-      "터키 일주",
-      "3일 온천"
+      "기간 3박",
+      "기간 3박 5일",
+      "3박 5일 출발지",
+      "5일 출발지",
+      "출발지 인천"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 항목 내용",
@@ -673,7 +793,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:20:31.869Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -685,11 +805,11 @@
     "category": "travel",
     "head_keyword": "항목 내용 여행사",
     "related_keywords": [
-      "내용 여행사 모두투어",
-      "도시 호놀룰루",
-      "도시 호놀룰루 성인",
-      "방문 도시",
-      "방문 도시 호놀룰루"
+      "기간 3박",
+      "기간 3박 5일",
+      "3박 5일 출발지",
+      "5일 출발지",
+      "출발지 인천"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 항목 내용 여행사",
@@ -697,7 +817,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:34:34.295Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
