@@ -11,11 +11,7 @@ toolVersions: {}
 manualReview: none
 manualReviewReasons: []
 aiAssisted: true
-image: /images/kotakinabalu-firefly-tour-main.png
 ---
-
-<!-- wj-auto-images:kotakinabalu-firefly-tour:32c04dae2cebe5aaa4ef3bd06d270873acec3c62d1f4358911cc32dfe0f2675f -->
-대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
 
 코타키나발루 반딧불투어는 뚜아이 원숭이·선셋 포함 여부, 출발 시간대와 총 소요 시간, 포함·불포함 사항을 같은 기준으로 비교해야 고르기 쉽습니다. 제공된 원자료에는 특정 상품의 확정 가격과 구체적인 출발 시각이 없습니다. 이 글은 예약 전 확인 순서를 정리한 초안입니다.
 
@@ -50,10 +46,6 @@ image: /images/kotakinabalu-firefly-tour-main.png
 | 시티투어·호핑투어·반딧불투어·마사지·선셋을 연결할 수 있다는 설명이 있습니다. | 반딧불투어가 다른 일정과 묶이는지, 이동 순서가 어떻게 되는지 확인합니다. | [NAVER 원문 참조](https://blog.naver.com/kotabob/224410880135) |
 | 체크아웃 후 시내관광을 거쳐 반딧불투어로 이어지는 일정이 설명돼 있습니다. | 앞 일정 종료 시각과 반딧불투어 출발 시각이 겹치지 않는지 확인합니다. | [NAVER 원문 참조](https://blog.naver.com/xwjvby6pgj/224411265357) |
 
-
-<!-- wj-image-section:4908dc0ed8e2c804 -->
-![AI 생성 일러스트 — 투어 구성은 항목별로 비교합니다](/images/kotakinabalu-firefly-tour-sub-1.png)
-
 ## 출발 시간대와 소요 시간은 시간표로 적습니다
 
 출발 시간대와 소요 시간은 예약 안내에서 픽업 시각, 현장 일정, 호텔 복귀 시각을 한 줄로 기록해 비교합니다.
@@ -76,10 +68,6 @@ image: /images/kotakinabalu-firefly-tour-main.png
 호텔 복귀 시각: [직접 확인 필요: 복귀 예정 시각]
 총 소요 시간: [직접 확인 필요: 상품 안내]
 ```
-
-
-<!-- wj-image-section:bffd621a54ebbd82 -->
-![AI 생성 일러스트 — 출발 시간대와 소요 시간은 시간표로 적습니다](/images/kotakinabalu-firefly-tour-sub-2.png)
 
 ## 포함·불포함 사항을 나눠 봅니다
 

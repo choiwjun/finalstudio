@@ -11,11 +11,7 @@ toolVersions: {}
 manualReview: none
 manualReviewReasons: []
 aiAssisted: true
-image: /images/oil-100-dollar-check-main.png
 ---
-
-<!-- wj-auto-images:oil-100-dollar-check:d1a1ac83a451d47caa09ea4aa14c3cf2b2d6eca3bc8db1636657ce6ac4484c84 -->
-대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
 
 국제유가 100달러 돌파 보도를 봤다면 숫자만 믿지 말고 WTI인지 브렌트인지 확인해야 합니다. 같은 기준 시각의 공식 지표와 원문을 맞춰 본 뒤 호르무즈 해협·중동 정세, 원달러 환율, 국내 물가와 산업계로 이어지는 경로를 나눠 읽어야 합니다.
 
@@ -27,10 +23,6 @@ image: /images/oil-100-dollar-check-main.png
 - 정세: 중동 사건과 실제 공급 영향 주장을 분리합니다.
 - 환율: 같은 기준 시각의 원달러 환율을 함께 봅니다.
 - 국내 영향: 원유 가격에서 물가·산업계로 이어지는 경로를 단계별로 확인합니다.
-
-
-<!-- wj-image-section:b6d8bf9e56c1526f -->
-![AI 생성 일러스트 — 핵심 요약: 100달러보다 기준선이 먼저입니다](/images/oil-100-dollar-check-sub-1.png)
 
 ## 네 단계로 보도 원문과 지표를 대조합니다
 
@@ -63,10 +55,6 @@ image: /images/oil-100-dollar-check-main.png
 
 [스크린샷: WTI·브렌트 공식 지표에서 기준일과 가격 기준을 대조하는 화면]  
 ![WTI와 브렌트 기준일·가격 기준을 확인하는 공식 지표 화면]
-
-
-<!-- wj-image-section:adb461f0c416858c -->
-![AI 생성 일러스트 — 네 단계로 보도 원문과 지표를 대조합니다](/images/oil-100-dollar-check-sub-2.png)
 
 ## WTI와 브렌트 중 무엇을 확인해야 하나요?
 
