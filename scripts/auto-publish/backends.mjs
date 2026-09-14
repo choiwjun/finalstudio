@@ -2,14 +2,17 @@ import { execFileSync, spawn } from "node:child_process";
 import { buildWriterEnvironment } from "./writer-env.mjs";
 
 // Pluggable model backends. "codex" = ChatGPT OAuth (gpt-5.6-luna etc. via the
-// local codex config). "gemini" = Google OAuth via gemini-cli — requires the
-// CLI installed and `gemini` login completed; if it is missing the call fails
-// closed with an explicit install message rather than silently falling back.
+// local codex config). "gemini" = Google OAuth via the Antigravity CLI (`agy`)
+// — gemini-cli's individual OAuth path was retired by Google, so `agy` is the
+// supported Google-OAuth CLI. It requires `agy` installed and one interactive
+// sign-in completed; if it is missing the call fails closed with an explicit
+// install message rather than silently falling back.
 
 export const WRITER_BACKEND = process.env.WRITER_BACKEND ?? "codex";
 export const IMAGE_BACKEND =
   process.env.IMAGE_BACKEND ?? process.env.IMAGE_ENGINE ?? "codex";
-export const GEMINI_MODEL = process.env.GEMINI_MODEL; // e.g. gemini-3-flash
+// e.g. gemini-3.8-flash-high — `agy models` lists the account's catalog.
+export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash-high";
 
 export function findBinary(name) {
   try {
@@ -57,22 +60,24 @@ export function runCli({ executable, args, stdinText, cwd, env }) {
 }
 
 export function assertGeminiCli() {
-  const bin = findBinary("gemini");
+  const bin = findBinary("agy");
   if (!bin)
     throw new Error(
-      "gemini CLI가 없습니다. `npm install -g @google/gemini-cli` 후 `gemini`를 한 번 실행해 Google OAuth 로그인을 완료하세요.",
+      "Antigravity CLI(agy)가 없습니다. https://antigravity.google/docs/cli/install/ 로 설치 후 `agy`를 한 번 실행해 Google OAuth 로그인을 완료하세요.",
     );
   return bin;
 }
 
-// gemini-cli non-interactive mode: -p passes the instruction, piped stdin is
-// appended as context, -m selects the model, -y auto-approves tool actions
-// (needed when the model must write a file such as a PNG).
+// agy headless mode: -p runs one prompt and exits, --output-format text keeps
+// stdout clean, --dangerously-skip-permissions auto-approves tool actions
+// (needed when the model must write a file such as a PNG). agy print mode does
+// NOT read piped stdin as context, so stdinText is folded into the prompt.
 export function geminiCall({ prompt, stdinText, cwd, yolo = false }) {
   const bin = assertGeminiCli();
-  const args = [];
-  if (GEMINI_MODEL) args.push("-m", GEMINI_MODEL);
-  if (yolo) args.push("-y");
-  args.push("-p", prompt);
-  return runCli({ executable: bin, args, stdinText, cwd });
+  const args = ["--output-format", "text", "--print-timeout", "10m"];
+  if (GEMINI_MODEL) args.push("--model", GEMINI_MODEL);
+  if (yolo) args.push("--dangerously-skip-permissions");
+  const combined = stdinText ? `${prompt}\n\n${stdinText}` : prompt;
+  args.push("-p", combined);
+  return runCli({ executable: bin, args, cwd });
 }

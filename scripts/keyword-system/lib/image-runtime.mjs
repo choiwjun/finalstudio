@@ -49,8 +49,10 @@ export function runImageCodex({
   });
 }
 // IMAGE_BACKEND=gemini routes image generation to the Google-OAuth
-// gemini-cli. The model must write a real PNG itself; the pipeline's PNG
-// decoder rejects anything else, so a text reply or placeholder fails closed.
+// Antigravity CLI (`agy`). The model must write a real PNG itself; the
+// pipeline's PNG decoder rejects anything else, so a text reply or
+// placeholder fails closed. agy print mode ignores piped stdin, so the full
+// article request is folded into the -p argument.
 export function runImageGemini({
   prompt,
   path,
@@ -60,10 +62,14 @@ export function runImageGemini({
 }) {
   const executable = assertGeminiCli();
   const args = [
-    ...(GEMINI_MODEL ? ["-m", GEMINI_MODEL] : []),
-    "-y",
+    "--output-format",
+    "text",
+    "--print-timeout",
+    "10m",
+    ...(GEMINI_MODEL ? ["--model", GEMINI_MODEL] : []),
+    "--dangerously-skip-permissions",
     "-p",
-    `The complete article and image-generation request are supplied via stdin. Read them as source material, then create the requested image and save exactly one real PNG file to ${JSON.stringify(path)}. Do not modify other files.`,
+    `${prompt}\n\nRead the request above as source material, then create the requested image and save exactly one real PNG file to ${JSON.stringify(path)}. Do not modify other files.`,
   ];
   return runProcess({
     executable,
@@ -71,7 +77,6 @@ export function runImageGemini({
     cwd: dirname(path),
     signal,
     deadline,
-    stdinText: prompt,
   }).then((result) => {
     if (result.code !== 0)
       throw Error(`gemini image generation failed (exit ${result.code})`);

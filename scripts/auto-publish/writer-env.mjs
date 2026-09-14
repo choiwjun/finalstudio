@@ -11,6 +11,8 @@ const WRITER_ENVIRONMENT_KEYS = Object.freeze([
     "TEMP",
     "XDG_CONFIG_HOME",
     "XDG_CACHE_HOME",
+    "DBUS_SESSION_BUS_ADDRESS",
+    "DISPLAY",
     "CODEX_HOME",
     "TERM",
     "NO_COLOR",
