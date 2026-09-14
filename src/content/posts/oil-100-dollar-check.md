@@ -135,7 +135,7 @@ NAVER 블로그 검색 결과의 제목과 설명은 원문 대조 대상입니�
 
 아닙니다. 제공된 자료에서 해당 값은 요청 범위 안의 상대 지표로 제시됐습니다. 절대 검색량이나 순위로 바꾸어 쓰지 않습니다.
 
-## 한눈에 보기와 출처
+## 한눈에 보기
 
 발행 전에는 아래 네 항목을 직접 확인한 내용만 확정 문장으로 남깁니다.
 
@@ -147,21 +147,3 @@ NAVER 블로그 검색 결과의 제목과 설명은 원문 대조 대상입니�
 | 중동·호르무즈 언급 | 사건 원문과 공급 영향 주장 분리 | 긴장과 공급 차질을 같은 뜻으로 쓰지 않습니다. |
 | 국내 물가·산업계 영향 | 원달러 환율과 국내 자료 확인 | 즉시 반영을 단정하지 않습니다. |
 | 검색 추세 확인 | 상대 지표의 기준일·수집 시각 기록 | 절대 검색량으로 바꾸지 않습니다. |
-
-### 출처와 기준일
-
-원자료 수집 기준일은 `2026-09-14T07:23:07.953Z`입니다. 아래 NAVER 블로그 주소는 사실을 확정하기 전 원문 대조를 위한 참조 대상입니다.
-
-- [dc8 원문](https://blog.naver.com/dc8/224411309870)
-- [solarplane 원문](https://blog.naver.com/solarplane/224410531648)
-- [wonderstay 원문](https://blog.naver.com/wonderstay/224411243139)
-- [yun4770 원문](https://blog.naver.com/yun4770/224411237373)
-- [hmmo9 원문](https://blog.naver.com/hmmo9/224411177165)
-- [powerwrppp 원문](https://blog.naver.com/powerwrppp/224411107083)
-- [buildmyempire 원문](https://blog.naver.com/buildmyempire/224411089000)
-- [pocsinim 원문](https://blog.naver.com/pocsinim/224411087178)
-- [tngkreoqkr 원문](https://blog.naver.com/tngkreoqkr/224411063494)
-- [alflso7012 원문](https://blog.naver.com/alflso7012/224411060888)
-
-`[직접 확인 필요: WTI·브렌트 공식 지표, 중동·호르무즈 관련 공식 원문, 원달러 환율 공식 지표의 URL과 동일 기준 시각]`
-
