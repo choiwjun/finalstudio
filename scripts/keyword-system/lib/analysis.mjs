@@ -21,10 +21,12 @@
 // auth_missing, forbidden, malformed_response, empty_evidence, stale_evidence),
 // text risk flags (broad_keyword, sensitive_topic,
 // insufficient_related_keywords), and content risk flags derived from the
-// actual metrics — no_search_interest (head keyword's trend group shows zero
-// demand across the whole request window), thin_presence (blog search reports
-// fewer than two total results) — are re-derived on every analysis, so a later
-// clean run can clear transient failure flags.
+// actual metrics — no_search_interest (the group measuring the head keyword
+// shows zero demand across the whole request window; a usable trend response
+// that does not measure the head keyword at all is malformed_response),
+// thin_presence (blog search reports fewer than two total results) — are
+// re-derived on every analysis, so a later clean run can clear transient
+// failure flags.
 
 import {
   normalizeApiFailure,
@@ -369,20 +371,30 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
   if (usable.length > 0 && evidenceDays >= FRESH_MAX_DAYS + 1) risks.add('stale_evidence');
 
   // --- content signals: the collected data itself judges the candidate -----
-  // The newest usable trend response is checked for real demand: when the
-  // head keyword's own group reports zero ratio on every data point (or has
-  // no data at all), the candidate has no measurable search interest. If the
-  // response does not contain a group for the head keyword (legacy merged
-  // requests), the flag applies only when every reported group is zero — a
-  // nonzero group cannot disprove interest we cannot measure.
+  // The newest usable trend response is checked for real demand, but only
+  // through a group that actually measures the head keyword: the head must be
+  // the group's title or one of the terms bundled inside it. A usable response
+  // that covers nothing about the head keyword does not correspond to what
+  // collection requested (collect also rejects non-echoing responses at the
+  // boundary; this covers legacy or hand-built envelopes) — it is malformed
+  // evidence, never proof of zero demand. A covered head group that reports
+  // zero ratio on every data point is a measured absence of search interest.
   const newestUsable = (items) => items.reduce((best, item) => (item.collectedAt >= best.collectedAt ? item : best));
   const isZeroGroup = (group) => group.data_count === 0 || group.max_ratio === 0;
   const trendUsable = usable.filter((item) => item.source === 'naver-api-hub-trend');
   if (trendUsable.length > 0) {
     const trend = deriveTrendSignals(newestUsable(trendUsable).response);
     const headKey = keywordKey(head_keyword);
-    const headGroup = trend.groups.find((group) => keywordKey(group.title) === headKey);
-    if (headGroup === undefined ? trend.groups.every(isZeroGroup) : isZeroGroup(headGroup)) {
+    const covering = trend.groups.filter(
+      (group) =>
+        keywordKey(group.title) === headKey ||
+        group.keywords.some((keyword) => keywordKey(keyword) === headKey),
+    );
+    const headGroup =
+      covering.find((group) => keywordKey(group.title) === headKey) ?? covering[0];
+    if (headGroup === undefined) {
+      risks.add('malformed_response');
+    } else if (isZeroGroup(headGroup)) {
       risks.add('no_search_interest');
     }
   }

@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { basename, join } from "node:path";
 import { test } from "node:test";
 import { main } from "./auto-discover.mjs";
 import { fixturePath } from "./test-helpers.mjs";
+import { normalizeKeywordKey } from "./lib/contracts.mjs";
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
@@ -54,15 +55,56 @@ test("automatically discovers category topics and collects canonical evidence wi
       ),
       true,
     );
-    assert.equal(Array.isArray(ready), true);
-    assert.equal(
-      ready.every((record) => record.status === "ready-to-write"),
-      true,
-    );
     assert.equal(
       records.some((record) => record.status === "written"),
       false,
     );
+
+    // The ready queue is only meaningful when each promoted candidate's own
+    // head keyword was actually measured: its trend evidence must contain a
+    // group bound to that head with at least one nonzero ratio data point.
+    assert.equal(Array.isArray(ready), true);
+    assert.equal(ready.length, 6);
+    assert.equal(
+      ready.every((record) => record.status === "ready-to-write"),
+      true,
+    );
+    const trendEnvelopes = [];
+    for (const name of await readdir(join(outDir, "raw"), {
+      recursive: true,
+    })) {
+      if (!String(name).endsWith(".json")) continue;
+      if (!basename(String(name)).startsWith("naver-api-hub-trend-")) continue;
+      trendEnvelopes.push({
+        name: String(name),
+        envelope: JSON.parse(
+          await readFile(join(outDir, "raw", String(name)), "utf8"),
+        ),
+      });
+    }
+    assert.equal(trendEnvelopes.length, 6);
+    for (const record of ready) {
+      const headKey = normalizeKeywordKey(record.head_keyword);
+      const bound = trendEnvelopes.find(
+        ({ name, envelope }) =>
+          basename(name).startsWith(
+            `naver-api-hub-trend-${record.category}-`,
+          ) &&
+          envelope.request?.keywordGroups?.some(
+            (group) => normalizeKeywordKey(group?.groupName) === headKey,
+          ) &&
+          envelope.response?.results?.some(
+            (group) =>
+              normalizeKeywordKey(group?.title) === headKey &&
+              Array.isArray(group?.data) &&
+              group.data.some((point) => Number(point?.ratio) > 0),
+          ),
+      );
+      assert.ok(
+        bound,
+        `no head-bound trend evidence for ${record.category}/${record.head_keyword}`,
+      );
+    }
   } finally {
     await rm(root, { recursive: true, force: true });
   }

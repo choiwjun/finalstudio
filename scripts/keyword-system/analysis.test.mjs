@@ -55,7 +55,7 @@ function makeBlogEnvelope({ collectedAt = COLLECTED, response, source = 'naver-a
   };
 }
 
-function makeTrendEnvelope({ collectedAt = COLLECTED, response, source = 'naver-api-hub-trend' } = {}) {
+function makeTrendEnvelope({ collectedAt = COLLECTED, response, source = 'naver-api-hub-trend', headKeyword = '엑셀 자동화' } = {}) {
   return {
     schema_version: 1,
     provider: 'naver-api-hub',
@@ -66,11 +66,32 @@ function makeTrendEnvelope({ collectedAt = COLLECTED, response, source = 'naver-
       startDate: '2026-09-01',
       endDate: '2026-09-09',
       timeUnit: 'date',
-      keywordGroups: [{ groupName: '업무 자동화', keywords: ['엑셀 자동화', '엑셀 매크로'] }],
+      keywordGroups: [{ groupName: headKeyword, keywords: [headKeyword] }],
     },
     collected_at: collectedAt,
     http: { status: 200, ok: true },
+    // The default response keeps the legacy merged fixture body, which
+    // measures the default head inside its keyword bundle. Tests that
+    // override head_keyword must pass headKeyword (or a response) so the
+    // evidence still measures the candidate's own head.
     response: response ?? structuredClone(TREND_BODY),
+  };
+}
+
+// A trend response that measures the given head keyword as its own group —
+// the shape collection actually requests now.
+function headBoundTrendBody(headKeyword, ratio = 55) {
+  return {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [
+      {
+        title: headKeyword,
+        keywords: [headKeyword],
+        data: [{ period: '2026-09-09', ratio }],
+      },
+    ],
   };
 }
 
@@ -293,9 +314,10 @@ test('Given the head trend group carries an empty data array, when analyzed, the
   assert.equal(record.status, 'candidate');
 });
 
-test('Given the head keyword group is absent but another group has demand, when analyzed, then promotion still succeeds', () => {
-  // Legacy merged requests and unrelated groups cannot prove zero interest in
-  // the head keyword; the flag must not fire when any group shows demand.
+test('Given a usable trend response that measures no head keyword group, when analyzed, then malformed_response blocks promotion', () => {
+  // Demand must be measured through a group that actually covers the head
+  // keyword. A response listing only unrelated groups answers a different
+  // request — it is malformed evidence, not proof of demand or its absence.
   const otherDemand = {
     startDate: '2026-09-01',
     endDate: '2026-09-09',
@@ -307,8 +329,27 @@ test('Given the head keyword group is absent but another group has demand, when 
     [makeBlogEnvelope(), makeTrendEnvelope({ response: otherDemand })],
     { now: fixedClock },
   );
-  assert.deepEqual(record.risk_flags, []);
-  assert.equal(record.status, 'ready-to-write');
+  assert.deepEqual(record.risk_flags, ['malformed_response']);
+  assert.equal(record.status, 'candidate');
+});
+
+test('Given the head keyword measured inside a merged group, when analyzed, then that group judges demand', () => {
+  // Legacy merged requests bundled several terms under one topic title. When
+  // the head keyword is one of the bundled terms, that group is the head's
+  // demand line — impure but real. Zero there means no measurable interest.
+  const mergedZero = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [{ title: '업무 자동화', keywords: ['엑셀 자동화', '엑셀 매크로'], data: [{ period: '2026-09-09', ratio: 0 }] }],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: mergedZero })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, ['no_search_interest']);
+  assert.equal(record.status, 'candidate');
 });
 
 test('Given the head keyword group shows demand while a related group is zero, when analyzed, then promotion still succeeds', () => {
@@ -476,7 +517,7 @@ test('Given a failed analysis run followed by a clean run, when analyzed again, 
 test('Given sensitive-topic markers in the candidate text, when analyzed, then sensitive_topic blocks promotion', () => {
   const record = analyzeCandidate(
     makeCandidate({ head_keyword: '투자 수익률', content_angle: '공식 자료로 투자 수익 보장을 검증한다는 관점' }),
-    [makeBlogEnvelope(), makeTrendEnvelope()],
+    [makeBlogEnvelope(), makeTrendEnvelope({ headKeyword: '투자 수익률', response: headBoundTrendBody('투자 수익률') })],
     { now: fixedClock },
   );
   assert.equal(record.evidence_available, true);
@@ -497,7 +538,7 @@ test('Given a sensitive marker only inside a related keyword, when analyzed, the
 test('Given benign health/economy wording without medical or financial claims, when analyzed, then no sensitive flag is added', () => {
   const health = analyzeCandidate(
     makeCandidate({ category: 'health', head_keyword: '수면 습관', related_keywords: ['수면 시간', '수면 환경'], content_angle: '공식 보건 자료를 바탕으로 생활에서 확인할 수 있는 범위를 설명합니다' }),
-    [makeBlogEnvelope(), makeTrendEnvelope()],
+    [makeBlogEnvelope(), makeTrendEnvelope({ headKeyword: '수면 습관', response: headBoundTrendBody('수면 습관') })],
     { now: fixedClock },
   );
   assert.deepEqual(health.risk_flags, []);
@@ -505,7 +546,7 @@ test('Given benign health/economy wording without medical or financial claims, w
 
   const economy = analyzeCandidate(
     makeCandidate({ category: 'economy', head_keyword: '생활 물가', related_keywords: ['물가 지표', '공공 통계'], content_angle: '공공 통계의 기준과 일상에서 확인할 지점을 정리합니다' }),
-    [makeBlogEnvelope(), makeTrendEnvelope()],
+    [makeBlogEnvelope(), makeTrendEnvelope({ headKeyword: '생활 물가', response: headBoundTrendBody('생활 물가') })],
     { now: fixedClock },
   );
   assert.deepEqual(economy.risk_flags, []);
@@ -515,7 +556,7 @@ test('Given benign health/economy wording without medical or financial claims, w
 test('Given a single-token head keyword, when analyzed, then broad_keyword blocks promotion', () => {
   const record = analyzeCandidate(
     makeCandidate({ head_keyword: '수면', related_keywords: ['수면 시간', '수면 환경'] }),
-    [makeBlogEnvelope(), makeTrendEnvelope()],
+    [makeBlogEnvelope(), makeTrendEnvelope({ headKeyword: '수면', response: headBoundTrendBody('수면') })],
     { now: fixedClock },
   );
   assert.equal(record.evidence_available, true);

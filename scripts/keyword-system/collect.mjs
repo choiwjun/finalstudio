@@ -149,16 +149,58 @@ async function selectFixtureFile(fixture, source) {
 }
 
 /**
+ * A real DataLab trend response echoes the caller's keywordGroups back in
+ * `results`. Canned success fixtures cannot contain groups the caller chose
+ * at runtime (automatic discovery invents them per run), so for a successful
+ * trend fixture the requested groups are echoed onto the fixture's data
+ * shape. Error, malformed, and empty fixtures keep their canned bytes.
+ */
+function echoTrendFixture(cannedText, bodyText) {
+  if (typeof bodyText !== "string") return undefined;
+  let request;
+  let canned;
+  try {
+    request = JSON.parse(bodyText);
+    canned = JSON.parse(cannedText);
+  } catch {
+    return undefined;
+  }
+  const groups = request?.keywordGroups;
+  const template = canned?.results?.[0]?.data;
+  if (
+    !Array.isArray(groups) ||
+    groups.length === 0 ||
+    !Array.isArray(template) ||
+    template.length === 0
+  )
+    return undefined;
+  return JSON.stringify({
+    startDate: request.startDate ?? canned.startDate,
+    endDate: request.endDate ?? canned.endDate,
+    timeUnit: request.timeUnit ?? canned.timeUnit,
+    results: groups.map((group) => ({
+      title: group.groupName,
+      keywords: group.keywords,
+      data: template,
+    })),
+  });
+}
+
+/**
  * Build a fixture transport with the same Response-like surface used by the
  * provider. Fixture mode never puts fake credentials, headers, or body text
  * on stdout/stderr.
  */
 export function createFixtureFetch(fixture) {
-  return async (url) => {
+  return async (url, init = {}) => {
     const source = sourceForUrl(url);
     const file = await selectFixtureFile(fixture, source);
-    const text = await readFile(file, "utf8");
     const status = inferFixtureStatus(file);
+    let text = await readFile(file, "utf8");
+    if (source === "trend" && status === 200) {
+      const echoed = echoTrendFixture(text, init.body);
+      if (echoed !== undefined) text = echoed;
+    }
     return {
       status,
       ok: status >= 200 && status < 300,
@@ -189,12 +231,17 @@ function repositoryRelativePath(filePath, outDir) {
   return relative(resolve(outDir), file).split(sep).join("/");
 }
 
-function dateRequest(now, candidate) {
+export function dateRequest(now, candidate) {
   const end = new Date(now.getTime());
   const start = new Date(now.getTime() - 30 * 86_400_000);
   // One keyword group per term so DataLab returns a separate ratio line for the
   // head keyword and each related keyword — merging them into one group sums
-  // the terms and makes head-vs-related comparison impossible.
+  // the terms and makes head-vs-related comparison impossible. DataLab accepts
+  // at most five groups per request, so the head keyword always takes the first
+  // slot and related keywords are deterministically truncated to the remaining
+  // four; the dropped terms stay on the candidate record, and the persisted
+  // request body records exactly which groups were measured.
+  const MAX_TREND_GROUPS = 5;
   const seen = new Set();
   const groups = [candidate.head_keyword, ...candidate.related_keywords]
     .filter((keyword) => {
@@ -203,7 +250,7 @@ function dateRequest(now, candidate) {
       seen.add(key);
       return true;
     })
-    .slice(0, 5)
+    .slice(0, MAX_TREND_GROUPS)
     .map((keyword) => ({ groupName: keyword, keywords: [keyword] }));
   return {
     startDate: ISO_DAY(start),
@@ -211,6 +258,36 @@ function dateRequest(now, candidate) {
     timeUnit: "date",
     keywordGroups: groups,
   };
+}
+
+/**
+ * True only when the trend response echoes exactly the requested keyword
+ * groups: same count, and every returned result binds to one requested group
+ * by normalized groupName/keyword set. A response whose groups do not
+ * correspond to the request measures different terms than asked and cannot be
+ * trusted as evidence for this candidate.
+ */
+export function trendEchoMatches(request, response) {
+  const requested = request?.keywordGroups;
+  const results = response?.results;
+  if (!Array.isArray(requested) || !Array.isArray(results)) return false;
+  const keyOf = (title, keywords) =>
+    `${normalizeKeywordKey(title)}|${(Array.isArray(keywords) ? keywords : [])
+      .map((keyword) => normalizeKeywordKey(keyword))
+      .sort()
+      .join("|")}`;
+  const expected = new Set(
+    requested.map((group) => keyOf(group?.groupName, group?.keywords)),
+  );
+  if (expected.size !== requested.length || results.length !== requested.length)
+    return false;
+  const matched = new Set();
+  for (const result of results) {
+    const key = keyOf(result?.title, result?.keywords);
+    if (!expected.has(key)) return false;
+    matched.add(key);
+  }
+  return matched.size === expected.size;
 }
 
 function assertUniqueCandidates(candidates) {
@@ -313,6 +390,24 @@ async function collectOne({
         status: 0,
         message: "keyword provider failed",
         risk_flags: ["api_error"],
+      };
+    }
+    // The trend response must echo exactly the keyword groups this run sent.
+    // A response listing different groups answers a different request — treat
+    // it as malformed evidence instead of measuring the wrong keywords. Empty
+    // results keep the existing empty-evidence classification.
+    if (
+      item.source === "naver-api-hub-trend" &&
+      !(result && typeof result.kind === "string") &&
+      Array.isArray(result?.results) &&
+      result.results.length > 0 &&
+      !trendEchoMatches(item.request, result)
+    ) {
+      result = {
+        kind: "api_error",
+        status: 502,
+        message: "trend response groups do not match the requested keywordGroups",
+        risk_flags: ["malformed_response"],
       };
     }
     const failed = result && typeof result.kind === "string";
