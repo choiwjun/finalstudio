@@ -6,11 +6,15 @@ import {
   createFixtureFetch,
   writeBoundedJson,
 } from "./collect.mjs";
+import { main as analyzeMain } from "./analyze.mjs";
 import { createNaverApiHubProvider } from "./lib/naver-api-hub-provider.mjs";
+import { normalizeKeywordKey } from "./lib/contracts.mjs";
 import {
   AUTO_CATEGORY_QUERIES,
   buildAutomaticSeedDocument,
-  extractTopicCandidates,
+  collectPhraseStats,
+  relatedPhrasesForTopic,
+  topicCandidatesFromStats,
 } from "./lib/auto-discovery.mjs";
 import {
   assertContainedPath,
@@ -108,25 +112,37 @@ async function discoverFromNaver(args) {
       );
     }
     const discoveryResponseSha256 = hashDiscoveryResponse(response);
-    const topics = extractTopicCandidates(
-      { ...categoryQuery, response },
-      { limit: args.maxCandidates },
-    ).map((topic) => ({
+    // One phrase-stat scan feeds both topic ranking and per-topic related
+    // keywords: related terms are phrases that co-occur with the topic inside
+    // the same NAVER results, not sibling head topics.
+    const stats = collectPhraseStats(categoryQuery.query, response);
+    const topics = topicCandidatesFromStats(stats, {
+      ...categoryQuery,
+      limit: args.maxCandidates,
+    });
+    const headKeys = new Set(
+      topics.map((topic) => normalizeKeywordKey(topic.topic)),
+    );
+    const relatedTopics = topics.map((topic) => ({
       ...topic,
+      related_keywords: relatedPhrasesForTopic(stats, topic.topic, {
+        excludeKeys: headKeys,
+        limit: 5,
+      }),
       discovery_response_sha256: discoveryResponseSha256,
     }));
     if (topics.length === 0)
       fail(
         `NAVER returned no usable topic candidates for ${categoryQuery.category}`,
       );
-    groups.push({ category: categoryQuery.category, topics });
+    groups.push({ category: categoryQuery.category, topics: relatedTopics });
     manifestGroups.push({
       category: categoryQuery.category,
       query: categoryQuery.query,
       result_count: Number.isInteger(response.total)
         ? response.total
         : response.items.length,
-      candidates: topics,
+      candidates: relatedTopics,
       discovery_response_sha256: discoveryResponseSha256,
       response,
       source: {
@@ -182,11 +198,28 @@ export async function main(
   const collectArgs = ["--seed-file", seedPath, "--out-dir", args.outDir];
   if (args.fixture) collectArgs.push("--fixture", args.fixture);
   const collection = await collectMain(collectArgs);
+
+  // Collection alone only marks candidates "researching" — the automatic run
+  // must also analyze the fresh evidence so ready-to-write.json is repopulated
+  // and the write queue is actually fed. Analysis failures propagate (the run
+  // is fail-closed, matching collect's own contract).
+  const analysis = await analyzeMain(["--out-dir", args.outDir]);
+
   const candidateCount = seedDocument.inputs.length;
+  const readyCount = analysis.analysed.filter(
+    (record) => record.status === "ready-to-write",
+  ).length;
   console.log(
-    `automatically discovered ${candidateCount} topic candidate(s); canonical evidence collection completed`,
+    `automatically discovered ${candidateCount} topic candidate(s); canonical evidence collected and analyzed, ${readyCount} ready-to-write`,
   );
-  return { ...args, seedPath, manifestPath, seedDocument, collection };
+  return {
+    ...args,
+    seedPath,
+    manifestPath,
+    seedDocument,
+    collection,
+    analysis,
+  };
 }
 
 if (

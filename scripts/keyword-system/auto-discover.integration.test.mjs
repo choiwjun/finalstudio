@@ -27,6 +27,7 @@ test("automatically discovers category topics and collects canonical evidence wi
     const manifest = await readJson(join(outDir, "automatic-discovery.json"));
     const collection = await readJson(join(outDir, "collection.json"));
     const records = await readJson(join(outDir, "records.json"));
+    const ready = await readJson(join(outDir, "ready-to-write.json"));
 
     assert.equal(result.seedDocument.inputs.length, 6);
     assert.equal(manifest.schema_version, 1);
@@ -44,8 +45,18 @@ test("automatically discovers category topics and collects canonical evidence wi
       manifest.categories[0].discovery_response_sha256,
     );
     assert.equal(collection.candidates.length, 6);
+    // The automatic run now continues past collection into analysis: records
+    // leave "researching" for the analyzed outcomes and the ready-to-write
+    // queue file is populated. Nothing is ever auto-written.
     assert.equal(
-      records.every((record) => record.status === "researching"),
+      records.every((record) =>
+        ["ready-to-write", "candidate"].includes(record.status),
+      ),
+      true,
+    );
+    assert.equal(Array.isArray(ready), true);
+    assert.equal(
+      ready.every((record) => record.status === "ready-to-write"),
       true,
     );
     assert.equal(

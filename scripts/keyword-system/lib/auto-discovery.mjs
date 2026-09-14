@@ -71,9 +71,24 @@ function fail(message) {
 
 function splitTrailingParticle(token) {
   const suffixes = [
+    // Sentence-final endings first — NAVER descriptions carry copula/predicate
+    // tokens ("방법입니다") whose stem ("방법") is a stopword, while the raw
+    // token would survive and form fragment phrases.
+    "했습니다",
+    "였습니다",
+    "습니다",
+    "입니다",
+    "합니다",
+    "됩니다",
     "으로",
     "부터",
     "까지",
+    "였다",
+    "했다",
+    "이다",
+    "된다",
+    "해요",
+    "돼요",
     "를",
     "을",
     "은",
@@ -135,22 +150,22 @@ function normalizeItems(response) {
   return response.items.filter((item) => item && typeof item === "object");
 }
 
+// Description-only phrases are real topic evidence but must rank below
+// title-anchored phrases — the title carries the result's topic identity.
+// The offset keeps title positions strictly smaller on the first_position
+// tie-break.
+const DESCRIPTION_POSITION_OFFSET = 1_000_000;
+
 /**
- * Extract deterministic topic candidates from official NAVER blog results.
- * The score is an internal candidate-ranking signal, not search volume,
- * popularity, traffic, or revenue.
+ * Collect per-phrase occurrence stats across the blog items. Title and
+ * description are mined as separate units so phrase windows never cross the
+ * title/description boundary. The same stats feed both head-topic ranking and
+ * co-occurrence related-keyword extraction, so callers computing related
+ * keywords should reuse the returned map instead of re-running the scan.
  */
-export function extractTopicCandidates(
-  { category, query, response },
-  { limit = 5 } = {},
-) {
-  if (typeof category !== "string" || category.trim() === "")
-    fail("category is required");
+export function collectPhraseStats(query, response) {
   if (typeof query !== "string" || query.trim() === "")
     fail("query is required");
-  if (!Number.isInteger(limit) || limit < 1 || limit > 20)
-    fail("limit must be an integer from 1 to 20");
-
   const queryTokens = new Set(
     normalizeKeyword(query).toLowerCase().split(" ").filter(Boolean),
   );
@@ -165,9 +180,20 @@ export function extractTopicCandidates(
     const title = typeof item.title === "string" ? item.title.trim() : "";
     const description =
       typeof item.description === "string" ? item.description.trim() : "";
-    const normalizedText = normalizeKeyword(title || description);
-    const uniquePhrases = new Set(phraseWindows(normalizedText, stopwords));
+    const texts = [
+      { text: normalizeKeyword(title), offset: 0 },
+      { text: normalizeKeyword(description), offset: DESCRIPTION_POSITION_OFFSET },
+    ].filter((entry) => entry.text !== "");
+    const uniquePhrases = new Set(
+      texts.flatMap((entry) => phraseWindows(entry.text, stopwords)),
+    );
     uniquePhrases.forEach((phrase) => {
+      const position = Math.min(
+        ...texts.map((entry) => {
+          const index = entry.text.indexOf(phrase);
+          return index < 0 ? Number.MAX_SAFE_INTEGER : index + entry.offset;
+        }),
+      );
       const key = normalizeKeywordKey(phrase);
       const previous = stats.get(key) ?? {
         phrase,
@@ -183,15 +209,15 @@ export function extractTopicCandidates(
         supporting_results: previous.supporting_results + 1,
         result_indexes: [...previous.result_indexes, itemIndex],
         first_result_index: Math.min(previous.first_result_index, itemIndex),
-        first_position: Math.min(
-          previous.first_position,
-          normalizedText.indexOf(phrase),
-        ),
+        first_position: Math.min(previous.first_position, position),
       });
     });
   });
+  return stats;
+}
 
-  const candidates = [...stats.values()]
+function rankPhraseStats(stats) {
+  return [...stats.values()]
     .map((item) => ({
       ...item,
       score: item.supporting_results * 100 + item.occurrences,
@@ -208,25 +234,101 @@ export function extractTopicCandidates(
           normalizeKeywordKey(right.phrase),
           "ko",
         ),
-    )
-    .slice(0, limit);
+    );
+}
 
-  return candidates.map((candidate) => ({
+/** Turn ranked phrase stats into topic candidate objects. */
+export function topicCandidatesFromStats(
+  stats,
+  { category, query, limit = 5 } = {},
+) {
+  if (typeof category !== "string" || category.trim() === "")
+    fail("category is required");
+  if (typeof query !== "string" || query.trim() === "")
+    fail("query is required");
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20)
+    fail("limit must be an integer from 1 to 20");
+  return rankPhraseStats(stats)
+    .slice(0, limit)
+    .map((candidate) => ({
+      category,
+      query,
+      topic: candidate.phrase,
+      search_intent: inferSearchIntent(candidate.phrase),
+      discovery_score: candidate.score,
+      supporting_results: candidate.supporting_results,
+      occurrences: candidate.occurrences,
+      source_result_indexes: [...candidate.result_indexes],
+    }));
+}
+
+/**
+ * Extract deterministic topic candidates from official NAVER blog results.
+ * The score is an internal candidate-ranking signal, not search volume,
+ * popularity, traffic, or revenue.
+ */
+export function extractTopicCandidates(
+  { category, query, response },
+  { limit = 5 } = {},
+) {
+  return topicCandidatesFromStats(collectPhraseStats(query, response), {
     category,
     query,
-    topic: candidate.phrase,
-    search_intent: inferSearchIntent(candidate.phrase),
-    discovery_score: candidate.score,
-    supporting_results: candidate.supporting_results,
-    occurrences: candidate.occurrences,
-    source_result_indexes: [...candidate.result_indexes],
-  }));
+    limit,
+  });
+}
+
+/**
+ * Related keywords are phrases that co-occur with the topic inside the same
+ * NAVER result items — not sibling head topics, which are separate candidates.
+ * Phrases that are sub- or superstrings of the topic are redundant trend lines
+ * and are excluded. Ranking: shared result count, then occurrences, then
+ * earliest result position, then phrase key. Deterministic.
+ */
+export function relatedPhrasesForTopic(
+  stats,
+  topic,
+  { excludeKeys = new Set(), limit = 5 } = {},
+) {
+  const topicKey = normalizeKeywordKey(topic);
+  const topicEntry = stats.get(topicKey);
+  if (topicEntry === undefined) return [];
+  const topicIndexes = new Set(topicEntry.result_indexes);
+  return [...stats.entries()]
+    .filter(
+      ([key]) =>
+        key !== topicKey &&
+        !excludeKeys.has(key) &&
+        !key.includes(topicKey) &&
+        !topicKey.includes(key),
+    )
+    .map(([key, entry]) => ({
+      key,
+      entry,
+      shared: entry.result_indexes.filter((index) => topicIndexes.has(index))
+        .length,
+    }))
+    .filter((item) => item.shared > 0)
+    .sort(
+      (left, right) =>
+        right.shared - left.shared ||
+        right.entry.occurrences - left.entry.occurrences ||
+        left.entry.first_result_index - right.entry.first_result_index ||
+        left.key.localeCompare(right.key, "ko"),
+    )
+    .slice(0, limit)
+    .map((item) => item.entry.phrase);
 }
 
 /**
  * Convert automatically discovered topics into the existing seed contract so
  * collection, trend comparison, records, briefs, and approval gates remain
  * compatible. The generated terms are never treated as human approval.
+ *
+ * When a topic carries `related_keywords` (co-occurring phrases from the same
+ * NAVER results, see relatedPhrasesForTopic) they become the seeds' related
+ * terms. Topics without that field fall back to sibling topics for backward
+ * compatibility.
  */
 export function buildAutomaticSeedDocument(
   discovered,
@@ -251,9 +353,14 @@ export function buildAutomaticSeedDocument(
       .map((topic) => topic.topic)
       .filter((topic) => typeof topic === "string" && topic.trim() !== "");
     return group.topics.map((topic, index) => {
-      const related = topics
-        .filter((value) => value !== topic.topic)
-        .slice(0, relatedLimit);
+      const related = Array.isArray(topic.related_keywords)
+        ? dedupeRelated(topic.topic, topic.related_keywords).slice(
+            0,
+            relatedLimit,
+          )
+        : topics
+            .filter((value) => value !== topic.topic)
+            .slice(0, relatedLimit);
       return {
         category: group.category,
         seeds: [topic.topic, ...related],
@@ -266,4 +373,19 @@ export function buildAutomaticSeedDocument(
   });
 
   return { version: 1, inputs };
+}
+
+/** Keep only clean, non-empty related terms that differ from the topic. */
+function dedupeRelated(topic, related) {
+  const topicKey = normalizeKeywordKey(topic);
+  const seen = new Set([topicKey]);
+  const result = [];
+  for (const value of related) {
+    if (typeof value !== "string" || value.trim() === "") continue;
+    const key = normalizeKeywordKey(value);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(value);
+  }
+  return result;
 }

@@ -34,6 +34,8 @@ export const RISK_FLAGS = Object.freeze([
   "sensitive_topic",
   "stale_evidence",
   "insufficient_related_keywords",
+  "no_search_interest",
+  "thin_presence",
 ]);
 export const API_FAILURE_KINDS = Object.freeze([
   "auth_missing",

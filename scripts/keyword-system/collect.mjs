@@ -192,19 +192,24 @@ function repositoryRelativePath(filePath, outDir) {
 function dateRequest(now, candidate) {
   const end = new Date(now.getTime());
   const start = new Date(now.getTime() - 30 * 86_400_000);
+  // One keyword group per term so DataLab returns a separate ratio line for the
+  // head keyword and each related keyword — merging them into one group sums
+  // the terms and makes head-vs-related comparison impossible.
+  const seen = new Set();
+  const groups = [candidate.head_keyword, ...candidate.related_keywords]
+    .filter((keyword) => {
+      const key = normalizeKeywordKey(keyword);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 5)
+    .map((keyword) => ({ groupName: keyword, keywords: [keyword] }));
   return {
     startDate: ISO_DAY(start),
     endDate: ISO_DAY(end),
     timeUnit: "date",
-    keywordGroups: [
-      {
-        groupName: candidate.head_keyword,
-        keywords: [candidate.head_keyword, ...candidate.related_keywords].slice(
-          0,
-          20,
-        ),
-      },
-    ],
+    keywordGroups: groups,
   };
 }
 

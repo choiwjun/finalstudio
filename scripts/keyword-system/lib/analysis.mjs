@@ -18,9 +18,12 @@
 // A "blocking risk" is any derived risk flag: promotion to ready-to-write is
 // refused unless evidence_available is true, related keywords number 2..5,
 // and risk_flags is empty. Evidence risk flags (api_error, rate_limited,
-// auth_missing, forbidden, malformed_response, empty_evidence, stale_evidence)
-// and text risk flags (broad_keyword, sensitive_topic,
-// insufficient_related_keywords) are re-derived on every analysis, so a later
+// auth_missing, forbidden, malformed_response, empty_evidence, stale_evidence),
+// text risk flags (broad_keyword, sensitive_topic,
+// insufficient_related_keywords), and content risk flags derived from the
+// actual metrics — no_search_interest (head keyword's trend group shows zero
+// demand across the whole request window), thin_presence (blog search reports
+// fewer than two total results) — are re-derived on every analysis, so a later
 // clean run can clear transient failure flags.
 
 import {
@@ -364,6 +367,31 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
     if (item.kind === 'failure') for (const flag of item.riskFlags) risks.add(flag);
   }
   if (usable.length > 0 && evidenceDays >= FRESH_MAX_DAYS + 1) risks.add('stale_evidence');
+
+  // --- content signals: the collected data itself judges the candidate -----
+  // The newest usable trend response is checked for real demand: when the
+  // head keyword's own group reports zero ratio on every data point (or has
+  // no data at all), the candidate has no measurable search interest. If the
+  // response does not contain a group for the head keyword (legacy merged
+  // requests), the flag applies only when every reported group is zero — a
+  // nonzero group cannot disprove interest we cannot measure.
+  const newestUsable = (items) => items.reduce((best, item) => (item.collectedAt >= best.collectedAt ? item : best));
+  const isZeroGroup = (group) => group.data_count === 0 || group.max_ratio === 0;
+  const trendUsable = usable.filter((item) => item.source === 'naver-api-hub-trend');
+  if (trendUsable.length > 0) {
+    const trend = deriveTrendSignals(newestUsable(trendUsable).response);
+    const headKey = keywordKey(head_keyword);
+    const headGroup = trend.groups.find((group) => keywordKey(group.title) === headKey);
+    if (headGroup === undefined ? trend.groups.every(isZeroGroup) : isZeroGroup(headGroup)) {
+      risks.add('no_search_interest');
+    }
+  }
+  // A usable blog response whose total is below two means the keyword has
+  // essentially no NAVER blog presence to analyze or join.
+  const blogUsable = usable.filter((item) => item.source === 'naver-api-hub-blog');
+  if (blogUsable.length > 0 && deriveBlogSignals(newestUsable(blogUsable).response).total < 2) {
+    risks.add('thin_presence');
+  }
 
   const riskFlags = [...risks].sort();
   const evidenceAvailable = usable.length > 0;

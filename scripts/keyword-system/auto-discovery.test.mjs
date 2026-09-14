@@ -4,8 +4,12 @@ import { test } from 'node:test';
 import {
   AUTO_CATEGORY_QUERIES,
   buildAutomaticSeedDocument,
+  collectPhraseStats,
   extractTopicCandidates,
+  relatedPhrasesForTopic,
+  topicCandidatesFromStats,
 } from './lib/auto-discovery.mjs';
+import { normalizeKeywordKey } from './lib/contracts.mjs';
 
 const BLOG_FIXTURE = new URL('./fixtures/naver-api-hub/blog-success.json', import.meta.url);
 
@@ -86,4 +90,77 @@ test('uses only the approved top-level category queries', () => {
     'ai',
     'travel',
   ]);
+});
+
+test('related keywords come from phrases co-occurring in the same NAVER items', async () => {
+  const response = await readFixture();
+  const stats = collectPhraseStats('AI 인공지능', response);
+  const topics = topicCandidatesFromStats(stats, {
+    category: 'ai',
+    query: 'AI 인공지능',
+    limit: 3,
+  });
+  const headKeys = new Set(topics.map((topic) => normalizeKeywordKey(topic.topic)));
+
+  const related = relatedPhrasesForTopic(stats, topics[0].topic, {
+    excludeKeys: headKeys,
+  });
+
+  assert.ok(related.length > 0);
+  // Every related phrase shares at least one source result with the topic.
+  const topicIndexes = new Set(topics[0].source_result_indexes);
+  for (const phrase of related) {
+    const entry = stats.get(normalizeKeywordKey(phrase));
+    assert.ok(entry.result_indexes.some((index) => topicIndexes.has(index)));
+    // Head topics and sub/superset duplicates of the topic are excluded.
+    assert.equal(headKeys.has(normalizeKeywordKey(phrase)), false);
+    assert.equal(
+      normalizeKeywordKey(phrase).includes(normalizeKeywordKey(topics[0].topic)),
+      false,
+    );
+    assert.equal(
+      normalizeKeywordKey(topics[0].topic).includes(normalizeKeywordKey(phrase)),
+      false,
+    );
+  }
+});
+
+test('seed document prefers co-occurrence related keywords over sibling topics', () => {
+  const document = buildAutomaticSeedDocument([
+    {
+      category: 'ai',
+      topics: [
+        {
+          topic: '엑셀 자동화',
+          search_intent: '방법',
+          related_keywords: ['엑셀 기능', '반복 업무', '업무 줄이기'],
+        },
+        { topic: '업무 자동화', search_intent: '개념' },
+      ],
+    },
+  ]);
+
+  assert.deepEqual(document.inputs[0].seeds, [
+    '엑셀 자동화',
+    '엑셀 기능',
+    '반복 업무',
+    '업무 줄이기',
+  ]);
+  // A topic without related_keywords keeps the sibling-topic fallback.
+  assert.deepEqual(document.inputs[1].seeds, ['업무 자동화', '엑셀 자동화']);
+});
+
+test('related_keywords on a topic are deduplicated and never repeat the head term', () => {
+  const document = buildAutomaticSeedDocument([
+    {
+      category: 'ai',
+      topics: [
+        {
+          topic: '엑셀 자동화',
+          related_keywords: ['엑셀 자동화', '엑셀 기능', '엑셀 기능', ' ', 7],
+        },
+      ],
+    },
+  ]);
+  assert.deepEqual(document.inputs[0].seeds, ['엑셀 자동화', '엑셀 기능']);
 });

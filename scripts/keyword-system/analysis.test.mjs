@@ -254,6 +254,97 @@ test('Given the same input twice with the same clock, when analyzed, then the re
 });
 
 // ---------------------------------------------------------------------------
+// analyzeCandidate: content signals from the collected metrics
+// ---------------------------------------------------------------------------
+
+test('Given the head keyword trend group reports zero on every data point, when analyzed, then no_search_interest blocks promotion', () => {
+  const zeroDemand = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [
+      { title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [{ period: '2026-09-08', ratio: 0 }, { period: '2026-09-09', ratio: 0 }] },
+      { title: '엑셀 매크로', keywords: ['엑셀 매크로'], data: [{ period: '2026-09-09', ratio: 87 }] },
+    ],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: zeroDemand })],
+    { now: fixedClock },
+  );
+  assert.equal(record.evidence_available, true);
+  assert.deepEqual(record.risk_flags, ['no_search_interest']);
+  assert.equal(record.status, 'candidate');
+});
+
+test('Given the head trend group carries an empty data array, when analyzed, then the contract marks it malformed and blocks promotion', () => {
+  const noData = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [{ title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [] }],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: noData })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, ['malformed_response']);
+  assert.equal(record.status, 'candidate');
+});
+
+test('Given the head keyword group is absent but another group has demand, when analyzed, then promotion still succeeds', () => {
+  // Legacy merged requests and unrelated groups cannot prove zero interest in
+  // the head keyword; the flag must not fire when any group shows demand.
+  const otherDemand = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [{ title: '다른 주제', keywords: ['다른 주제'], data: [{ period: '2026-09-09', ratio: 55 }] }],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: otherDemand })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, []);
+  assert.equal(record.status, 'ready-to-write');
+});
+
+test('Given the head keyword group shows demand while a related group is zero, when analyzed, then promotion still succeeds', () => {
+  // The judgment targets the head keyword's own demand line; a weak related
+  // keyword does not disqualify a strong head.
+  const mixed = {
+    startDate: '2026-09-01',
+    endDate: '2026-09-09',
+    timeUnit: 'date',
+    results: [
+      { title: '엑셀 자동화', keywords: ['엑셀 자동화'], data: [{ period: '2026-09-09', ratio: 42 }] },
+      { title: '엑셀 매크로', keywords: ['엑셀 매크로'], data: [{ period: '2026-09-09', ratio: 0 }] },
+    ],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: mixed })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, []);
+  assert.equal(record.status, 'ready-to-write');
+});
+
+test('Given a blog response reporting a single total result, when analyzed, then thin_presence blocks promotion', () => {
+  const thin = { ...structuredClone(BLOG_BODY), total: 1, items: [structuredClone(BLOG_BODY).items[0]] };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope({ response: thin }), makeTrendEnvelope()],
+    { now: fixedClock },
+  );
+  assert.equal(record.evidence_available, true);
+  assert.deepEqual(record.risk_flags, ['thin_presence']);
+  assert.equal(record.status, 'candidate');
+});
+
+// ---------------------------------------------------------------------------
 // analyzeCandidate: freshness boundaries
 // ---------------------------------------------------------------------------
 
