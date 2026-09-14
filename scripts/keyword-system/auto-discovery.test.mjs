@@ -164,3 +164,31 @@ test('related_keywords on a topic are deduplicated and never repeat the head ter
   ]);
   assert.deepEqual(document.inputs[0].seeds, ['엑셀 자동화', '엑셀 기능']);
 });
+
+test('rejects phrases that can never be usable topics or related keywords', () => {
+  const response = {
+    items: [
+      {
+        title: '2026년 9월 경제뉴스 정리 자세히 보기 https://www.nbnnews.co.kr/news/articleView.html',
+        description:
+          '9월 14일 속도 조절해야 괜찮 걸까 상품 정리해봤어요 네오사피엔스 공모주 청약 일정입니다',
+        link: 'https://example.com/1',
+        bloggername: 'tester',
+        postdate: '20260914',
+      },
+    ],
+  };
+  const stats = collectPhraseStats('경제 뉴스', response);
+  const phrases = [...stats.values()].map((entry) => entry.phrase);
+  // Pure date expressions are never topics.
+  assert.ok(!phrases.includes('2026년 9월'));
+  assert.ok(!phrases.includes('9월 14일'));
+  // URL fragments from descriptions never leak into phrases.
+  assert.ok(!phrases.some((phrase) => /https?|www|\.co\.kr|articleview/i.test(phrase)));
+  // Windows ending in sentence-final endings or adverbial residue are rejected.
+  for (const bad of ['속도 조절해야', '괜찮 걸까', '상품 정리해봤어요']) {
+    assert.ok(!phrases.includes(bad), `expected ${bad} to be filtered`);
+  }
+  // Real topic phrases still survive.
+  assert.ok(phrases.includes('네오사피엔스 공모주'));
+});

@@ -191,18 +191,24 @@ export function deriveTrendSignals(trendResponse) {
   }
   const groups = response.results.map((result) => {
     const ratios = result.data.map((entry) => entry.ratio);
-    const maxRatio = Math.max(...ratios);
+    const maxRatio = ratios.length > 0 ? Math.max(...ratios) : 0;
     const maxEntry = result.data.find((entry) => entry.ratio === maxRatio);
-    const latestEntry = result.data.reduce((best, entry) => (entry.period >= best.period ? entry : best));
+    const latestEntry =
+      result.data.length > 0
+        ? result.data.reduce((best, entry) => (entry.period >= best.period ? entry : best))
+        : undefined;
     return {
       title: result.title,
       keywords: result.keywords,
       data_count: result.data.length,
-      latest_period: latestEntry.period,
-      latest_ratio: latestEntry.ratio,
-      max_period: maxEntry.period,
+      latest_period: latestEntry?.period ?? null,
+      latest_ratio: latestEntry?.ratio ?? 0,
+      max_period: maxEntry?.period ?? null,
       max_ratio: maxRatio,
-      average_ratio: ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length,
+      average_ratio:
+        ratios.length > 0
+          ? ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length
+          : 0,
     };
   });
   return {

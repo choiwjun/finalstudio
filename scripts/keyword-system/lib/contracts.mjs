@@ -302,8 +302,8 @@ export const isValidBlogSearchResponse = (value) => {
 function normalizeTrendData(data, resultIndex) {
   if (!Array.isArray(data))
     fail(`response.results[${resultIndex}].data`, "must be an array");
-  if (data.length === 0)
-    fail(`response.results[${resultIndex}].data`, "must not be empty");
+  // An empty data array is a real DataLab answer: the group was measured and
+  // has zero demand in the window. It is not malformed.
   if (data.length > MAX_TREND_DATA_POINTS)
     fail(
       `response.results[${resultIndex}].data`,

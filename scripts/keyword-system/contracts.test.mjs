@@ -519,7 +519,6 @@ test("Given documented numeric, category, and timestamp boundaries, when validat
         { ...trend.results[0], keywords: [], data: trend.results[0].data },
       ],
     },
-    { ...trend, results: [{ ...trend.results[0], keywords: ["x"], data: [] }] },
     {
       ...trend,
       results: [
@@ -532,6 +531,13 @@ test("Given documented numeric, category, and timestamp boundaries, when validat
       ContractValidationError,
     );
   }
+  // A measured zero-demand group legitimately returns an empty data array.
+  assert.doesNotThrow(() =>
+    normalizeTrendResponse({
+      ...trend,
+      results: [{ ...trend.results[0], keywords: ["x"], data: [] }],
+    }),
+  );
 
   for (const category of ["---", "-ai-it", "ai-it-", "AI-it"]) {
     assert.throws(

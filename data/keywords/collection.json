@@ -1,335 +1,335 @@
 {
   "schema_version": 1,
-  "run_id": "20260911T124058Z-e64b20c0",
-  "collected_at": "2026-09-11T12:40:58.537Z",
+  "run_id": "20260914T011556Z-0c97db22",
+  "collected_at": "2026-09-14T01:15:56.882Z",
   "candidates": [
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "주가 전망 차트분석"
+        "head_keyword": "크루져 Cruiser"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-economy-business-주가-전망-차트분석.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-크루져-Cruiser.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-economy-business-주가-전망-차트분석.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-크루져-Cruiser.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "주가 전망"
+        "head_keyword": "전하 블로그"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-economy-business-주가-전망.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-전하-블로그.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-economy-business-주가-전망.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-전하-블로그.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "전망 차트분석"
+        "head_keyword": "블로그 쥔장 크루져"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-economy-business-전망-차트분석.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-블로그-쥔장-크루져.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-economy-business-전망-차트분석.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-블로그-쥔장-크루져.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "100달러 돌파"
+        "head_keyword": "블로그 쥔장"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-economy-business-100달러-돌파.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-블로그-쥔장.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-economy-business-100달러-돌파.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-블로그-쥔장.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "브렌트유 100달러"
+        "head_keyword": "쥔장 크루져 Cruiser"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-economy-business-브렌트유-100달러.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-쥔장-크루져-Cruiser.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-economy-business-브렌트유-100달러.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-쥔장-크루져-Cruiser.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "네오사피엔스 공모주 청약"
+        "head_keyword": "개발 속도"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-ai-네오사피엔스-공모주-청약.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-개발-속도.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-ai-네오사피엔스-공모주-청약.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-개발-속도.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "네오사피엔스 공모주"
+        "head_keyword": "앤트로픽 오픈AI"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-ai-네오사피엔스-공모주.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-앤트로픽-오픈AI.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-ai-네오사피엔스-공모주.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-앤트로픽-오픈AI.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "공모주 청약"
+        "head_keyword": "2026년 9월"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-ai-공모주-청약.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-2026년-9월.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-ai-공모주-청약.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-2026년-9월.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "LG AI연구원"
+        "head_keyword": "9월 14일"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-ai-LG-AI연구원.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-9월-14일.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-ai-LG-AI연구원.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-9월-14일.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "데이터센터 전력"
+        "head_keyword": "하루 다르게"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-ai-데이터센터-전력.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-하루-다르게.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-ai-데이터센터-전력.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-하루-다르게.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "제주 애월"
+        "head_keyword": "한눈 보는"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-travel-제주-애월.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-한눈-보는.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-travel-제주-애월.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-한눈-보는.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "가격 비교"
+        "head_keyword": "항목 내용 여행사"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-travel-가격-비교.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-항목-내용-여행사.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-travel-가격-비교.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-항목-내용-여행사.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "스튜디오 옥스포드 일일"
+        "head_keyword": "항목 내용"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-travel-스튜디오-옥스포드-일일.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-항목-내용.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-travel-스튜디오-옥스포드-일일.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-항목-내용.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "해리포터 스튜디오 옥스포드"
+        "head_keyword": "내용 여행사"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-travel-해리포터-스튜디오-옥스포드.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-내용-여행사.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-travel-해리포터-스튜디오-옥스포드.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-내용-여행사.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "스튜디오 옥스포드"
+        "head_keyword": "상품 정리해봤어요"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-blog-travel-스튜디오-옥스포드.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-상품-정리해봤어요.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/11/20260911T124058Z-e64b20c0/naver-api-hub-trend-travel-스튜디오-옥스포드.json",
-          "run_id": "20260911T124058Z-e64b20c0",
-          "collected_at": "2026-09-11T12:40:58.537Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-상품-정리해봤어요.json",
+          "run_id": "20260914T011556Z-0c97db22",
+          "collected_at": "2026-09-14T01:15:56.882Z"
         }
       ]
     }

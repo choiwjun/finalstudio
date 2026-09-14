@@ -298,7 +298,9 @@ test('Given the head keyword trend group reports zero on every data point, when 
   assert.equal(record.status, 'candidate');
 });
 
-test('Given the head trend group carries an empty data array, when analyzed, then the contract marks it malformed and blocks promotion', () => {
+test('Given the head trend group carries an empty data array, when analyzed, then measured zero demand blocks promotion', () => {
+  // Real DataLab answers echo a zero-volume group with data: [] — that is a
+  // legitimate measurement of no interest, not a malformed response.
   const noData = {
     startDate: '2026-09-01',
     endDate: '2026-09-09',
@@ -310,7 +312,7 @@ test('Given the head trend group carries an empty data array, when analyzed, the
     [makeBlogEnvelope(), makeTrendEnvelope({ response: noData })],
     { now: fixedClock },
   );
-  assert.deepEqual(record.risk_flags, ['malformed_response']);
+  assert.deepEqual(record.risk_flags, ['no_search_interest']);
   assert.equal(record.status, 'candidate');
 });
 

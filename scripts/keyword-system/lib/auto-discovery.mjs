@@ -112,6 +112,22 @@ function splitTrailingParticle(token) {
   return token;
 }
 
+// Phrases that can never be a usable topic or related keyword, no matter how
+// often they co-occur: pure calendar expressions, URL fragments leaking from
+// descriptions, and windows ending in a sentence-final ending or adverbial
+// residue (the token-level particle splitter cannot see phrase-final verbs).
+const DATE_TOKEN_PATTERN = /^(?:\d{4}년|\d{1,2}월|\d{1,2}일|\d{1,4}분기|\d{1,2}주차|\d+년도|\d+)$/;
+const URL_TOKEN_PATTERN = /^(?:https?|www)$|\/|[a-z0-9-]+\.(?:com|net|org|io|kr|co)/i;
+const FRAGMENT_ENDING_PATTERN =
+  /(?:해야|해서|하고|하면|하는|해왔|걸까|건가요|어요|아요|여요|에요|였어요|세요|네요|군요|이에요|예요|봤어요|봅니다|드립니다|려주|없이|려고|인데|지만|더라|거든|잖아|랍니다|까요|시죠)$/u;
+
+function isViablePhrase(window) {
+  if (window.every((token) => DATE_TOKEN_PATTERN.test(token))) return false;
+  if (window.some((token) => URL_TOKEN_PATTERN.test(token))) return false;
+  if (FRAGMENT_ENDING_PATTERN.test(window[window.length - 1])) return false;
+  return true;
+}
+
 function phraseWindows(text, stopwords) {
   const tokens = normalizeKeyword(text)
     .split(" ")
@@ -132,7 +148,11 @@ function phraseWindows(text, stopwords) {
       )
         continue;
       const phrase = window.join(" ");
-      if (phrase.length <= MAX_TOPIC_LENGTH && SAFE_TOPIC_PATTERN.test(phrase))
+      if (
+        phrase.length <= MAX_TOPIC_LENGTH &&
+        SAFE_TOPIC_PATTERN.test(phrase) &&
+        isViablePhrase(window)
+      )
         phrases.push(phrase);
     }
   }
