@@ -14,8 +14,9 @@ aiAssisted: true
 image: /images/travel-3nights-5days-package-main.png
 ---
 
-<!-- wj-auto-images:travel-3nights-5days-package:99e0d94f62a4eb51057c0be23f3401e588573f835e54812fd651fcf19b90dba1 -->
+<!-- wj-auto-images:travel-3nights-5days-package:4605c5e855416e72c878572934b779d395d26151bc1a5d567bcaa07f38a77376 -->
 대표 이미지와 "AI 생성 일러스트"로 표시된 본문 이미지는 AI 생성이며 실제 사진·스크린샷이 아닙니다.
+
 
 3박 5일 패키지 여행은 상품명보다 일정표, 포함 사항, 출발지 동선을 같은 기준으로 비교해야 합니다. 날짜별 방문 도시와 이동 구간을 적고 노팁·노옵션 문구의 적용 범위를 확인합니다. 집에서 출발지까지의 이동과 현지 도착 후 첫 숙소까지의 동선도 따로 살펴봅니다.
 
@@ -31,7 +32,7 @@ image: /images/travel-3nights-5days-package-main.png
 | 휴양과 관광을 함께 원할 때 | 숙소 위치와 관광 일정 사이의 이동을 비교합니다. | 객실 업그레이드나 호텔 혜택은 포함 여부를 따로 확인합니다. |
 
 
-<!-- wj-image-section:875f870e1aefd0a4 -->
+<!-- wj-image-section:4befe0f4e8a7ee30 -->
 ![AI 생성 일러스트 — 핵심 요약: 한눈에 보기](/images/travel-3nights-5days-package-sub-1.png)
 
 ## 일정표는 방문지보다 이동 순서부터 봅니다
@@ -77,7 +78,7 @@ image: /images/travel-3nights-5days-package-main.png
 이 양식을 실제 자료에 적용하면 이렇게 됩니다. 다낭과 호이안을 잇는 상품 자료에는 바나힐과 호이안 올드타운 방문이 포함됐다고 적혀 있으므로, 일정표에서 두 도시 사이 이동이 어느 날에 배치됐는지를 먼저 찾습니다. 그다음 노옵션 문구가 있으면 포함 관광 목록과 별도 지불 항목을 나눠 적고, 출발 공항과 집결 위치가 비어 있으면 그 칸을 채우기 전까지 다른 상품과 비교하지 않습니다. 이렇게 한 상품의 빈칸이 드러나면 그 항목이 문의 대상입니다.
 
 
-<!-- wj-image-section:ff9ccd511826d214 -->
+<!-- wj-image-section:37bb491aad896de9 -->
 ![AI 생성 일러스트 — 일정표는 방문지보다 이동 순서부터 봅니다](/images/travel-3nights-5days-package-sub-2.png)
 
 ## 노팁·노옵션은 제목보다 포함표를 먼저 봅니다

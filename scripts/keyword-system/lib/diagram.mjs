@@ -87,8 +87,17 @@ function pickLabels(candidates, postText, { max = 3, maxLen = 18 } = {}) {
   const seen = new Set();
   const isMarker = (label) =>
     /\[직접|확인 필요\]|확인 필요:|TODO|TBD/u.test(label);
+  // Residual markdown/URL fragments — a sentence or cell boundary can cut a
+  // link mid-token, leaving raw `[text](https://…` or `…/12345)` residue that
+  // would render literally in the image.
+  const isJunk = (label) =>
+    /[\[\]]|https?:|www\.|[a-z0-9-]+\.(?:com|net|kr|co|or|io|dev)\b/iu.test(
+      label,
+    ) ||
+    (label.match(/\(/gu) ?? []).length !== (label.match(/\)/gu) ?? []).length;
   const push = (label) => {
-    if (!label || seen.has(label) || isMarker(label)) return false;
+    if (!label || seen.has(label) || isMarker(label) || isJunk(label))
+      return false;
     if (!verbatim(label, postText)) return false;
     seen.add(label);
     out.push(label);
@@ -111,7 +120,9 @@ function tableCells(sectionBody) {
   const tables =
     sectionBody.match(/^\|.+\|$(?:\r?\n^\|[\s:|-]+\|$)(?:\r?\n^\|.+\|$)*/gmu) ??
     [];
-  // data rows only — skip header row and separator row of each table
+  // data rows only — skip header row and separator row of each table.
+  // Pure-link cells carry only a source reference, not article content, so
+  // they are weaker diagram labels than substantive cells.
   return tables.flatMap((table) =>
     table
       .split(/\r?\n/u)
@@ -121,7 +132,7 @@ function tableCells(sectionBody) {
           .split("|")
           .slice(1, -1)
           .map((c) => c.trim())
-          .filter(Boolean),
+          .filter((c) => c && !/^\[[^\]]+\]\([^)]*\)$/u.test(c)),
       ),
   );
 }
