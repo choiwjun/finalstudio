@@ -450,7 +450,7 @@ if (
 ) {
   main().catch((error) => {
     process.stderr.write(
-      `keyword draft generation failed (${error?.code ?? "KEYWORD_DRAFT_CLI"})\n`,
+      `keyword draft generation failed (${error?.code ?? "KEYWORD_DRAFT_CLI"}): ${error?.message ?? error}\n`,
     );
     process.exitCode = 1;
   });

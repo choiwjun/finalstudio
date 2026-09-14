@@ -1,28 +1,6 @@
 [
   {
     "category": "ai",
-    "head_keyword": "AI 데이터센터",
-    "related_keywords": [
-      "데이터센터 전력",
-      "국가 AI 컴퓨팅센터",
-      "부유식 데이터센터 FDC",
-      "AI 인프라",
-      "광통신"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 AI 데이터센터",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T07:23:07.953Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "ready-to-write"
-  },
-  {
-    "category": "ai",
     "head_keyword": "인공지능 윤리",
     "related_keywords": [
       "AI 윤리",
