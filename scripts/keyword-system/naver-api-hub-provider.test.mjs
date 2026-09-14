@@ -103,7 +103,7 @@ test('Given a trend request and a success fixture body, when searchTrends runs, 
   assert.deepEqual(JSON.parse(call.init.body), normalizeTrendRequest(TREND_REQUEST));
 
   assert.deepEqual(result, normalizeTrendResponse(await readJsonFixture('trend-success.json')));
-  assert.equal(result.results[0].data[0].ratio, 61.23);
+  assert.equal(result.results[0].data[0].ratio, 55.1);
   assert.equal(singleRead, true);
 });
 

@@ -25,28 +25,6 @@
   },
   {
     "category": "ai",
-    "head_keyword": "LG AI연구원",
-    "related_keywords": [
-      "네오사피엔스 공모주 청약",
-      "네오사피엔스 공모주",
-      "공모주 청약",
-      "데이터센터 전력",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 LG AI연구원",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "ai",
     "head_keyword": "개발 속도",
     "related_keywords": [
       "앤트로픽 다리오",
@@ -68,72 +46,6 @@
     ],
     "evidence_available": true,
     "status": "candidate"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "공모주 청약",
-    "related_keywords": [
-      "네오사피엔스 공모주 청약",
-      "네오사피엔스 공모주",
-      "LG AI연구원",
-      "데이터센터 전력",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 공모주 청약",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "네오사피엔스 공모주",
-    "related_keywords": [
-      "네오사피엔스 공모주 청약",
-      "공모주 청약",
-      "LG AI연구원",
-      "데이터센터 전력",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 네오사피엔스 공모주",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "네오사피엔스 공모주 청약",
-    "related_keywords": [
-      "네오사피엔스 공모주",
-      "공모주 청약",
-      "LG AI연구원",
-      "데이터센터 전력",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 네오사피엔스 공모주 청약",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
   },
   {
     "category": "ai",
@@ -182,28 +94,6 @@
     ],
     "evidence_available": true,
     "status": "candidate"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "데이터센터 전력",
-    "related_keywords": [
-      "네오사피엔스 공모주 청약",
-      "네오사피엔스 공모주",
-      "공모주 청약",
-      "LG AI연구원",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 데이터센터 전력",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
   },
   {
     "category": "ai",
@@ -279,50 +169,6 @@
   },
   {
     "category": "economy-business",
-    "head_keyword": "100달러 돌파",
-    "related_keywords": [
-      "주가 전망 차트분석",
-      "주가 전망",
-      "전망 차트분석",
-      "브렌트유 100달러",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 100달러 돌파",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "economy-business",
-    "head_keyword": "브렌트유 100달러",
-    "related_keywords": [
-      "주가 전망 차트분석",
-      "주가 전망",
-      "전망 차트분석",
-      "100달러 돌파",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 브렌트유 100달러",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "economy-business",
     "head_keyword": "블로그 쥔장",
     "related_keywords": [
       "쥔장 크루져",
@@ -371,28 +217,6 @@
   },
   {
     "category": "economy-business",
-    "head_keyword": "전망 차트분석",
-    "related_keywords": [
-      "주가 전망 차트분석",
-      "주가 전망",
-      "100달러 돌파",
-      "브렌트유 100달러",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 전망 차트분석",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "economy-business",
     "head_keyword": "전하 블로그",
     "related_keywords": [
       "쥔장 크루져",
@@ -414,50 +238,6 @@
     ],
     "evidence_available": true,
     "status": "candidate"
-  },
-  {
-    "category": "economy-business",
-    "head_keyword": "주가 전망",
-    "related_keywords": [
-      "주가 전망 차트분석",
-      "전망 차트분석",
-      "100달러 돌파",
-      "브렌트유 100달러",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 주가 전망",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "economy-business",
-    "head_keyword": "주가 전망 차트분석",
-    "related_keywords": [
-      "주가 전망",
-      "전망 차트분석",
-      "100달러 돌파",
-      "브렌트유 100달러",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 주가 전망 차트분석",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
   },
   {
     "category": "economy-business",
@@ -555,50 +335,6 @@
   },
   {
     "category": "travel",
-    "head_keyword": "가격 비교",
-    "related_keywords": [
-      "제주 애월",
-      "스튜디오 옥스포드 일일",
-      "해리포터 스튜디오 옥스포드",
-      "스튜디오 옥스포드",
-      "NAVER 블로그"
-    ],
-    "search_intent": "비교",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 가격 비교",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "가족 숙소",
-    "related_keywords": [
-      "알려주 다양한 작품들",
-      "오딧세이뜻 알려주 다양한",
-      "알려주 다양한",
-      "오딧세이뜻 알려주",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 가족 숙소",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:32:05.171Z",
-    "freshness": "unknown",
-    "risk_flags": [],
-    "evidence_available": false,
-    "status": "researching"
-  },
-  {
-    "category": "travel",
     "head_keyword": "계획하면서 숙소",
     "related_keywords": [
       "확인 사항",
@@ -647,138 +383,6 @@
   },
   {
     "category": "travel",
-    "head_keyword": "스튜디오 옥스포드",
-    "related_keywords": [
-      "제주 애월",
-      "가격 비교",
-      "스튜디오 옥스포드 일일",
-      "해리포터 스튜디오 옥스포드",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 스튜디오 옥스포드",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "스튜디오 옥스포드 일일",
-    "related_keywords": [
-      "제주 애월",
-      "가격 비교",
-      "해리포터 스튜디오 옥스포드",
-      "스튜디오 옥스포드",
-      "옥스포드 일일"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 스튜디오 옥스포드 일일",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "알려주 다양한",
-    "related_keywords": [
-      "가족 숙소",
-      "알려주 다양한 작품들",
-      "오딧세이뜻 알려주 다양한",
-      "오딧세이뜻 알려주",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 알려주 다양한",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:32:05.171Z",
-    "freshness": "unknown",
-    "risk_flags": [],
-    "evidence_available": false,
-    "status": "researching"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "알려주 다양한 작품들",
-    "related_keywords": [
-      "가족 숙소",
-      "오딧세이뜻 알려주 다양한",
-      "알려주 다양한",
-      "오딧세이뜻 알려주",
-      "다양한 작품들"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 알려주 다양한 작품들",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:32:05.171Z",
-    "freshness": "unknown",
-    "risk_flags": [],
-    "evidence_available": false,
-    "status": "researching"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "오딧세이뜻 알려주 다양한",
-    "related_keywords": [
-      "가족 숙소",
-      "알려주 다양한 작품들",
-      "알려주 다양한",
-      "오딧세이뜻 알려주",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 오딧세이뜻 알려주 다양한",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:32:05.171Z",
-    "freshness": "unknown",
-    "risk_flags": [],
-    "evidence_available": false,
-    "status": "researching"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "제주 애월",
-    "related_keywords": [
-      "가격 비교",
-      "스튜디오 옥스포드 일일",
-      "해리포터 스튜디오 옥스포드",
-      "스튜디오 옥스포드",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 제주 애월",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
-  },
-  {
-    "category": "travel",
     "head_keyword": "항목 내용",
     "related_keywords": [
       "기간 3박",
@@ -824,27 +428,5 @@
     ],
     "evidence_available": true,
     "status": "candidate"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "해리포터 스튜디오 옥스포드",
-    "related_keywords": [
-      "제주 애월",
-      "가격 비교",
-      "스튜디오 옥스포드 일일",
-      "스튜디오 옥스포드",
-      "해리포터 스튜디오"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 해리포터 스튜디오 옥스포드",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:40:58.537Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "written"
   }
 ]

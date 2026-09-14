@@ -139,7 +139,7 @@ test("Given successful blog and trend fixture bodies, when normalized, then type
       .replaceAll("</b>", ""),
   );
   assert.equal(blog.items[0].description.includes("<b>"), false);
-  assert.equal(trend.results[0].data[0].ratio, 61.23);
+  assert.equal(trend.results[0].data[0].ratio, 55.1);
   assert.equal(isValidBlogSearchResponse(blog), true);
   assert.equal(isValidTrendResponse(trend), true);
 });

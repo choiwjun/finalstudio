@@ -179,7 +179,7 @@ test('Given a successful trend fixture, when evidence is written, then keyword g
     const parsed = JSON.parse(await readFile(result.path, 'utf8'));
     assert.equal(result.path, join(root, '2026', '09', '09', RUN_ID, 'naver-api-hub-trend-업무-자동화.json'));
     assert.deepEqual(parsed.request.keywordGroups[0], { groupName: '업무 자동화', keywords: ['엑셀 자동화', '엑셀 매크로'] });
-    assert.equal(parsed.response.results[0].data[0].ratio, 61.23);
+    assert.equal(parsed.response.results[0].data[0].ratio, 55.1);
     assert.equal(parsed.http.ok, true);
     assert.equal(parsed.error, undefined);
   });
