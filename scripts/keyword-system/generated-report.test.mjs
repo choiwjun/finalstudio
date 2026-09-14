@@ -66,3 +66,21 @@ test("all reader prose and verification markers outside the archived tail remain
   assert.equal(result.article, oil.slice(0, result.archive.start));
   assert.ok(result.article.includes("[직접 확인 필요: 발행 전 NAVER API HUB"));
 });
+test("single-line --- 윤문 리포트 --- wrapper is separated only when the tail is a complete report", () => {
+  const looseTail =
+    "--- 윤문 리포트 ---\n\n변경률: 약 9%\n\n카테고리별 수정: A 번역투 4건, E 문장 리듬 3건\n\n주요 변경 1건:\n\n- \"전\" → \"후\"\n\n자체검증: 6항 중 6항 통과\n";
+  for (const prefix of ["기사 본문입니다.\n\n", "기사 본문입니다.\n\n---\n\n"]) {
+    const source = prefix + looseTail;
+    const result = separateGeneratedReport(source);
+    assert.equal(result.article, prefix.replace(/---\r?\n\r?\n$/u, ""));
+    assert.equal(result.archive.text, source.slice(result.article.length));
+    assert.equal(restoreGeneratedReport(result.article, result.archive), source);
+  }
+  assert.throws(
+    () =>
+      separateGeneratedReport(
+        "본문\n\n--- 윤문 리포트 ---\n\n변경률: 약 9%\n\n끝나지 않은 리포트\n",
+      ),
+    /report/,
+  );
+});

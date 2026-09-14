@@ -281,7 +281,7 @@
     "freshness": "fresh",
     "risk_flags": [],
     "evidence_available": true,
-    "status": "ready-to-write"
+    "status": "written"
   },
   {
     "category": "ai",
@@ -422,7 +422,7 @@
     "freshness": "fresh",
     "risk_flags": [],
     "evidence_available": true,
-    "status": "ready-to-write"
+    "status": "written"
   },
   {
     "category": "economy-business",
@@ -850,7 +850,7 @@
     "freshness": "fresh",
     "risk_flags": [],
     "evidence_available": true,
-    "status": "ready-to-write"
+    "status": "written"
   },
   {
     "category": "travel",

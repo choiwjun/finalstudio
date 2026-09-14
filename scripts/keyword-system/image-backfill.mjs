@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { basename, relative, resolve } from "node:path";
+import { basename, dirname, relative, resolve } from "node:path";
+import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import {
   generateImageBundle,
@@ -7,7 +8,13 @@ import {
 } from "./lib/image-bundle.mjs";
 import { imageRoles } from "./lib/image-plan.mjs";
 import { containedPath, readBounded } from "./lib/image-storage.mjs";
+import {
+  openVerifiedDirectory,
+  writeStableTextAtDirectory,
+} from "./lib/file-lock.mjs";
 import { IMAGE_DEADLINE_MS } from "./lib/image-runtime.mjs";
+import { extractArticleSignals } from "./lib/visual-brief.mjs";
+import { buildDiagramSpec, renderDiagramSvg } from "./lib/diagram.mjs";
 
 export function parseImageBackfillArgs(argv = []) {
   let result = { dryRun: false, subCount: 2 };
@@ -15,6 +22,10 @@ export function parseImageBackfillArgs(argv = []) {
     const flag = argv[index];
     if (flag === "--dry-run") {
       result = { ...result, dryRun: true };
+      continue;
+    }
+    if (flag === "--diagram") {
+      result = { ...result, diagram: true };
       continue;
     }
     if (!["--approved", "--sub-count"].includes(flag))
@@ -68,6 +79,45 @@ async function readApprovedList(root, path) {
     throw Error("duplicate approved post");
   return Object.freeze(posts);
 }
+
+async function rasterizeDiagram(svg) {
+  const { default: sharp } = await import("sharp");
+  return sharp(Buffer.from(String(svg), "utf8")).png().toBuffer();
+}
+
+// Deterministic diagram runner for first-install: every rendered label is
+// verified verbatim against the post text by buildDiagramSpec, so no model
+// image backend is invoked and generation cannot exceed the bundle deadline.
+async function buildDiagramRunner(root, entry) {
+  const postPath = containedPath(root, entry.path);
+  const postText = (await readBounded(postPath)).toString("utf8");
+  const { spec, specHash } = buildDiagramSpec({
+    signals: extractArticleSignals(postText),
+    postText,
+  });
+  let specWritten = false;
+  return async ({ role, path }) => {
+    const roleSpec = spec.roles[role];
+    if (!roleSpec) throw Error(`diagram spec has no ${role} role`);
+    const directory = await openVerifiedDirectory(dirname(path), {
+      create: false,
+    });
+    try {
+      if (!specWritten) {
+        await writeStableTextAtDirectory(
+          directory,
+          "diagram-spec.json",
+          JSON.stringify({ specHash, spec }, null, 2) + "\n",
+        );
+        specWritten = true;
+      }
+    } finally {
+      await directory.close().catch(() => {});
+    }
+    await writeFile(path, await rasterizeDiagram(renderDiagramSvg(roleSpec)));
+    return `diagram specHash=${specHash} role=${role} kind=${roleSpec.kind ?? "diagram"}`;
+  };
+}
 export async function main(argv = process.argv.slice(2), dependencies = {}) {
   const args = parseImageBackfillArgs(argv);
   const root = resolve(dependencies.root ?? process.cwd());
@@ -84,7 +134,9 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
       format: entry.format,
       subCount: args.subCount,
       deadline: Date.now() + IMAGE_DEADLINE_MS,
-      runImage: dependencies.runImage,
+      runImage: args.diagram
+        ? await buildDiagramRunner(root, entry)
+        : dependencies.runImage,
       runJudge: dependencies.runJudge,
     };
     try {

@@ -12,6 +12,10 @@ export function separateGeneratedReport(source) {
   const ranges = markdownProtectedRanges(source);
   const boundaries = [
     ...source.matchAll(/^---\r?\n\r?\n윤문 리포트\r?\n\r?\n/gmu),
+    // Single-line wrapper variant observed in writer output:
+    // "--- 윤문 리포트 ---" on one line, report fields following; an
+    // optional preceding "---" horizontal rule belongs to the boundary.
+    ...source.matchAll(/^(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n/gmu),
   ].filter((match) => !isProtectedOffset(ranges, match.index));
   const structured = boundaries.filter((match) =>
     /^(?:변경률:|카테고리별 수정:|주요 변경|자체검증:)/mu.test(
@@ -28,16 +32,34 @@ export function separateGeneratedReport(source) {
     throw Error(
       "generated report contains verification marker; review required",
     );
-  const match = text.match(
+  const strictMatch = text.match(
     /^---\r?\n\r?\n윤문 리포트\r?\n\r?\n변경률: (\d{1,3})%\r?\n\r?\n카테고리별 수정: ([^\r\n]+)\r?\n\r?\n주요 변경 (\d+)건:\r?\n\r?\n((?:- `[^`\r\n]+` → `[^`\r\n]+`\r?\n)+)\r?\n자체검증: 6항 중 6항 통과\s*$/u,
   );
-  if (
-    !match ||
-    Number(match[1]) > 100 ||
-    !/^[A-F] [가-힣 ]+ \d+건(?:, [A-F] [가-힣 ]+ \d+건)*$/u.test(match[2]) ||
-    Number(match[3]) !== match[4].trimEnd().split(/\r?\n/u).length
-  )
+  // The loose form still has to be a complete terminal report: the boundary
+  // line, a 변경률 field, a category/change list, and the fixed closing line —
+  // nothing after it, or it is not process metadata and we fail closed.
+  const looseMatch = strictMatch
+    ? null
+    : text.match(
+        /^(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n[\s\S]*?변경률: 약?\s*(\d{1,3})%[\s\S]*?자체검증: 6항 중 6항 통과\s*$/u,
+      );
+  if (strictMatch) {
+    if (
+      Number(strictMatch[1]) > 100 ||
+      !/^[A-F] [가-힣 ]+ \d+건(?:, [A-F] [가-힣 ]+ \d+건)*$/u.test(
+        strictMatch[2],
+      ) ||
+      Number(strictMatch[3]) !==
+        strictMatch[4].trimEnd().split(/\r?\n/u).length
+    )
+      throw Error("ambiguous generated report structure; review required");
+  } else if (
+    !looseMatch ||
+    Number(looseMatch[1]) > 100 ||
+    !/(?:카테고리별 수정:|주요 변경)/u.test(looseMatch[0])
+  ) {
     throw Error("ambiguous generated report structure; review required");
+  }
   const article = source.slice(0, start);
   const archive = Object.freeze({
     version: 1,
