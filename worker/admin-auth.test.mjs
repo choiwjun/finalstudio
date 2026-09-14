@@ -5,12 +5,22 @@ import {
   clearSessionCookie,
   createSessionToken,
   isAuthenticated,
+  MIN_ADMIN_PASSWORD_LENGTH,
   sameOrigin,
   sessionCookie,
   verifySessionToken,
 } from "./admin-auth.mjs";
 
 const secret = "test-admin-password-123456";
+
+test("uses the ten-character minimum admin password policy", async () => {
+  assert.equal(MIN_ADMIN_PASSWORD_LENGTH, 10);
+  await assert.doesNotReject(() => createSessionToken("1234567890", 1_000));
+  await assert.rejects(
+    () => createSessionToken("123456789", 1_000),
+    /ADMIN_PASSWORD must be configured/,
+  );
+});
 
 test("creates and verifies an expiring signed admin session", async () => {
   const token = await createSessionToken(secret, 1_000);

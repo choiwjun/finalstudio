@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createWorker } from "./index.mjs";
 
-const password = "production-admin-password-123456";
+const password = "testpass10";
 const env = {
   ADMIN_PASSWORD: password,
   DATABASE_URL: "postgresql://redacted.example/db",

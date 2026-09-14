@@ -1,5 +1,6 @@
 const encoder = new TextEncoder();
 const SESSION_TTL_SECONDS = 8 * 60 * 60;
+export const MIN_ADMIN_PASSWORD_LENGTH = 10;
 export const ADMIN_COOKIE = "__Host-wjblog_admin";
 
 function encodeBase64Url(bytes) {
@@ -33,7 +34,10 @@ export async function createSessionToken(
   secret,
   now = Math.floor(Date.now() / 1000),
 ) {
-  if (typeof secret !== "string" || secret.length < 16)
+  if (
+    typeof secret !== "string" ||
+    secret.length < MIN_ADMIN_PASSWORD_LENGTH
+  )
     throw new Error("ADMIN_PASSWORD must be configured");
   const payload = encodeBase64Url(
     encoder.encode(

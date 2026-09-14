@@ -2,6 +2,7 @@ import {
   clearSessionCookie,
   createSessionToken,
   isAuthenticated,
+  MIN_ADMIN_PASSWORD_LENGTH,
   sameOrigin,
   sessionCookie,
 } from "./admin-auth.mjs";
@@ -58,7 +59,8 @@ async function readJson(request) {
 
 function adminNotConfigured(env) {
   return (
-    typeof env?.ADMIN_PASSWORD !== "string" || env.ADMIN_PASSWORD.length < 16
+    typeof env?.ADMIN_PASSWORD !== "string" ||
+    env.ADMIN_PASSWORD.length < MIN_ADMIN_PASSWORD_LENGTH
   );
 }
 
@@ -86,7 +88,7 @@ async function login(request, env) {
   }
   if (
     typeof body.password !== "string" ||
-    body.password.length < 16 ||
+    body.password.length < MIN_ADMIN_PASSWORD_LENGTH ||
     body.password.length > 256
   ) {
     recordLoginFailure(request, now);

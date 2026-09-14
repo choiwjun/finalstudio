@@ -391,7 +391,7 @@ const reviewSignals = (post: (typeof posts)[number]) => {
         <p class="admin-lede">글과 키워드를 안전하게 관리하는 비공개 편집 공간입니다.</p>
         <form id="admin-login-form" class="admin-login-card">
           <label for="admin-password">관리자 비밀번호</label>
-          <input id="admin-password" name="password" type="password" minlength="16" autocomplete="current-password" required />
+          <input id="admin-password" name="password" type="password" minlength="10" autocomplete="current-password" required />
           <button class="admin-primary-button" type="submit">운영 데스크 들어가기 <span aria-hidden="true">→</span></button>
           <p id="admin-login-error" class="admin-error" role="alert" hidden></p>
         </form>
