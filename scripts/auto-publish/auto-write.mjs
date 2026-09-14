@@ -85,11 +85,21 @@ const readFrontmatter = (text) => {
   return { front: m[1], body: text.slice(m[0].length).trimStart(), get };
 };
 
-const stripFences = (text) =>
-  text
-    .replace(/^```(?:markdown)?\n/, "")
-    .replace(/\n```$/, "")
-    .trim();
+// Models may wrap the payload in a ```markdown fence whose closer sits
+// mid-text (e.g. when a 윤문 리포트 block follows the article). Strip the
+// opening line and the first standalone closing line; inner code fences are
+// rare in this pipeline's prose and any residual imbalance still fails
+// closed downstream in markdownProtectedRanges.
+const stripFences = (text) => {
+  const opened = text.match(/^ {0,3}```(?:markdown|md)?[ \t]*\r?\n/u);
+  if (!opened) return text.trim();
+  const rest = text.slice(opened[0].length);
+  const closer = rest.match(/^ {0,3}```[ \t]*\r?\n?/mu);
+  if (!closer) return rest.trim();
+  return (
+    rest.slice(0, closer.index) + rest.slice(closer.index + closer[0].length)
+  ).trim();
+};
 
 // 검수 응답에는 최종 채점표가 붙을 수 있다. 저장 대상은 채점표가 아닌
 // frontmatter부터 시작하는 글 본문이어야 하므로, 본문을 안전하게 추출한다.
