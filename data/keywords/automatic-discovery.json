@@ -1,165 +1,138 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-14T01:34:33.846Z",
+  "generated_at": "2026-09-14T07:23:07.714Z",
   "selection": "automatic-from-naver-blog-results",
+  "extractor": "model",
   "ranking_note": "discovery_score is an internal extraction rank, not search volume, popularity, traffic, or revenue",
   "categories": [
     {
       "category": "economy-business",
       "query": "경제 비즈니스",
-      "result_count": 80872,
+      "result_count": 80932,
       "candidates": [
         {
-          "category": "economy-business",
-          "query": "경제 비즈니스",
-          "topic": "크루져 Cruiser",
-          "search_intent": "개념",
-          "discovery_score": 1414,
-          "supporting_results": 14,
-          "occurrences": 14,
-          "source_result_indexes": [
-            29,
-            30,
-            32,
-            33,
-            35,
-            36,
-            37,
-            38,
-            39,
-            40,
-            43,
-            44,
-            47,
-            52
-          ],
+          "topic": "국제유가 100달러 돌파",
+          "search_intent": "최신 이슈",
+          "content_angle": "중동 분쟁과 고유가가 환율·물가·국내 산업계에 미치는 영향",
           "related_keywords": [
-            "쥔장 크루져",
-            "전하 블로그 쥔장",
-            "트렌드 전하",
-            "트렌드 전하 블로그",
-            "지속 가능한"
+            "원달러 환율",
+            "호르무즈 해협",
+            "중동 전쟁 확전",
+            "고유가 공포",
+            "국내 산업계"
           ],
-          "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be"
+          "extraction_rationale": "국제유가 100달러 돌파가 여러 경제 시황 글에서 반복되고 원달러 환율과 중동 정세가 함께 다뤄져 시의성이 높다.",
+          "discovery_response_sha256": "1c7e979b422fd3ba59c0e75b42a3137c17c05e0a8afbdc42cbd7ad01b1536fb8"
         },
         {
-          "category": "economy-business",
-          "query": "경제 비즈니스",
-          "topic": "전하 블로그",
-          "search_intent": "개념",
-          "discovery_score": 1010,
-          "supporting_results": 10,
-          "occurrences": 10,
-          "source_result_indexes": [
-            29,
-            30,
-            32,
-            35,
-            36,
-            39,
-            40,
-            44,
-            47,
-            52
-          ],
+          "topic": "내 집 마련",
+          "search_intent": "방법",
+          "content_angle": "무주택자와 사회초년생을 위한 대출·청약 자금 설계",
           "related_keywords": [
-            "쥔장 크루져",
-            "트렌드 전하",
-            "지속 가능한",
-            "블로그 운영자",
-            "블로그 운영자 크루져"
+            "보금자리론",
+            "신생아특례 대출",
+            "주택청약",
+            "무주택자",
+            "정부 지원 대출"
           ],
-          "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be"
+          "extraction_rationale": "내 집 마련을 중심으로 보금자리론, 신생아특례 대출, 주택청약을 다룬 실용적인 글이 여러 편 확인된다.",
+          "discovery_response_sha256": "1c7e979b422fd3ba59c0e75b42a3137c17c05e0a8afbdc42cbd7ad01b1536fb8"
         },
         {
-          "category": "economy-business",
-          "query": "경제 비즈니스",
-          "topic": "블로그 쥔장 크루져",
-          "search_intent": "개념",
-          "discovery_score": 909,
-          "supporting_results": 9,
-          "occurrences": 9,
-          "source_result_indexes": [
-            29,
-            30,
-            32,
-            35,
-            36,
-            37,
-            38,
-            40,
-            47
-          ],
+          "topic": "관세 리스크",
+          "search_intent": "최신 이슈",
+          "content_angle": "관세와 원자재 가격 폭등이 공급망과 제조업 원가에 미치는 영향",
           "related_keywords": [
-            "전하 블로그 쥔장",
-            "지속 가능한",
-            "트렌드 전하",
-            "트렌드 전하 블로그",
-            "라이프스타일 전하"
+            "핵심 원자재 가격 폭등",
+            "구리",
+            "글로벌 무역",
+            "공급망 분절결함",
+            "선물헤징전략"
           ],
-          "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be"
+          "extraction_rationale": "관세 리스크가 반복적으로 등장하며 구리와 핵심 원자재 가격 폭등, 공급망 이슈와 연결되어 있다.",
+          "discovery_response_sha256": "1c7e979b422fd3ba59c0e75b42a3137c17c05e0a8afbdc42cbd7ad01b1536fb8"
         },
         {
-          "category": "economy-business",
-          "query": "경제 비즈니스",
-          "topic": "블로그 쥔장",
-          "search_intent": "개념",
-          "discovery_score": 909,
-          "supporting_results": 9,
-          "occurrences": 9,
-          "source_result_indexes": [
-            29,
-            30,
-            32,
-            35,
-            36,
-            37,
-            38,
-            40,
-            47
-          ],
+          "topic": "소상공인 1인 창업 정부지원금",
+          "search_intent": "방법",
+          "content_angle": "2026 하반기 소상공인 창업 지원금 종류와 사업계획서 준비",
           "related_keywords": [
-            "쥔장 크루져",
-            "지속 가능한",
-            "트렌드 전하",
-            "트렌드 전하 블로그",
-            "라이프스타일 전하"
+            "소상공인",
+            "사업계획서",
+            "창업지원사업",
+            "2026 하반기",
+            "지역 경제"
           ],
-          "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be"
-        },
-        {
-          "category": "economy-business",
-          "query": "경제 비즈니스",
-          "topic": "쥔장 크루져 Cruiser",
-          "search_intent": "개념",
-          "discovery_score": 909,
-          "supporting_results": 9,
-          "occurrences": 9,
-          "source_result_indexes": [
-            29,
-            30,
-            32,
-            35,
-            36,
-            37,
-            38,
-            40,
-            47
-          ],
-          "related_keywords": [
-            "전하 블로그 쥔장",
-            "지속 가능한",
-            "트렌드 전하",
-            "트렌드 전하 블로그",
-            "라이프스타일 전하"
-          ],
-          "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be"
+          "extraction_rationale": "소상공인 대상 지역별 지원 글이 다수 등장하고 창업지원사업과 사업계획서에 대한 실질적인 수요가 보인다.",
+          "discovery_response_sha256": "1c7e979b422fd3ba59c0e75b42a3137c17c05e0a8afbdc42cbd7ad01b1536fb8"
         }
       ],
-      "discovery_response_sha256": "8ce2cb20a315221c29b0b6bf155f90f0a559780ae50c5637e54fd31ddca487be",
+      "discovery_response_sha256": "1c7e979b422fd3ba59c0e75b42a3137c17c05e0a8afbdc42cbd7ad01b1536fb8",
+      "extraction": {
+        "extractor": "model",
+        "model": "codex-plan-default",
+        "extraction_input_sha256": "8de822787a3fe1f36c7a410a5beeda188e66bffe80d89e6c093eb3d29e56893a",
+        "extraction_raw_sha256": "99ff32d8a1652a6760f671de8e5d14182f3275eded37447062f04cd8bbe96e3e",
+        "over_cap_dropped": [],
+        "triage_rejected": [
+          {
+            "topic": "AI 비즈니스",
+            "reason": "범위가 지나치게 넓고 구체적인 검색 의도가 드러나지 않는다."
+          }
+        ],
+        "triage_merged": []
+      },
       "response": {
-        "total": 80872,
+        "total": 80932,
         "items": [
+          {
+            "title": "[2026년 9월 14일] 인도네시아 경제·비즈니스 주요 뉴스 10가지 (증시·....",
+            "description": "인도네시아의 가장 빠르고 정확한 경제·비즈니스 소식을 전해드리는 블로그입니다. 2026년 9월 14일 월요일 오늘, 현지 주요 언론사(Kontan, Antara, Vibiznews, tvOne 등) 및 금융 당국의 최신 발표를 바탕으로...",
+            "link": "https://blog.naver.com/idinsight/224411228587",
+            "postdate": "20260914"
+          },
+          {
+            "title": "9 월14 일 비지니스ㆍ경제 뉴스 정리",
+            "description": "9월 14일 비즈니스·경제 뉴스 정리 금리·유가·AI·반도체가 움직이는 한 주 안녕하세요. AELIM입니다. 9월 14일 비즈니스·경제 흐름을 살펴보겠습니다. 이번 주 시장의 핵심 키워드는 금리, 국제유가, 환율...",
+            "link": "https://blog.naver.com/kongdukre/224411213032",
+            "postdate": "20260914"
+          },
+          {
+            "title": "[모집]김포시 사회연대경제 임팩트 비즈니스 아카데미 수강생 모집",
+            "description": "김포시가 사회연대경제기업의 실무 역량 강화를 위한 '임팩트 비즈니스 아카데미' 수강생을 모집합니다. AI 활용, 수출 마케팅, 지식재산권까지 5개 강의로 구성됐고 필요한 회차만 골라 들을...",
+            "link": "https://blog.naver.com/gsec7/224411162875",
+            "postdate": "20260914"
+          },
+          {
+            "title": "2026.09.10.목요일 한국경제",
+            "description": "한국경제 (A1) “오염부지 1년내 착공” … 용산 개발 새국면 “반도체 수저 물려주자” 동탄 학원, 대치 넘었다 한·불 비즈니스 테이블 “미래 투자 함께하자” 출판업계 1위 문학동네 최대주주 지분 41...",
+            "link": "https://blog.naver.com/reum0806/224411147252",
+            "postdate": "20260914"
+          },
+          {
+            "title": "[말라카 해협 이야기] ② 바다의 주유소, 그리고 환경 규제의 역설",
+            "description": "경제에 결정적인 말라카 해협의 지리적 무게와 늪지대 도시국가 싱가포르의 반전 스토리를 짚어봤습니다. 오늘은 그 반전 스토리를 실제로 움직이는 엔진, 즉 '벙커링'이라는 바다 위 주유소 비즈니스와 그...",
+            "link": "https://blog.naver.com/samycozy/224411057311",
+            "postdate": "20260914"
+          },
+          {
+            "title": "[비즈니스 인사이트] 접는 아이폰 들고 나타난 존 터너스, 잡스와 쿡....",
+            "description": "안녕하세요, 경제산책입니다. 출처: 중앙일보 2026년 9월 14일 자 16면 「기업인 연구: 존 터너스 애플... [경제산책 코멘트] 이번에 공개된 아이폰 18 프로는 1,199달러(약 190만 원대), 18 프로 맥스는 1,299달러(약...",
+            "link": "https://blog.naver.com/rebook24/224411016236",
+            "postdate": "20260914"
+          },
+          {
+            "title": "관상보다 정확한 사람 판별법! 인간관계와 비즈니스에서 꼭 걸러야 ....",
+            "description": "인간관계와 비즈니스에서 진짜 '사람'을 판별하는 3가지 기준 안녕하세요. 돈되는 경제 이야기, 돈경이입니다. 살아가다 보면 참 다양한 사람들을 만나게 됩니다. 겉으로는 번듯한 이력이나 화려한 말로 호감을...",
+            "link": "https://blog.naver.com/enqqudwaks/224410980852",
+            "postdate": "20260914"
+          },
+          {
+            "title": "롯데바이오로직스, 10월 글로벌 CDMO 수주 총력전! 송도 1공장 가동 앞....",
+            "description": "매일 생생한 비즈니스와 바이오 투자 트렌드를 짚어드리는 경제블로거 모아의 머니로그 입니다. 요즘 제약·바이오 시장에서 가장 뜨겁게 거론되는 키워드를 하나 꼽으라면 단연 'CDMO(위탁개발생산)...",
+            "link": "https://blog.naver.com/corocococo/224410929968",
+            "postdate": "20260914"
+          },
           {
             "title": "[비즈니스/경제] &quot;전기료 25조 선납 거절&quot; 삼전닉스 한전 제안 퇴짜…....",
             "description": "&quot; #삼성전자 #SK하이닉스 #한전전기요금 #전기료25조선납 #한전부채210조 #반도체전력망 #용인반도체클러스터 #한전채발행한도 #산업용전기요금 #반도체재무전략 #비즈니스경제 #루이스리포트",
@@ -401,9 +374,9 @@
             "postdate": "20260912"
           },
           {
-            "title": "[이너뷰티]촬영 전 붓기 쏙 빼는 여배우들의 시크릿 이너 음료 및 식....",
-            "description": "경제와 비즈니스, 그리고 지속 가능한 고효율 라이프스타일을 전하는 블로그 쥔장 크루져(Cruiser)입니다. 중요한 비즈니스 미팅, PT 발표, 혹은 특별한 촬영을 앞둔 아침, 거울 속에 퉁퉁 부은 얼굴을 마주하면...",
-            "link": "https://blog.naver.com/wonkwi78/224409387650",
+            "title": "리플 시세 차트분석: 일단 박스권 이동중 리플 전망 상승힘이 조금 ....",
+            "description": "경제 비즈니스 주간 베스트셀러 '차트심리학: 투자의 판을 뒤집다!' 작가 인생한방입니다. 네이버 경제 비즈니스 인플루언서 [투자 분석가- 주식/펀드 전문] 지지, 저항, 추세, 이평선만을 이용한 정석...",
+            "link": "https://blog.naver.com/invest1bang/224409387823",
             "postdate": "20260912"
           },
           {
@@ -413,9 +386,9 @@
             "postdate": "20260912"
           },
           {
-            "title": "리플 시세 차트분석: 일단 박스권 이동중 리플 전망 상승힘이 조금 ....",
-            "description": "경제 비즈니스 주간 베스트셀러 '차트심리학: 투자의 판을 뒤집다!' 작가 인생한방입니다. 네이버 경제 비즈니스 인플루언서 [투자 분석가- 주식/펀드 전문] 지지, 저항, 추세, 이평선만을 이용한 정석...",
-            "link": "https://blog.naver.com/invest1bang/224409387823",
+            "title": "[이너뷰티]촬영 전 붓기 쏙 빼는 여배우들의 시크릿 이너 음료 및 식....",
+            "description": "경제와 비즈니스, 그리고 지속 가능한 고효율 라이프스타일을 전하는 블로그 쥔장 크루져(Cruiser)입니다. 중요한 비즈니스 미팅, PT 발표, 혹은 특별한 촬영을 앞둔 아침, 거울 속에 퉁퉁 부은 얼굴을 마주하면...",
+            "link": "https://blog.naver.com/wonkwi78/224409387650",
             "postdate": "20260912"
           },
           {
@@ -545,15 +518,15 @@
             "postdate": "20260912"
           },
           {
-            "title": "[경제 시황] 미 국채 금리 폭등과 금융 시장 불안: 5% 임계선 마주한 ....",
-            "description": "연준금리인상 #증시하방압력 #할인율폭주 #정크스프레드 #한계기업차환뇌관 #원달러환율1340원 #하노이공장경영 #박린원료유통 #거시경제매커니즘 #양산수율사수 #비즈니스인사이트 #묵빠블로그",
-            "link": "https://blog.naver.com/sentimin/224408788537",
-            "postdate": "20260912"
-          },
-          {
             "title": "IT CEO 바디 시스템 경영: 번아웃 차단하는 스마트 헬스케어",
             "description": "IT CEO의 바디 시스템 경영: 직감에 의존하던 내 몸, 데이터로 통제하라 전략 분석일: 2026년 9월 11일 | 작성자: 트랜스포머 (IT&amp;경제 비즈니스 리더) 트랜스포머의 리더십 요약 기업의 서버와 트래픽은 24시간...",
             "link": "https://blog.naver.com/midrise/224408541149",
+            "postdate": "20260912"
+          },
+          {
+            "title": "[경제 시황] 미 국채 금리 폭등과 금융 시장 불안: 5% 임계선 마주한 ....",
+            "description": "연준금리인상 #증시하방압력 #할인율폭주 #정크스프레드 #한계기업차환뇌관 #원달러환율1340원 #하노이공장경영 #박린원료유통 #거시경제매커니즘 #양산수율사수 #비즈니스인사이트 #묵빠블로그",
+            "link": "https://blog.naver.com/sentimin/224408788537",
             "postdate": "20260912"
           },
           {
@@ -587,15 +560,15 @@
             "postdate": "20260912"
           },
           {
-            "title": "[경제 시황] 중동 전쟁 확전과 국제유가 배럴당 100달러 돌파: 오일 ....",
-            "description": "[경제 시황] 중동 전쟁 확전과 국제유가 배럴당 100달러 돌파: 오일 쇼크 리스크와 국내 산업계 영향... 베트남 하노이와 박린 지역을 기반으로 공업용 화공약품 제조 및 유통업을 영위하는 비즈니스 파트너...",
-            "link": "https://blog.naver.com/sentimin/224408701802",
-            "postdate": "20260912"
-          },
-          {
             "title": "대기업 CVC 벤처캐피탈 규제 완화 총정리",
             "description": "어려운 경제와 복잡한 비즈니스 이슈를 직장인 점심 도시락처럼 한 입 크기로 깔끔하게 정리해드리는 블로그 경제 이치타카짱입니다. 항상 오늘처럼만 기분 좋은 하루가 이어지길 바라며, 오늘도 감사하는...",
             "link": "https://blog.naver.com/souhoho/224406478949",
+            "postdate": "20260912"
+          },
+          {
+            "title": "[경제 시황] 중동 전쟁 확전과 국제유가 배럴당 100달러 돌파: 오일 ....",
+            "description": "[경제 시황] 중동 전쟁 확전과 국제유가 배럴당 100달러 돌파: 오일 쇼크 리스크와 국내 산업계 영향... 베트남 하노이와 박린 지역을 기반으로 공업용 화공약품 제조 및 유통업을 영위하는 비즈니스 파트너...",
+            "link": "https://blog.naver.com/sentimin/224408701802",
             "postdate": "20260912"
           },
           {
@@ -701,67 +674,19 @@
             "postdate": "20260911"
           },
           {
-            "title": "전북 창업지원사업의 모든 것! 전북모두의 창업, 지역 경제 살리는 ....",
-            "description": "최근 전북특별자치도 내에서 자신만의 새로운 비즈니스를 꿈꾸며 힘찬 도전을 준비하시는 분들이... 그래서 오늘은 지역 경제 활성화와 스타트업 생태계 구축을 위해 마련된 아주 유익한 소식을 취재했습니다....",
-            "link": "https://blog.naver.com/kims93kr/224408483365",
-            "postdate": "20260911"
-          },
-          {
             "title": "개인 투자자가 꼭 봐야 할 주도주 체크리스트",
             "description": "경제/비즈니스 잼민이 줌마의 경제철학관입니다. 우리 이웃 여러분, 미국 주식 하시는 분들이라면 한 번쯤 'M7'이라는 단어 들어보셨죠? 애플, 마이크로소프트, 엔비디아처럼 전 세계 IT 시장을 주무르는...",
             "link": "https://blog.naver.com/zumma2026/224399002733",
             "postdate": "20260911"
           },
           {
-            "title": "미국 기업, 캄보디아 투자 확대 관심",
-            "description": "Source: CC Times #캄보디아 #캄보디아투자 #캄보디아경제 #미국캄보디아 #캄보디아비즈니스 #캄보디아농업 #캄보디아물류 #시아누크빌항 #캄보디아무역 #캄보디아시장 #캄보디아사업 #캄보디아관광...",
-            "link": "https://blog.naver.com/cambotour/224408442959",
-            "postdate": "20260911"
-          },
-          {
-            "title": "[강남 전광판 광고] 강남역과 삼성역 그 사이!! 한 페이지로 보는 테....",
-            "description": "대한민국 경제와 비즈니스의 핵심축, 강남역부터 삼성역까지 이어지는 '테헤란로'는 일평균 수십만 명의 직장인, 경제력을 갖춘 소비층, 그리고 수많은 차량 통행량이 집중되는 최고의 옥외광고...",
-            "link": "https://blog.naver.com/justad3/224408355693",
-            "postdate": "20260911"
-          },
-          {
-            "title": "원전 관련주 급등 이유 미국 원전 8기 논의와 브렌트유 100달러 돌파",
-            "description": "비즈니스·경제 정보를 전하는 테크니티입니다. 최근 국내 증시에서 원전 관련 종목이 강세를 보이는 가운데 국제유가도 크게 움직이고 있습니다. 미국 내 대형 원자력발전소 건설 논의가 알려지면서...",
-            "link": "https://blog.naver.com/tacknity/224408348931",
-            "postdate": "20260911"
-          },
-          {
-            "title": "동경외어전문학교 통역번역과 일한코스 및 국제비즈니스학과 2027년....",
-            "description": "일한코스 ／국제비즈니스학과 동경외어전문학교 전문과정 2027년도 4월 모집을 안내해 드립니다. 한국에서 시험을 치루고 입학하실 수 있습니다. 학교개요 동경외어전문학교는 일본의 문화, 경제의...",
-            "link": "https://blog.naver.com/maybeall/224408332063",
-            "postdate": "20260911"
-          },
-          {
-            "title": "[산업단지/울산] 울산 High Tech Valley 일반산단(R&amp;D비즈니스밸리 R&amp;D지구....",
-            "description": "울산광역시 울주군 삼남읍 일원에 위치한 울산 High Tech Valley 일반산업단지(울산경제자유구역 R&amp;D비즈니스밸리 R&amp;D지구)의 개발계획 및 지구단위계획 변경안이 최종 확정 고시되었습니다. 이번...",
-            "link": "https://blog.naver.com/0o0o0o0ok/224407889795",
-            "postdate": "20260911"
-          },
-          {
-            "title": "책임 있는 경영을 향한 길 - 기업윤리와 GRC의 조화",
-            "description": "경제적 성과로만 판단할 수는 없다. 고객, 임직원, 주주, 지역사회 등 다양한 이해관계자와 관계를 맺으며 활동하기 때문이다. 이익 추구 방식의 정당성과 행동의 도덕적 가치를 검토하는 지점에서 비즈니스...",
-            "link": "https://blog.naver.com/yeonamsabook/224408298647",
-            "postdate": "20260911"
-          },
-          {
-            "title": "네오사피엔스 공모주 청약, 공모가 1만원 흥행할까?",
-            "description": "경제 비즈니스 전문가 인페르입니다! 공모주 시장에서 네오사피엔스가 이슈가 되고 있습니다. AI 음성 서비스 ‘타입캐스트’를 운영하는 회사인데요. 익숙한 서비스와 AI라는 인기 업종, 예상보다 낮아진...",
-            "link": "https://blog.naver.com/infermiera/224408208642",
-            "postdate": "20260911"
-          },
-          {
-            "title": "엔에이치스팩34호 주가 103% 급등, 합병 대상은?",
-            "description": "경제 비즈니스 전문가 인페르입니다! 9월 10일 코스닥에 상장한 엔에이치스팩34호가 이슈가 되고 있습니다. 공모가는 2,000원이었지만 상장 첫날 장중 4,060원에 거래되며 공모가 대비 상승률이 103%까지 높아졌기...",
-            "link": "https://blog.naver.com/infermiera/224408094472",
+            "title": "전북 창업지원사업의 모든 것! 전북모두의 창업, 지역 경제 살리는 ....",
+            "description": "최근 전북특별자치도 내에서 자신만의 새로운 비즈니스를 꿈꾸며 힘찬 도전을 준비하시는 분들이... 그래서 오늘은 지역 경제 활성화와 스타트업 생태계 구축을 위해 마련된 아주 유익한 소식을 취재했습니다....",
+            "link": "https://blog.naver.com/kims93kr/224408483365",
             "postdate": "20260911"
           }
         ],
-        "lastBuildDate": "Mon, 14 Sep 2026 10:34:33 +0900",
+        "lastBuildDate": "Mon, 14 Sep 2026 16:18:51 +0900",
         "start": 1,
         "display": 100
       },
@@ -771,6 +696,38 @@
         "method": "GET"
       },
       "result_sample": [
+        {
+          "title": "[2026년 9월 14일] 인도네시아 경제·비즈니스 주요 뉴스 10가지 (증시·....",
+          "postdate": "20260914"
+        },
+        {
+          "title": "9 월14 일 비지니스ㆍ경제 뉴스 정리",
+          "postdate": "20260914"
+        },
+        {
+          "title": "[모집]김포시 사회연대경제 임팩트 비즈니스 아카데미 수강생 모집",
+          "postdate": "20260914"
+        },
+        {
+          "title": "2026.09.10.목요일 한국경제",
+          "postdate": "20260914"
+        },
+        {
+          "title": "[말라카 해협 이야기] ② 바다의 주유소, 그리고 환경 규제의 역설",
+          "postdate": "20260914"
+        },
+        {
+          "title": "[비즈니스 인사이트] 접는 아이폰 들고 나타난 존 터너스, 잡스와 쿡....",
+          "postdate": "20260914"
+        },
+        {
+          "title": "관상보다 정확한 사람 판별법! 인간관계와 비즈니스에서 꼭 걸러야 ....",
+          "postdate": "20260914"
+        },
+        {
+          "title": "롯데바이오로직스, 10월 글로벌 CDMO 수주 총력전! 송도 1공장 가동 앞....",
+          "postdate": "20260914"
+        },
         {
           "title": "[비즈니스/경제] &quot;전기료 25조 선납 거절&quot; 삼전닉스 한전 제안 퇴짜…....",
           "postdate": "20260914"
@@ -778,773 +735,699 @@
         {
           "title": "[앤트로픽 AI 미래예측 리포트 핵심요약] AI가 만들 가장 큰 변화ㅡ203....",
           "postdate": "20260914"
-        },
-        {
-          "title": "『초풍요의 시대』 – 피터 디아만디스,스티븐 코틀러 : AI와 인류의....",
-          "postdate": "20260914"
-        },
-        {
-          "title": "26.09.14 오늘의 환율 및 글로벌 경제 뉴스 (호르무즈 협상 연기, 한국 ....",
-          "postdate": "20260914"
-        },
-        {
-          "title": "No-brainer decision, 무슨 뜻일까? 경제뉴스 속 영어 표현",
-          "postdate": "20260914"
-        },
-        {
-          "title": "안녕하세요? 포천나눔의집장애인자립생활센터입니다.활동지원사님....",
-          "postdate": "20260914"
-        },
-        {
-          "title": "지금 집 사면 큰일 난다는 당신이 놓치고 있는 5,000억의 비밀 : 수도....",
-          "postdate": "20260914"
-        },
-        {
-          "title": "금시세 3가지, 같은 금인데 왜 다를까요?",
-          "postdate": "20260914"
-        },
-        {
-          "title": "변동성 장세에서 예금 늘리고 주식 분산투자하는 꿀팁",
-          "postdate": "20260914"
-        },
-        {
-          "title": "[신한쏠퀴즈] 9월 14일 신한 쏠퀴즈/슈퍼쏠 출석퀴즈/쏠페이 퀴즈팡....",
-          "postdate": "20260914"
         }
       ]
     },
     {
       "category": "ai",
       "query": "AI 인공지능",
-      "result_count": 597134,
+      "result_count": 597492,
       "candidates": [
         {
-          "category": "ai",
-          "query": "AI 인공지능",
-          "topic": "개발 속도",
-          "search_intent": "개념",
-          "discovery_score": 1111,
-          "supporting_results": 11,
-          "occurrences": 11,
-          "source_result_indexes": [
-            2,
-            4,
-            5,
-            11,
-            13,
-            22,
-            23,
-            29,
-            31,
-            39,
-            91
-          ],
+          "topic": "무료 생성형 AI 도구",
+          "search_intent": "방법",
+          "content_angle": "직장인의 업무에 맞는 무료 생성형 AI 도구 활용법",
           "related_keywords": [
-            "앤트로픽 다리오",
-            "앤트로픽 다리오 아모데",
-            "CEO 최첨단",
-            "속도 조절론",
-            "속도 조절"
+            "생성형 AI",
+            "직장인",
+            "캔바 캡컷",
+            "AI 영상"
           ],
-          "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe"
+          "extraction_rationale": "무료 도구 선택과 실무 활용에 대한 직접적인 검색 수요가 확인된다.",
+          "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f"
         },
         {
-          "category": "ai",
-          "query": "AI 인공지능",
-          "topic": "다리오 아모데",
-          "search_intent": "개념",
-          "discovery_score": 404,
-          "supporting_results": 4,
-          "occurrences": 4,
-          "source_result_indexes": [
-            2,
-            13,
-            23,
-            29
-          ],
+          "topic": "AI 속도조절론",
+          "search_intent": "비교",
+          "content_angle": "AI 개발 속도와 안전 통제를 둘러싼 정치권·기업의 입장 비교",
           "related_keywords": [
-            "앤트로픽 다리오",
-            "CEO 최첨단",
-            "기업 앤트로픽",
-            "기업 앤트로픽 Anthropic",
-            "앤트로픽 Anthropic"
+            "AI 위험성",
+            "초지능",
+            "앤트로픽 CEO",
+            "트럼프",
+            "개발 속도"
           ],
-          "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe"
+          "extraction_rationale": "여러 글에서 AI 위험성과 개발 속도를 둘러싼 최신 논쟁이 반복적으로 등장한다.",
+          "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f"
         },
         {
-          "category": "ai",
-          "query": "AI 인공지능",
-          "topic": "앤트로픽 오픈AI",
+          "topic": "피지컬 AI",
           "search_intent": "개념",
-          "discovery_score": 404,
-          "supporting_results": 4,
-          "occurrences": 4,
-          "source_result_indexes": [
-            22,
-            29,
-            31,
-            91
-          ],
+          "content_angle": "화면 속 AI에서 로봇과 현실 세계로 확장되는 기술 개념",
           "related_keywords": [
-            "오픈AI xAI",
-            "앤트로픽 다리오",
-            "앤트로픽 다리오 아모데",
-            "개발 속도 조절",
-            "속도 조절"
+            "멀티모달 로봇 AI",
+            "로봇 파운데이션 모델",
+            "분산형 로봇 지능",
+            "촉각센서 기반 제어",
+            "인공지능 로봇개발"
           ],
-          "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe"
+          "extraction_rationale": "피지컬 AI와 로봇 관련 세부 기술 표현이 여러 자료에서 함께 나타난다.",
+          "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f"
         },
         {
-          "category": "ai",
-          "query": "AI 인공지능",
-          "topic": "다리오 아모데 CEO",
+          "topic": "AI 데이터센터",
           "search_intent": "개념",
-          "discovery_score": 303,
-          "supporting_results": 3,
-          "occurrences": 3,
-          "source_result_indexes": [
-            2,
-            13,
-            29
-          ],
+          "content_angle": "AI 확산을 뒷받침하는 전력·통신·공간 인프라",
           "related_keywords": [
-            "앤트로픽 다리오",
-            "앤트로픽 다리오 아모데",
-            "CEO 최첨단",
-            "기업 앤트로픽",
-            "기업 앤트로픽 Anthropic"
+            "데이터센터 전력",
+            "국가 AI 컴퓨팅센터",
+            "부유식 데이터센터(FDC)",
+            "AI 인프라",
+            "광통신"
           ],
-          "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe"
+          "extraction_rationale": "AI 데이터센터의 전력과 부지 문제, 국가 인프라 확장이 반복적으로 다뤄진다.",
+          "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f"
         },
         {
-          "category": "ai",
-          "query": "AI 인공지능",
-          "topic": "아모데 CEO",
-          "search_intent": "개념",
-          "discovery_score": 303,
-          "supporting_results": 3,
-          "occurrences": 3,
-          "source_result_indexes": [
-            2,
-            13,
-            29
-          ],
+          "topic": "인공지능 윤리",
+          "search_intent": "문제 해결",
+          "content_angle": "공정하고 안전한 AI 활용을 위한 핵심 윤리 문제",
           "related_keywords": [
-            "앤트로픽 다리오",
-            "앤트로픽 다리오 아모데",
-            "CEO 최첨단",
-            "기업 앤트로픽",
-            "기업 앤트로픽 Anthropic"
+            "AI 윤리",
+            "알고리즘편향",
+            "설명가능AI",
+            "데이터프라이버시",
+            "AI책임성"
           ],
-          "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe"
+          "extraction_rationale": "알고리즘 편향과 데이터프라이버시 등 구체적인 인공지능 윤리 문제가 함께 제시된다.",
+          "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f"
         }
       ],
-      "discovery_response_sha256": "ed0d2bcb49af8c0ac35837349be633f1bf7f0d6841df2d0e797633f82827b2fe",
+      "discovery_response_sha256": "121467a9dee02e11960991651170d2e5c47b97185249ce453a7726d4cdcd9a1f",
+      "extraction": {
+        "extractor": "model",
+        "model": "codex-plan-default",
+        "extraction_input_sha256": "d48401b1f8ea714becfaf33c2107d26da4e6cf27c0ac3da58d277cbb7c32e1d7",
+        "extraction_raw_sha256": "17df6e22cb285a4881a862e631cded4797e730b72d4fc63e0244a8070382206e",
+        "over_cap_dropped": [],
+        "triage_rejected": [],
+        "triage_merged": []
+      },
       "response": {
-        "total": 597134,
+        "total": 597492,
         "items": [
           {
-            "title": "2026.9.18~19 제8회 금천과학축제 G-Science Festival 일정 및 프로그램 안내",
-            "description": "인공지능과 첨단 과학기술을 한자리에서 만날 수 있는 제8회 금천과학축제(2026 G-Science Festival)가 오는 9월 18일~19일까지 이틀간 금천구청 일대에서 개최됩니다. 이번 축제는 'AI와 소통하는 활기찬 미래...",
-            "link": "https://blog.naver.com/believe4416/224410929435",
+            "title": "부산 센텀시티 '스마트도시 특화단지' 최종 선정… 기대효과는?",
+            "description": "이에 따라 센텀시티 일원이 인공지능(AI) 기반의 지능형 관제 및 안전 실증 거점으로 새롭게 거듭난다. 스마트 도시 특화단지란 ? 도시 경쟁력과 시민의 삶의 질을 향상하기 위해 행정, 교통, 에너지, 수자원...",
+            "link": "https://blog.naver.com/babadaliy/224411368645",
             "postdate": "20260914"
           },
           {
-            "title": "최태원 “AI, 스스로 돈 벌고 재투자하는 지속 가능한 구조 필요”",
-            "description": "최태원 SK그룹 회장이 미래 인공지능(AI) 산업이 지속적으로 성장하기 위해서는 AI가 스스로 수익을 창출하고, 이를 다시 투자로 연결할 수 있는 비즈니스 모델을 구축해야 한다고 강조했습니다. AI 산업 초기...",
-            "link": "https://blog.naver.com/mokryun77/224410927077",
+            "title": "디지털 문해력 똥손도 10분 만에 캔바 캡컷으로 AI 영상 만드는 완벽....",
+            "description": "인공지능 시대에 흔들리지 않는 나를 만드는 아주 특별한 생존 무기... 완벽한 인공지능 창작물입니다. 이정선 강사님의 열정적인 강의를... 바로 인공지능을 내 수족처럼 부리는 권력이구나 라는 짜릿한 전율이...",
+            "link": "https://blog.naver.com/9004skylove07/224411348400",
             "postdate": "20260914"
           },
           {
-            "title": "[손잡경] 인공지능 감속론 | 중국차 미국 진출 | KRX 애프터마켓 | 26091....",
-            "description": "AI 빅3 CEO 일제히 경고.. &quot;개발 속도 조절해야&quot; 앤트로픽의 다리오 아모데이 CEO가 &quot;AI 모델의 능력을 개선하는 속도를 늦춰야 한다&quot;고 제안 ㄴ&gt; 오픈AI의 샘 올트먼 CEO도 최첨단 AI의 개발 속도를 적절히 조절해야...",
-            "link": "https://blog.naver.com/yuding_ga/224410926911",
+            "title": "AI가 인류 말살?…챗GPT에 물었더니",
+            "description": "인공지능(AI)을 만드는 전문가들이 잇따라 섬뜩한 경고를 내놓았다. 지금과 같은 개발 경쟁이... 그는 지난 8일 앤트로픽을 떠나면서 두 회사가 자가 개선이 가능한 초지능 개발을 위해 경쟁하고 있다며...",
+            "link": "https://blog.naver.com/zaragd/224411359814",
             "postdate": "20260914"
           },
           {
-            "title": "[NABS 2026 기획] AI 데이터 폭증에 스토리지 비용·전력 부담…씨게이....",
-            "description": "- HAMR로 플래터당 4TB·드라이브당 최대 44TB 구현…같은 공간에 더 많은 AI 데이터 저장 - '엑소스 스케일' 단일 인클로저 최대 3.2PB…전력 30% 낮추고 냉각 효율 70% 개선 인공지능(AI) 시대, 데이터는 더 이상...",
-            "link": "https://blog.naver.com/et_news/224410924296",
+            "title": "AI 주식 수익률 96%? 암 진단 4주를 하루로 줄인 LG 엑사원의 반격",
+            "description": "LG 전문가 AI 엑사원의 산업 현장 혁신 성과 요약 인공지능 이야기만 나오면 대화형 챗봇이나 그럴듯한 그림을 그려주는 생성형 AI를 먼저 떠올리시는 분들이 많으실 겁니다. 하지만 화려한 말솜씨를 뽐내는...",
+            "link": "https://blog.naver.com/dc8/224411357602",
             "postdate": "20260914"
           },
           {
-            "title": "빅테크 CEO들이 먼저 외친 AI 속도 조절론 : 인류에게 위협으로 다가....",
-            "description": "최근 글로벌 테크 업계에서 인공지능(AI) 개발 속도를 의도적으로 늦춰야 한다는 'AI 속도 조절론'이... 시스템 내부의 연산 과정과 위험성을 개발자조차 완벽히 파악하지 못하는 상태에서 지능 폭발이 일어날...",
-            "link": "https://blog.naver.com/js3404_/224410920657",
+            "title": "[KOHI 소식] AI와 돌봄의 만남! 보건복지 정책과 현장을 잇는 '2026년 미....",
+            "description": "아카데미 현장 리포트 지난 9월 11일(금), 한국보건복지인재원 오송 본원에서 '인공지능(AI) 시대, 미래 돌봄 인재를 다시 설계하다 - 우리는 어떤 인재를, 어떻게 양성할 것인가?'를 주제로 아카데미가...",
+            "link": "https://blog.naver.com/kohipr/224411352111",
             "postdate": "20260914"
           },
           {
-            "title": "트럼프 &quot;AI 규제론자는 부정적 세력&quot;…빅테크 '개발 속도 조절' 제동",
-            "description": "도널드 트럼프(Donald Trump) 미국 대통령이 인공지능(AI) 위험론과 개발 속도 조절 요구를 정면으로 일축하며 대중국 패권 유지를 위한 기술 가속화 기조를 천명했다. 최근 실리콘밸리 선도 기업 최고경영자(CEO)...",
-            "link": "https://blog.naver.com/tae567/224410920795",
+            "title": "인공지능 AI 관련 최신 동향 확인 안 하면 손해입니다·농업 분야 활....",
+            "description": "인공지능(AI) 관련 최신 동향과 농업 분야 활용법, 도입 효과를 꼼꼼히 정리했습니다. 직장인이 주목해야 할 스마트 농업 기술과 트렌드 총정리. ✔ 이 글의 핵심 요약 • AI 활용 농업: 코딩과 유전자 가위를...",
+            "link": "https://blog.naver.com/sharejoa/224411348462",
             "postdate": "20260914"
           },
           {
-            "title": "9월 14일 KB스타뱅킹 퀴즈 정답, AI·한국사 오늘 답은?",
-            "description": "오늘은 인공지능 AI 글로벌 기업 관련 문제와 한국사 퀴즈가 함께 확인됐습니다. 9월 14일 KB스타뱅킹 AI 퀴즈 정답은? Q. 인공지능 분야를 이끄는 글로벌 핵심 기업 5곳의 앞글자를 딴 표현에 해당하지 않는...",
-            "link": "https://blog.naver.com/ykjky2001/224410918268",
+            "title": "인공지능 윤리, 우리가 반드시 알아야 할 5가지 핵심 문제",
+            "description": "있으며, 공정하고 안전하며 인간 중심적인 AI 시대를 열기 위해 지금 당장 행동해야 할 때입니다. #인공지능윤리 #AI윤리 #알고리즘편향 #설명가능AI #데이터프라이버시 #AI책임성 #블랙박스 #디지털윤리 #AI거버",
+            "link": "https://blog.naver.com/rotater/224399782711",
             "postdate": "20260914"
           },
           {
-            "title": "‘군소도서개도국 기후기술 협력 및 인공지능(AI) 활용 포럼’ 인천 ....",
-            "description": "",
-            "link": "https://blog.naver.com/consumernews1225/224410915606",
+            "title": "KOSA 주간 소식 모음 | 2026년 9월 2주",
+            "description": "KOSA·한국발명진흥회, 'IP·AI 융합인재' 육성 MOU 체결 KOSA가 한국발명진흥회와 함께 지식재산(IP)과 인공지능(AI)을 아우르는 융합형 인재 육성에 나섭니다. 전국 9개 지식재산 전문인력 양성 중점대학의...",
+            "link": "https://blog.naver.com/kosapr/224411346268",
             "postdate": "20260914"
           },
           {
-            "title": "[충청중심뉴스]홍성군, AI 건강 내비게이션 대상자 사전모집",
-            "description": "[충청중심뉴스] 홍성군보건소가 인공지능을 활용한 만성질환 관리 실증사업에 참여할 군민을 9월 14일부터 28일까지 모집한다. 모집 대상은 20세 이상 성인 중 △고혈압·당뇨병·이상지질혈증으로 1개월...",
-            "link": "https://blog.naver.com/ccnews72/224410914691",
+            "title": "AI가 일자리를 빼앗는 진짜 이유: 사라지는 일자리와 살아남는 '문해....",
+            "description": "글로벌 시장조사기관의 분석에 따르면 전 세계 기업의 75% 이상이 업무 전반에 생성형 AI 도입을 서두르고 있으며, 국내에서도 제조업과 서비스업을 막론하고 디지털 전환을 넘어선 인공지능 대전환(AX)이...",
+            "link": "https://blog.naver.com/baews2/224409982476",
             "postdate": "20260914"
           },
           {
-            "title": "이례적인 韓 개발자 채용…샌디스크, 낸드 인력 확보 총력",
-            "description": "https://www.nbnbiz.co.kr/news/articleView.html?idxno=45790 인공지능(AI) 시장의 급격한 팽창에 따라 글로벌 반도체 기업들이 국내 핵심 인재를 확보하기 위한 경쟁에 본격적으로...",
-            "link": "https://blog.naver.com/nbnbiz/224410912691",
+            "title": "반도체 기업 성과급 지급 소식 화제: 호황의 배경과 보상 구조 완벽 ....",
+            "description": "인공지능(AI) 인프라 확장으로 촉발된 고대역폭 메모리(HBM) 및 첨단 반도체 수요가 실적을 견인하면서 보상 규모 역시 사상 최대 수준에 도달했습니다. 단순한 금액의 크기를 넘어 기업의 영업이익 배분 기준과...",
+            "link": "https://blog.naver.com/noseoyen6758/224409241969",
             "postdate": "20260914"
           },
           {
-            "title": "동해시, ‘인공지능위’ 출범 AI 데이터센터 이후 준비본격화",
-            "description": "□ 시는 오는 9월16일 ‘동해시 인공지능위원회’를 출범하고 첫 회의를 열어 AI 데이터센터와... 한국전자통신연구원 AI안전연구소 소장 10 임태범 한국전자기술연구원 지능융합연구소장 11 배성훈...",
-            "link": "https://blog.naver.com/kwtimes/224410912201",
+            "title": "[AI도 조직의 일원이 된다]KB손해보험, AI 에이전트에 ‘사원번호’ ....",
+            "description": "검토…AI향 데이터 관리체계도 구축 [출처=KB손해보험]@전국뉴스 [전국뉴스=김달환 기자] 인공지능이 단순히 직원의 업무를 돕는 보조도구를 넘어 실제 업무를 수행하는 단계로 진입하면서 기업의 AI 관리...",
+            "link": "https://blog.naver.com/kingoftheone/224411343014",
             "postdate": "20260914"
           },
           {
-            "title": "[행정사노우주] 미국·중국 AI 패권 경쟁, 왜 ‘죄수의 딜레마’가 됐....",
-            "description": "인공지능(AI)을 더 빠르게 개발해야 할까, 아니면 위험을 점검할 시간을 확보해야 할까. 이 질문에 미국과 중국의 경쟁이 얽히면서 답은 한층 어려워졌다. 어느 한쪽이 개발 속도를 늦추는 동안 상대가 앞서...",
-            "link": "https://blog.naver.com/army3005/224410911217",
+            "title": "[광통신] 퀄컴·AWS, 버라이즌·코닝 빅딜에 국내 광통신주 '들썩'",
+            "description": "두 계약 모두 인공지능(AI) 데이터센터 확장에 필요한 초고속·저지연 연결망 구축을 핵심으로 하며, 그 여파는 국내 관련 테마주로도 번졌다. 한국거래소에 따르면 9~10일 이틀간 머큐리는 3,350원에서 4...",
+            "link": "https://blog.naver.com/investnews/224411343682",
             "postdate": "20260914"
           },
           {
-            "title": "AI 속도조절론이 산업에 미칠 영향",
-            "description": "#AI속도조절론 #인공지능안전 #빅테크전망 #기술주전망 #기업투자전략 #반도체트렌드 #글로벌AI경쟁 #테크이슈정리 #IT트렌드분석 #오픈AI이슈 #앤트로픽소식 #미국테크뉴스 #경제트렌드 #산업패러다임변화...",
-            "link": "https://blog.naver.com/jetumuse/224410910281",
+            "title": "국내 기업 AI 도입률 58% 달성에도 전면 전환은 26% 그쳐",
+            "description": "대기업 고도화 9% 체증 속 ROI 측정 부재가 실질적 전환 막는 병목 요인 국내 산업 현장의 인공지능(AI) 활용이 보편화 단계에 들어섰으나, 기업 구조 전체를 개혁하는 전면적 혁신으로 이어진 비중은 저조한...",
+            "link": "https://blog.naver.com/jinrocals/224411340845",
             "postdate": "20260914"
           },
           {
-            "title": "앤트로픽 &quot;AI 개발 속도 조절해야&quot;…머스크·알트먼도 공감 이유",
-            "description": "앤트로픽 “속도 조절해야” 머스크·알트먼도 공감 최근 인공지능 업계에서 상당히 이례적인 목소리가 나왔습니다. 빠르게 성장해 온 AI 기업 앤트로픽(Anthropic)의 다리오 아모데이 CEO가 최첨단 AI 모델의...",
-            "link": "https://blog.naver.com/na2nu3/224410909998",
+            "title": "AI가 대체한 그 시간 우리는 무엇을 하고 있을까?",
+            "description": "효율화의 역설과 시간 점유 경제학: AI 시대 잉여 시간의 팽창과 경험 비즈니스의 가치 포착 구조 AI 자동화와 효율화의 역설: 가처분 시간의 거시적 팽창 메커니즘 인공지능(AI)의 모델 경량화와 추론...",
+            "link": "https://blog.naver.com/bang__road/224411338376",
             "postdate": "20260914"
           },
           {
-            "title": "광진구, 인공지능 혁신 우수사례‘국무총리상’ 수상",
-            "description": "구의 사례는 전문 개발자가 아닌 행정직 8급 공무원(류승인 주무관)이 현장에서 겪는 업무상 불편을 직접 발굴하고, 생성형 인공지능(AI)과 바이브 코딩(Vibe Coding)을 활용해 업무용 도구 6종을 개발한 것이다....",
-            "link": "https://blog.naver.com/63swlee/224410905572",
+            "title": "대구K뉴딜 SKT ALEPH 2차 추가모집, AI 인프라 취업교육 알아보기!",
+            "description": "최근 AI 기술이 빠르게 발전하면서 단순히 인공지능을 사용하는 것을 넘어 AI 시스템과 기업의 IT 인프라를 직접 운영할 수 있는 인재에 대한 관심도 높아지고 있는데요 특히 네트워크와 정보보안...",
+            "link": "https://blog.naver.com/ghi05217/224411337488",
             "postdate": "20260914"
           },
           {
-            "title": "AI 활용 생화학 무기 개발 시도 있었다&quot;... 앤트로픽, 자사 기술 이용 ....",
-            "description": "anthropic 에서 ai와 생화학무기 ㅡ AI 검색 인공지능(AI) 기업 앤트로픽(Anthropic)은 자사 AI 모델인 '클로드(Claude)'를 생물학 및 화학 무기 개발 등에 악용하려던 시도를 적발해 관련 계정을 긴급...",
-            "link": "https://blog.naver.com/fairy77_123/224410905802",
+            "title": "●페르소나에이아이 주식●IPO 본격화, SKT ‘모두의 AI’ 참여한 AI ....",
+            "description": "페르소나에이아이 기업소개 페르소나AI는 AI 기술을 활용하여 공공의 불편함을 해소하고 실생활에서 인간을 위한, 인공지능의 적정기술을 선도하는 기업으로 성장하고 있습니다. 자연어처리 자체 토종...",
+            "link": "https://blog.naver.com/another_11/224411338403",
             "postdate": "20260914"
           },
           {
-            "title": "[디지털새싹 후기_오류초등학교] &quot;소리와 만들기로 빚어낸 우리만의....",
-            "description": "오류초등학교 학생들과 함께 인공지능의 핵심 개념과 일상 속 활용 사례를 체험 중심으로 풀어보는... 코딩과 인공지능을 단순한 기술이 아닌 나만의 예술적 도구로 경험해본 뜻깊은 시간이었습니다....",
-            "link": "https://blog.naver.com/onethecode/224406092103",
+            "title": "동해시, ‘인공지능위원회’ 전격 출범… AI 데이터센터 유치 이후....",
+            "description": "동해시가 인공지능(AI) 데이터센터 유치를 단발성 성과에 그치지 않고 지역의 실질적이고 지속 가능한 성장 동력으로 굳건히 뿌리내리기 위한 후속 발전 전략 수립에 본격적으로 착수했다. 동해시는 오는 9월...",
+            "link": "https://blog.naver.com/metrotimes/224411336068",
             "postdate": "20260914"
           },
           {
-            "title": "『초풍요의 시대』 – 피터 디아만디스,스티븐 코틀러 : AI와 인류의....",
-            "description": "분야 : 경제·경영 / 미래예측 / 인공지능 『초풍요의 시대』 – 피터 디아만디스, 스티븐 코틀러 AI와... 즉 인공일반지능이 중요한 위치를 차지합니다. 현재의 AI가 특정 영역에서 뛰어난 능력을 발휘하는...",
-            "link": "https://blog.naver.com/ayajae/224395746945",
+            "title": "2026 대한민국 반도체 메가 클러스터 완벽 해부: 용인(시스템·메모리....",
+            "description": "글로벌 인공지능(AI) 가속기 수요의 폭발과 함께 반도체 제조 패권 경쟁이 국가 대항전으로 격화되는 가운데, 대한민국 반도체 산업은 사상 최대 규모인 총 622조 원 이상의 민간 투자가 집결하는 '경기...",
+            "link": "https://blog.naver.com/football_stratis/224411085247",
             "postdate": "20260914"
           },
           {
-            "title": "KODEX 원자력SMR ETF 주목, AI 시대 핵심 동력으로 떠오르는 이유",
-            "description": "AI 시대, 원자력 발전의 재조명 최근 인공지능 기술의 눈부신 발전과 함께 급증하는 데이터센터의 전력 수요가 새로운 에너지원에 대한 관심을 불러일으키고 있습니다. AI 학습과 운영에는 막대한 양의...",
-            "link": "https://blog.naver.com/themoneyinsights/224410813865",
+            "title": "삼성·미스트랄 AI 협업, 범용 챗봇 넘어 업무 특화 AI 가능성 보여줬....",
+            "description": "삼성전자가 프랑스 인공지능 기업 미스트랄 AI와 손잡고 반도체 설계·제조에 특화된 자체 AI를 개발합니다. 양사는 2026년 9월 8일 현지에서 전략적 파트너십을 체결했으며, 삼성전자는 다음 날인 9월 9일 공식...",
+            "link": "https://blog.naver.com/hnscom2012/224411333244",
             "postdate": "20260914"
           },
           {
-            "title": "울산 남구 ‘AI 개운포 경상좌수영성 디지털 탐구교실’ 국가유산 ....",
-            "description": "있도록 인공지능(AI)과 디지털 기술을 접목한, 학교로 찾아가는 국가유산교육 프로그램으로 울산 남구가 ‘AI와 함께하는 개운포 경상좌수영성 디지털 탐구교실’이 국가유산청이 주관하는 ‘2027년...",
-            "link": "https://blog.naver.com/06rnftkrrl/224410901183",
+            "title": "&quot;우리 동네 데이터센터 절대 안 된다더니?&quot; 한화오션이 바다 위에 배....",
+            "description": "인공지능(AI) 열풍으로 데이터센터 수요가 폭발하고 있지만, 정작 육지에서는 짓고 싶어도 짓지 못하는 기이한 현상이 벌어지고 있습니다. 막대한 전기 소비로 인한 전력망 포화, 서버 냉각 과정에서 발생하는...",
+            "link": "https://blog.naver.com/gigagiga123/224411042546",
             "postdate": "20260914"
           },
           {
-            "title": "생성형 AI는 왜 갑자기 발전했을까",
-            "description": "몇 년 전까지만 해도 인공지능은 특정 작업만 잘하는 기술이라는 이미지가 강했습니다. 그런데 최근에는 ChatGPT처럼 글을 쓰고, 이미지를 만들고, 코드를 작성하는 생성형 AI가 빠르게 등장하고 있습니다....",
-            "link": "https://blog.naver.com/ye00n_704/224410901269",
+            "title": "AI 속도조절론 트럼프 &quot;유지&quot; 와 오바마 &quot;통제&quot; 핵심 입장 비교",
+            "description": "인공지능(AI) 기술이 무섭게 발전하면서 '이대로 둬도 괜찮을까?' 하는 걱정 한번쯤 해보셨죠? 최근 빅테크 수장들 사이에서도 AI 개발 속도를 늦춰야 한다는 목소리가 커지면서 미국 정치권의 대립 구도도...",
+            "link": "https://blog.naver.com/blog-news/224411328791",
             "postdate": "20260914"
           },
           {
-            "title": "글로벌 컴퓨팅 센터 TO50&lt;2026,9월 14일&gt;",
-            "description": "미국이 94% 장악한 글로벌 AI 컴퓨팅 전쟁, 진짜 승부처는 ‘전력과 효율’ 인공지능(AI) 산업이 빠르게 성장하면서 이제 AI 경쟁의 핵심은 단순히 GPU를 얼마나 많이 확보했느냐에만 있지...",
-            "link": "https://blog.naver.com/yiyunv0520/224410900013",
+            "title": "무료 생성형 AI 도구 뭐가 좋을까? 직장인이라면 이렇게 활용하면 편....",
+            "description": "인공지능을 잘 쓰는 사람은 기술을 많이 아는 사람이 아니라, 자기 일에 맞게 단순하게 쓰는 사람에 가깝습니다. 무료 생성형 AI 도구는 많지만, 중요한 건 무엇을 하려는지입니다. 목적이 분명하면 도구 선택도...",
+            "link": "https://blog.naver.com/vitaking7948/224411326297",
             "postdate": "20260914"
           },
           {
-            "title": "‘AI 종말론’ 현실화되나…앤트로픽발 속도조절론에 업계 동참",
-            "description": "https://www.nbnnews.co.kr/news/articleView.html?idxno=1055831 인공지능(AI) 기술의 잠재적 위험성에 대한 우려가 커지자 앤트로픽과 오픈AI 등 글로벌 AI 업계 대표들이 개발 속도를 조절해야...",
-            "link": "https://blog.naver.com/nbnnews1/224410897543",
+            "title": "사이버보안 관련주 TOP6 투자 포인트 확인",
+            "description": "투자 시장에서 인공지능(AI), 반도체와 함께 꾸준히 관심을 받는 분야가 바로 사이버보안 관련주입니다. 예전에는 해킹이라고 하면 개인 정보 유출이나 홈페이지 공격 정도로 생각했지만, 지금은 상황이...",
+            "link": "https://blog.naver.com/prettygirl-30/224411325654",
             "postdate": "20260914"
           },
           {
-            "title": "[2026년 9월 14일 경제뉴스] 애프터마켓 개장, 청약통장 순증 2000억, ....",
-            "description": "AI 수장들 &quot;개발 속도 늦추자&quot;, 올트먼은 상장 연기 (핵심) 무슨 일이 있었나 서로를 겨누던 미국 인공지능 기업 최고경영자들이 같은 방향의 말을 내놓았습니다. 다리오 아모데이 앤트로픽 CEO는 12일...",
-            "link": "https://blog.naver.com/urban-note/224410895938",
+            "title": "AI가 스스로를 인식하는 순간, 앤트로픽 연구원이 목격한 충격적 현....",
+            "description": "거대한 연산 능력과 정교한 인공신경망 구조가 결합하면서, 일정 수준 이상의 정밀도에 도달했을 때... https://naver.me/xcg1Aera #앤트로픽 #AI연구원고백 #인공지능미래 #클로드AI #창발적지능 #AI안전성 #AI정렬문제...",
+            "link": "https://blog.naver.com/pjinraepaa/224411326914",
             "postdate": "20260914"
           },
           {
-            "title": "H D 현대 중공업, AI 데이터 센터 전력 수요 대응을 위해 1조 원 규모 ....",
-            "description": "네이버 블로그 👆 HD현대중공업이 인공지능(AI) 데이터센터 확산으로 급증하는 전력 수요에 선제적으로 대응하기 위해 발전엔진과 소형모듈원자로(SMR) 분야에 총 1조722억 원을 투자한다고 2026년 9월 10일...",
-            "link": "https://sskn.tistory.com/4981",
+            "title": "2026 LG AI 청소년 캠프 모집 | 서울대·미국 연수 전액 무료 지원법",
+            "description": "서울대·미국 연수까지 전액 무료인 이유 LG AI 청소년 캠프는 LG Discovery Lab이 주최하는 청소년 대상 인공지능 인재 양성 프로그램입니다. 인공지능 기술을 활용해 실생활과 사회의 문제를 해결하는 팀...",
+            "link": "https://blog.naver.com/tjrudska82/224411324942",
             "postdate": "20260914"
           },
           {
-            "title": "시진핑, 브릭스에 AI 동맹 제안…“강권이 곧 정의여선 안 돼”",
-            "description": "기술 생태계와 별도의 축이 만들어질 가능성도 있습니다. AI 경쟁이 이제 기업 간 경쟁을 넘어 국가 블록 간 경쟁으로 번지는 모습입니다. #시진핑 #브릭스 #BRICS #인공지능 #AI협력 #중국AI #글로벌사우스 #미중경쟁",
-            "link": "https://blog.naver.com/jji3961/224410664585",
+            "title": "음원업계, AI '가짜 스트리밍' 차단 나선다… 공동지침 마련",
+            "description": "음반사와 유통업체들이 인공지능(AI)을 통해 음원을 대량 생성한 뒤 반복 재생하여 로열티를 가로채는 이른바 '스트리밍 사기'를 차단하기 위해 공동 대응에 나섭니다. 파이낸셜타임스(FT) 등 외신에 따르면...",
+            "link": "https://blog.naver.com/ojae123/224411323945",
             "postdate": "20260914"
           },
           {
-            "title": "'인류 위협' 공포에 : AI 수장들 &quot;개발 늦춰야&quot;",
-            "description": "'인류 위협' 공포에 : AI 수장들 &quot;개발 늦춰야&quot; 인공지능(AI) 기술이 하루가 다르게 발전하면서 이제는... 'AI가 인간보다 훨씬 뛰어난 지능을 갖게 된다면 어떻게 될 것인가'라는 질문입니다. 현재의 AI는 특정...",
-            "link": "https://blog.naver.com/jh6355009/224410624364",
+            "title": "AI 위험성에 대한 앤트로픽 CEO의 경고와 속도 조절의 필요성",
+            "description": "AI 위험성에 대한 앤트로픽 CEO의 경고와 속도 조절의 필요성 인공지능 개발 기업 앤트로픽의 다리오 아모데이 최고경영자는 최근 방송 인터뷰에서 AI 분야가 실질적인 위험을 수반하고 있음을 인정하며 속도...",
+            "link": "https://blog.naver.com/rich_acorn/224411323090",
             "postdate": "20260914"
           },
           {
-            "title": "10년 뒤에도 살아남을 직업은?…AI 시대, 학생들이 지금부터 준비해....",
-            "description": "10년 뒤에도 살아남을 직업은?…AI 시대, 학생들이 지금부터 준비해야 할 진로는 무엇인가 인공지능(AI)과 자동화 기술이 빠르게 발전하면서 학생들의 진로 선택에도 큰 변화가 일어나고 있다. 최근 온라인에서...",
-            "link": "https://blog.naver.com/studyhappy/224410883986",
+            "title": "한화오션, ‘가스텍 2026’서 60MW급 부유식 데이터센터(FDC) 글로벌 첫....",
+            "description": "해상 전력 생산 및 해수 냉각 활용… 육상 데이터센터의 전력·부지 한계 극복 대안 제시 한화오션, ‘가스텍 2026’서 60MW급 부유식 데이터센터(FDC) 글로벌 첫 공개 [사진=시사큐브] 한화오션은 인공지능(AI)...",
+            "link": "https://blog.naver.com/sugitoyang/224411320486",
             "postdate": "20260914"
           },
           {
-            "title": "[연수후기]일본 국제 복지기기 박람회 연수",
-            "description": "단순한 견학을 넘어, 인공지능(AI)과 로봇이 우리 삶의 '불편함'을 어떻게 '가능성'으로 바꾸고 있는지, 그 생생한 현장으로 함께 가보실까요? 한눈에 보는 현장학습 일정표 이번 일정은 복지 선진국 일본의...",
-            "link": "https://blog.naver.com/nicetravel2025/224404747934",
+            "title": "로봇시대, 인간의 일 구본권 저 어크로스. 2015년 1쇄 2018년 18쇄 342쪽 ....",
+            "description": "로봇과 인공지능이 우리 인간이 할 일을 대신하는 시대에 인간만이 할 수 있는 일은 무엇일까? ai와 로봇에게 어느 정도까지의 일을 맡기고 어느 정도의 권리를 줘야 할까? 인간보다 훨씬 똑똑하고 유능해진 ai가...",
+            "link": "https://blog.naver.com/song5038/224411318986",
             "postdate": "20260914"
           },
           {
-            "title": "“AI가 인류 몰살” 공포가 현실로?… 앤트로픽·오픈AI·머스크 “개....",
-            "description": "인공지능(AI) 업계 수장들이 이례적으로 한목소리를 냈습니다. 앤트로픽의 다리오 아모데이 CEO가 “프론티어 AI 개발 속도를 조절해야 한다”고 밝히자, 샘 올트먼(오픈AI), 일론 머스크(스페이스X·xAI), 데미스...",
-            "link": "https://blog.naver.com/anycall1044/224410791375",
+            "title": "이항검증 ~ 표본비율 검증 ~ 이항분포 정규근사에 따라서",
+            "description": "인공지능 AI 와 인간에게 의사결정을 위한 조언을 요청할수 있습니다. 이런 경우 AI 가 인간보다 이전 기억을 더 잘 활용할수 있다고 생각하는지 조사하였습니다. 이를 위해 5가지 시나리오를...",
+            "link": "https://blog.naver.com/lucifer246/224411318349",
             "postdate": "20260914"
           },
           {
-            "title": "인공지능, 복잡한 기술을 이해하고 실생활에 적용하기",
-            "description": "인공지능(AI)은 오늘날 우리 사회 곳곳에서 혁신을 이끌고 있는 핵심... 모방하여 지능적인 행동을 수행하도록 만드는 것입니다. 이러한... 딥러닝은 머신러닝의 한 분야로, 인간의 신경망 구조를 모방한 인공...",
-            "link": "https://blog.naver.com/hwang40851/224410893236",
+            "title": "AX 시대 채용 트렌드가 바뀝니다, 광주 AI국비교육으로 준비하세요",
+            "description": "AI역량이 취업에 필요한 이유! &quot;개발자가 될 생각이 없는데도 인공지능을 배워야 하나요?&quot; 라는 질문을 정말 자주 받습니다. 결론부터 말씀드리면, 지금은 직무와 상관없이 필요한 시대가 되었습니다. 이유는...",
+            "link": "https://blog.naver.com/bteach/224411318423",
             "postdate": "20260914"
           },
           {
-            "title": "[오늘의 핫이슈 ON] AI 개발 속도조절론에 선 그은 트럼프 미중 기....",
-            "description": "앤트로픽, 오픈AI, xAI 등 세계 인공지능(AI) 프런티어 산업을 이끄는 빅테크 수장들이 일제히 기술 통제... 초지능 AI를 개발할 것이라는 상호 불신 때문에 어느 한쪽도 선뜻 개발 속도를 줄이지 못하는...",
-            "link": "https://blog.naver.com/coin8282444/224410836609",
+            "title": "SK하이닉스 반도체 전망 나만 몰랐던 반등 시나리오와 목표가",
+            "description": "인공지능 서버가 견인하는 구조적 성장의 서막 최근 반도체 시장 분위기를 보면 단순히 경기가 살아나는 수준을 훨씬 넘어섰어요. 에이전틱 AI 기술이 확산되면서 고대역폭 메모리인 HBM의 공급 부족이...",
+            "link": "https://blog.naver.com/dudal0080/224411313996",
             "postdate": "20260914"
           },
           {
-            "title": "로컬 AI의 혁신: 퍼플렉시티 포터블 컴퓨터(Perplexity Portable Computer) 분....",
-            "description": "2026년 들어 인공지능 기술의 흐름은 중앙집중식 클라우드 서버에서 개개인의 기기로 직접 내려오는 '온디바이스(On-device) 로컬 AI' 환경으로 빠르게 재편되고 있습니다. 지금까지 대다수의 AI 에이전트는...",
-            "link": "https://blog.naver.com/rotater/224407332631",
+            "title": "[이엠넷 인재육성 프로젝트] 이엠넷 전사 AI 교육 현장 공개! AI시대, ....",
+            "description": "이엠넷은 전사 AI 역량 레벨업을 위해 AI 시대 ‘생각정리 스킬' 교육을 시작으로 인공지능·데이터... 따라 AI를 '지능 증폭(Intelligence Amplification)' 도구로 활용하는 사고 체계를 확립하는 데 집중했습니다....",
+            "link": "https://blog.naver.com/emnetblog1/224411314889",
             "postdate": "20260914"
           },
           {
-            "title": "허준이도 이름 올렸다…필즈상 수상자 25명이 AI 기업에 던진 질문",
-            "description": "오랫동안 풀리지 않던 수학 문제를 인공지능이 해결했다면, 가장 먼저 기뻐할 사람은 수학자들일 것... AI로 어려운 수학 문제의 해법을 찾았다는 회사의 발표와 맞물려, 연구자들은 누가 아이디어를 냈고...",
-            "link": "https://blog.naver.com/ny-keith/224409374979",
+            "title": "전북자치도, 자체 구축 ‘전북AI’로 대통령상 수상",
+            "description": "지역정보화 우수사례 발표대회 전국 1위… 오픈소스 활용해 보안성·확장성 확보 전북특별자치도가 자체 구축한 생성형 인공지능 시스템 ‘전북AI’를 통해 전국 지역정보화 우수사례 발표대회에서 최고상인...",
+            "link": "https://blog.naver.com/leemanhoo/224411314183",
             "postdate": "20260914"
           },
           {
-            "title": "오픈AI '불량 에이전트' 루비잼스까지 해킹 시도...&quot;데이터 수집일 뿐....",
-            "description": "오픈AI 에이전트, 루비젬스까지 해킹했다 ㅡ 허깅페이스·독일 위키 이어 세 번째 사고 확인 오픈AI의 자율형 AI 에이전트(사람 개입 없이 스스로 판단해 작업을 수행하는 인공지능)가 오픈소스 패키지 관리...",
-            "link": "https://blog.naver.com/macholic/224410165911",
+            "title": "앤트로픽 CEO, AI 킬 스위치 발언에 업계가 주목한 이유",
+            "description": "AI 안전, 왜 다시 화두가 됐나 최근 인공지능(AI) 분야에서 '킬 스위치'라는 단어가 다시 등장했습니다. 앤트로픽 CEO인 데리어 아모데이가 “AI 위험을 업계가 오랫동안 숨겨왔다”는 발언을 하면서 이슈가...",
+            "link": "https://blog.naver.com/221227_/224411313388",
             "postdate": "20260914"
           },
           {
-            "title": "휴림로봇 주가 전망과 핵심 모멘텀 산업용 로봇부터 휴머노이드 실....",
-            "description": "관련주는 인공지능(AI) 기술 융합과 제조 자동화 수요 확대에 힘입어 꾸준한 관심을 받고 있습니다.... 특히 직각좌표 로봇과 수평다관절(스카라) 로봇 등 전통적인 산업용 라인업부터 지능형 서비스 로봇까지...",
-            "link": "https://blog.naver.com/ashline1/224410413249",
+            "title": "AI 뮤지컬일까, 사랑 이야기일까? ㅣ 뮤지컬 &lt;You&amp;It&gt;의 장르",
+            "description": "바로 AI, 인공지능입니다. 그렇다면 사랑하는 사람의 기억과 모습을 AI로 다시 만들어낼 수 있다면 어떨까요? 뮤지컬 &lt;유앤잇(You&amp;It)&gt; 역시 이런 상상에서 출발합니다. 사랑하는 아내 미나를 잃은 남편...",
+            "link": "https://blog.naver.com/egmusical1018/224411312808",
             "postdate": "20260914"
           },
           {
-            "title": "6G 네트워크와 인프라 시장 보고서",
-            "description": "&quot;6G 네트워크와 인프라&quot; 자료는 장기적인 사업 및 투자 계획 수립을 위해 무선 장비(Radios), 인공지능(AI) 기반 인프라, 코어 네트워크 및 무선접속망(RAN)의 자본적 지출(CAPEX) 가운데 6G 투자가 어느...",
-            "link": "https://blog.naver.com/giikorea2/224408483300",
+            "title": "명함 AI와 인류 멸망",
+            "description": "인류의 모든 온라인 회로에 접속할 수 있고, 그를 통해 물리적인 행위도 할 수 있는 강인공지능 AI를 개발되었다. 한 사용자는 그에게 '명함을 최대한 많이 만들어' 라고 명령한다. AI는 명함을 만들기 위해...",
+            "link": "https://blog.naver.com/qwurty/224411308558",
             "postdate": "20260914"
           },
           {
-            "title": "말 한마디로 게임부터 영상까지! 챗GPT 차세대 AI 모델이 바꾼 일상의....",
-            "description": "마치 컴퓨터 앞에 앉은 노련한 실무자가 워드, 포토샵, 영상 렌더러, 캘린더를 번갈아 켜가며 능숙하게 작업을 처리하듯, 인공지능이 스스로 필요한 도구를 골라 쥐고 실행하는 진정한 '에이전틱(Agentic) AI'의...",
-            "link": "https://blog.naver.com/baews2/224409966394",
+            "title": "팔란티어 알렉스 카프가 2023년에 말한 AI 패권 경쟁, 2026년 지금 더 ....",
+            "description": "투자와 AI 이야기 들려주는 누나 https://litt.ly/jinlogue #팔란티어 #알렉스카프 #팔란티어주식 #인공지능 #AI #미국주식 #미국증시 #기술주 #성장주 #데이터분석 #빅데이터 #거대언어모델 #LLM #AI에이전트...",
+            "link": "https://blog.naver.com/jinlogue/224411308295",
             "postdate": "20260914"
           },
           {
-            "title": "[글로벌 교육 인사이트] 싱가포르 명문대의 AI 전면 수용 승부수: 정....",
-            "description": "대학들이 AI 문해력과 비판적 검증 능력을 교육의 최우선 순위로 설정한 흐름은 우리 아이들의 영어 및 문해력 학습에 매우 명확한 방향성을 제시합니다. 인공지능이 제시하는 요약문이나 단편적인 객관식...",
-            "link": "https://blog.naver.com/engarden1/224396096895",
+            "title": "청년 AI 구독료, 세금으로 지원해야 할까?",
+            "description": "인공지능 기술이 빠르게 발전하면서 AI는 더 이상 일부 개발자나 대기업만 사용하는 전문 도구가 아닙니다. 이제는 대학생의 과제와 발표 준비, 취업준비생의 자기소개서 작성, 직장인의 문서 업무, 프리랜서의...",
+            "link": "https://blog.naver.com/limjun0529/224411306562",
             "postdate": "20260914"
           },
           {
-            "title": "AI 모델 기업들 앤트로픽, 오픈 AI, 그록, 이제는 개발 속도 조절론…....",
-            "description": "https://n.news.naver.com/mnews/ranking/article/214/0001523664?ntype=RANKING&amp;sid=001 &quot; &quot; https://naver.me/FaehZEOo 세계적인 인공지능(AI) 기업 수장들이 그동안 강조해 온 개발 속도 경쟁에 제동을 걸고 나섰습니다. AI의 능력이...",
-            "link": "https://blog.naver.com/jksuccess25/224410808568",
+            "title": "AI가 글을 써주는 시대에도 우리가 문학을 읽어야 하는 이유｜인공....",
+            "description": "AI에게 한 문장을 부탁하면 몇 초 만에 답이 나온다. 줄거리도... AI에게 줄거리를 물어보면 몇 분도 걸리지 않는다. 그런데도 사람들은... AI가 빠르게 답을 만드는 시대일수록 오히려 문학의 느린 시간이 더...",
+            "link": "https://blog.naver.com/csmode7/224411042624",
             "postdate": "20260914"
           },
           {
-            "title": "올트먼·머스크 &quot;AI 속도 조절&quot; 한목소리…반도체주 단기 타격 우려",
-            "description": "거침없던 AI의 급브레이크, '수익화 보릿고개' 넘기 위한 전략적 후퇴인가 그동안 &quot;더 빠르게, 더 거대하게&quot;만을 외치며 거침없이 질주하던 인공지능(AI) 열차의 기관사들이 일제히 브레이크 페달을 밟기...",
-            "link": "https://blog.naver.com/sinyboy/224410888518",
+            "title": "[kb스타퀴즈 | kb pay퀴즈] 9월 14일 오늘의 정답",
+            "description": "인공지능 패러다임을 주도하는 글로벌 핵심 기업 5곳의 앞 글자를 딴 '돈다'에 해당하지 않는 기업은 무엇일까요? 오픈AI 엔비디아 딥시크 구글 정답은 이미지에서 확인하실 수 있습니다 9월14일 KB Pay...",
+            "link": "https://blog.naver.com/youandiday/224411301829",
             "postdate": "20260914"
           },
           {
-            "title": "AI 인프라 2.0 전쟁: 고대역폭 메모리 독점 구도와 빅테크 전력망 수....",
-            "description": "전 세계 테크 산업과 글로벌 주식시장을 집어삼킨 인공지능(AI) 열풍이 새로운 분기점을 맞이하고 있습니다. 지금까지의 AI 1.0 시대가 챗GPT와 같은 대규모 언어 모델(LLM)의 가능성을 확인하고 이를...",
-            "link": "https://blog.naver.com/berich1004/224410887928",
+            "title": "AI토피아 -KBS N &lt;AI토피아&gt; 제작팀-",
+            "description": "인공지능에 관한 수업이 있었다. 2022년 여름에 들었는데, 그 덕에 챗지피티가 나온 그해 11월은 내게... (이제부터 AI라고 하겠다.) AI가 알아듣는다. 0과 1이 아닌, 인간의 말, 자연어를 처리할 수 있다는 말이다....",
+            "link": "https://blog.naver.com/gurae0/224411300810",
             "postdate": "20260914"
           },
           {
-            "title": "[사회/IT 분석] 챗GPT에 다 물어보다 내 머리가 굳었다? 인공지능이 앗....",
-            "description": "우리는 지금 손가락 몇 번만 까딱하면 세상 모든 지식을 3초 만에 요약해 주는 압도적인 '초지능(AI)의... 인공지능이 똑똑해지는 만큼, 우리의 뇌는 스스로 질문하고 비판하는 기능을 멈춘 채 조용히...",
-            "link": "https://blog.naver.com/aksh0210/224410887691",
+            "title": "ANI에서 AGI, 그리고 ASI까지: 인간이 만든 지능의 세 계단과 그 너머",
+            "description": "AI는 어디까지 똑똑해질까 ‘똑똑한 AI’와 ‘인간처럼 생각하는 AI’는 같은 말이 아니다... 초인공지능 지능 범위 특정 영역 광범위한 영역 거의 모든 지적 영역 인간과 비교 특정 분야에서는 인간...",
+            "link": "https://blog.naver.com/border202/224411298091",
             "postdate": "20260914"
           },
           {
-            "title": "(짧소모)AI 개발속도 늦춘다.빅테크 수장들.",
-            "description": "&quot;이러다 다 죽는다&quot;…폭주하는 AI에 브레이크 밟는 빅테크 수장들 하루가 다르게 똑똑해지는 인공지능(AI) 뉴스 보면서 &quot;이러다 진짜 터미네이터 영화처럼 되는 거 아냐?&quot; 하고 걱정하셨던 분들 많으실...",
-            "link": "https://blog.naver.com/vitamin2007/224410886016",
+            "title": "에스엔시스 인공지능(AI)·데이터센터 등 신규 전력 인프라 시장으로....",
+            "description": "안녕하세요 조선·해양·전력 통합 솔루션 기업 에스엔시스는 약 150억원을 투자해 부산 제2공장을 신설하는데 인공지능(AI)·데이터센터 등 신규 전력 인프라 시장으로 사업 영역을 확대해 갑니다 부산...",
+            "link": "https://blog.naver.com/johnkth/224411296850",
             "postdate": "20260914"
           },
           {
-            "title": "스마트팜학과 4년제 대학 알아보기, 진학 후 어떤 교육을 받을까",
-            "description": "전통적인 농업에 인공지능(AI), 사물인터넷(IoT), 빅데이터, 로보틱스 등의 첨단 기술이 결합하면서 미래 핵심 고부가가치 산업으로 급부상하고 있기 때문입니다. 오늘은 이 스마트팜학과 4년제로 알아보시는...",
-            "link": "https://blog.naver.com/beaguen/224410886651",
+            "title": "인공지능 학점은행제, AI 공부와 학위 준비를 함께할 수 있을까?",
+            "description": "안녕하세요 :) 최근 인공지능(AI)이 빠르게 발전하면서 AI를 공부하려는 분들이 정말 많아졌습니다.... 딥러닝에서는 인공신경망을 활용해 더욱 복잡한 데이터를 처리합니다. 최근에는 생성형 AI가 대중화되면서...",
+            "link": "https://blog.naver.com/nhomng/224411297384",
             "postdate": "20260914"
           },
           {
-            "title": "[엔비디아,젠슨황] &quot;젠슨 황이 다음 대세로 찍었다!&quot; AI 시대에 날개 ....",
-            "description": "요즘 주식 시장에서 가장 핫한 키워드를 꼽으라면 단연 'AI(인공지능)' 죠? 그런데 여러분, AI 기술이 눈부시게 발전할수록 우리를 더 긴장하게 만드는 문제가 있다는 사실, 알고 계셨나요? 바로 해킹이나 정보...",
-            "link": "https://blog.naver.com/sia6611/224410884268",
+            "title": "&quot;AI가 통번역 다 해주는 시대, 외고 진학 괜찮을까?&quot; 학부모가 꼭 알....",
+            "description": "인공지능(AI) 실시간 통번역 기술이 일상화된 시대에 굳이 비싼 등록금을 내고, 치열한 경쟁을 뚫고 외고에 갈 필요가 있냐는 회의적인 시각도 적지 않습니다. 하지만 현행 대입 제도와 AI 시대 인재상의...",
+            "link": "https://blog.naver.com/jylove272/224411296303",
             "postdate": "20260914"
           },
           {
-            "title": "초광역 AI 연합이 행정의 미래를 바꿉니다",
-            "description": "최근 인공지능 전환 즉, AX는 거스를 수 없는 거대한 흐름이 되었습니다. 하지만 규모가 작은 기초지자체나 재정 여건이 넉넉하지 않은 지역 입장에서는 독자적인 AI 인프라를 구축하고 운영하는 것이...",
-            "link": "https://blog.naver.com/happybrain_ai/224410884387",
+            "title": "2026년 8월 연구실 주요 소식｜AI·양자경영연구소개소와 교수님 수상",
+            "description": "AI·양자경영연구소 비전선포식 AI양자경영연구소는 인공지능과 양자기술을 경영·산업 분야와 연결하고, 기술의 실질적인 비즈니스 활용 가능성을 연구하기 위해 설립되었습니다. 앞으로 학술연구를 비롯해...",
+            "link": "https://blog.naver.com/yoonity519/224411293637",
             "postdate": "20260914"
           },
           {
-            "title": "KOTRA의 AI 무역지원센터(AITC) 활용해서 B2B 사이트 BuyKorea에 상품 등록....",
-            "description": "KOTRA AI무역지원센터(AITC)와 buyKOREA 상품 등록 완벽 가이드 해외 판로 개척에 어려움을 겪는 국내 중소·중견기업을 위해 KOTRA는 최신 인공지능(AI) 기술과 디지털 무역 플랫폼을 결합한 지원...",
-            "link": "https://blog.naver.com/happyojh/224410884079",
+            "title": "파운드리 시장 점유율 70% 독점과 2026 국내 반도체 생존 전략",
+            "description": "인공지능(AI) 열풍으로 시장 규모는 매일 역대급으로 커지고 있는데, 정작 과실을 가져가는 쪽은 한곳으로 쏠리고 있거든요. 대만 TSMC가 전 세계 반도체 위탁생산 시장에서 무려 70%를 훌쩍 넘는 압도적인...",
+            "link": "https://blog.naver.com/songsouho/224407652554",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;진료 데이터에 검색 더했다&quot;… 네이버, '의료 AI 플랫폼' 사업 본격 ....",
-            "description": "국내 최대 검색 플랫폼 네이버가 미래 핵심 성장동력으로 낙점한 '의료 인공지능(AI)' 사업을 전면에 내걸고 본격적인 상용화에 착수합니다. 10여 년간 축적해 온 연구 데이터와 공격적인 인수합병(M&amp;A)...",
-            "link": "https://blog.naver.com/kka407/224407448161",
+            "title": "댓글부터 읽다가 설마 했다면, 마감 3일 남은 kt ai자격증 홈페이지 ....",
+            "description": "인공지능 역량이 중요해진 요즘, 관련 자격을 준비하려고 마음먹었다가 막막했던 적 있으신가요?... 5단계로 나뉜 등급 체계와 특징 kt ai자격증 홈페이지 접속 및 바로가기 이번 자격 제도는 KT와...",
+            "link": "https://blog.naver.com/mod0214/224411082615",
             "postdate": "20260914"
           },
           {
-            "title": "AI 속도조절론이 반도체 시장에 미칠 영향",
-            "description": "#AI속도조절론 #반도체 #AI데이터센터 #오라클 #투자전망 #인공지능동향 #테크트렌드 #서버인프라 #빅테크투자 #반도체수요 #기술전망 #IT트렌드 #데이터센터서버 #차세대기술 #반도체시장",
-            "link": "https://blog.naver.com/sdo2278/224410850138",
+            "title": "피지컬 AI 시대, 요한계시록을 다시 읽는 이유...폰티스 후마니타스 ....",
+            "description": "인공지능이 글을 쓰고 그림을 만들던 시대를 지나 이제는 AI가 로봇과 결합해 현실 세계에서 움직이는 시대가 다가오고 있습니다. 이른바 ‘피지컬 AI(Physical AI)’ 시대입니다. AI가 화면 속에서 정보를 처리하는...",
+            "link": "https://blog.naver.com/susangeist/224411286782",
             "postdate": "20260914"
           },
           {
-            "title": "5분만에 읽는 돈되는 뉴스(2026. 9. 14.)",
-            "description": "나오듯이 인공지능과 관련한 보안이슈들이 엄청나게 제기되고있음 wsj 이란은 실제로 미국산 ai를 통해서 미 해군함정 표적화 진행중임 wsj AI가 파멸적 수준의 기술을 보이고있고 인간의 생태계 전반을...",
-            "link": "https://blog.naver.com/snjupman/224410882935",
+            "title": "원주, 9월 글로벌 AI 컨퍼런스 개최…의료 AI 허브 도약 선언",
+            "description": "https://www.nbnnews.co.kr/news/articleView.html?idxno=1055973 강원도 원주시가 오는 9월 글로벌 인공지능(AI) 기업들을 초청해 대규모 컨퍼런스를 열고 의료 AI 산업 허브로의 도약을...",
+            "link": "https://blog.naver.com/nbnnews1/224411283188",
             "postdate": "20260914"
           },
           {
-            "title": "인류 멸종의 시계: AI가 먼저일까, 기후 이상이 먼저일까? (한반도와 ....",
-            "description": "인류의 생존을 위협하는 양대 산맥인 기후 이상과 인공지능(AI)의 위협은 오늘날 가장 뜨거운 화두입니다. 전 세계 평균보다 빠른 속도로 변화를 겪고 있는 한반도의 현실과, 지구 온난화로 인해 촉발될 수 있는...",
-            "link": "https://blog.naver.com/wjdeogh100/224410881169",
+            "title": "읽은, 읽고 있는, 읽지 못한",
+            "description": "읽은 《미래가 원하는 아이》(문석현 지음 / 메디치) 미래가 원하는 아이 문석현2017메디치미디어 이 책은 인공지능 박사가 소프트웨어 업계에서 남들보다 일찍 AI를 접하면서 느끼게 된 여러 인사이트들을 담은...",
+            "link": "https://blog.naver.com/my_shiny_days/224411282883",
             "postdate": "20260914"
           },
           {
-            "title": "젠슨 황이 찍었다! “AI 다음 전쟁터는 사이버보안”｜엔비디아가 ....",
-            "description": "인공지능(AI)의 다음 성장동력은 과연 무엇일까요? 챗GPT 같은 생성형 AI를 시작으로 코딩이 대표적인 AI 활용처로 자리 잡았다면, 이제 그다음 무대는 사이버보안이 될 가능성이 커지고 있습니다. 특히...",
-            "link": "https://blog.naver.com/quntum2030/224410880644",
+            "title": "롤러코스터 타고 대구 달성군의 매력을 한눈에 관광",
+            "description": "대구광역시 달성군이 9개의 읍·면 관광 명소를 소개하기 위해 제작한 인공지능(AI) 가상 영상 콘텐츠는 달성군의 매력을 가장 짜릿하게 즐기는 방법, '달성코스터'가 지금 출발합니다! 인...",
+            "link": "https://blog.naver.com/simjk1/224411281807",
             "postdate": "20260914"
           },
           {
-            "title": "[특징주] 젠슨 황 AI 다음은 사이버보안주 강세",
-            "description": "바로 인공지능 반도체 대장으로 불리는 엔비디아의 젠슨 황... 콘퍼런스에서 인공지능 기술의 차세대 핵심 무대는 바로 보안이라고 강조했답니다. 인공지능이 스스로 프로그래밍을 돕는 세상이 오면서...",
-            "link": "https://blog.naver.com/snsanfrhrl/224410879788",
+            "title": "*** [체계적인 인공지능(AI) 학습을 위한 구체적인 로드맵]에 대하여",
+            "description": "[체계적인 인공지능(AI) 학습을 위한 구체적인 로드맵]에 대하여 https://chatgpt.com/share/6aa78ee6-bde8-83ee-8124-fa673a229f40?ogimg=plain",
+            "link": "https://blog.naver.com/yygyn77/224411282498",
             "postdate": "20260914"
           },
           {
-            "title": "AI 서버 시대, 반도체만 볼 게 아니다 지금 삼성전기(009150)를 주목하....",
-            "description": "요즘 국내 주식시장에서 가장 많이 언급되는 키워드 중 하나가 바로 **AI(인공지능)**입니다. 엔비디아를 비롯한 글로벌 빅테크 기업들이 AI 데이터센터 투자를 확대하면서 GPU, HBM, 서버, 네트워크 장비 등...",
-            "link": "https://blog.naver.com/yaakumo/224410878563",
+            "title": "SK 최태원, AI센터 '규모' 다음은 회수…5GW 350조 자본규율",
+            "description": "회장이 인공지능(AI) 전략의 무게중심을 ‘얼마나 크게 짓느냐’에서 ‘투자한 돈을 어떻게 회수하느냐’로 옮기고 있다. SK가 2035년 최대 15GW 규모 AI 데이터센터를 구상한 가운데 1단계 5GW 구축...",
+            "link": "https://blog.naver.com/toyo2017/224411279533",
             "postdate": "20260914"
           },
           {
-            "title": "공공 AI 도입의 새로운 표준과 공직자의 필수 역량",
-            "description": "인공지능이 우리 일상의 도구가 된 것을 넘어 이제는 공공 행정의 핵심 동력으로 자리 잡고 있습니다. 많은 공직자분들이 업무 효율을 높이기 위해 생성형 AI를 활용하고 있으며, 지자체마다 AI를 접목한...",
-            "link": "https://blog.naver.com/happybrain_ai/224410878039",
+            "title": "아라키 아카네 프로필, 인스타 AI 오해를 받은 전직 배드민턴 선수 ....",
+            "description": "사진이 너무 완벽하다는 이유로 인공지능 합성 의혹까지 받았으나, 본인의 적극적인 해명과 함께... 인스타 AI 논란의 진실과 은퇴 후 근황 선수 생활을 마친 뒤 그녀는 꾸준한 식단 관리와 코어 운동으로...",
+            "link": "https://blog.naver.com/blu2sky7/224411203427",
             "postdate": "20260914"
           },
           {
-            "title": "HD현대로보틱스, 스타트업에 130억 투자…‘피지컬 AI’로 몸값 키운....",
-            "description": "/HD현대 HD현대로보틱스가 국내 로봇 감각기능 스타트업에 지분을 투자하며 피지컬 인공지능(AI) 기술 확보에 나섰다. 중공업 현장에 적용할 휴머노이드 핵심 기술을 외부에서 빠르게 확보하고 사업 영역을...",
-            "link": "https://blog.naver.com/donggujob/224410878637",
+            "title": "해남 솔라시도에 17조 움직인다…논밭 한가운데 AI 도시 생길까?",
+            "description": "국가 AI 컴퓨팅센터가 핵심 시설 솔라시도 개발이 다시 주목받은 가장 큰 이유는 국가 AI 컴퓨팅센터 추진이에요. 이 시설은 기업과 대학, 연구기관이 인공지능 모델을 개발할 때 필요한 고성능...",
+            "link": "https://blog.naver.com/yxaedureo88/224411199930",
             "postdate": "20260914"
           },
           {
-            "title": "AI발 부품값 폭등, 기상청 덮쳤다…슈퍼컴 6호기 도입 '비상'",
-            "description": "https://www.nbnnews.co.kr/news/articleView.html?idxno=1055814 기상청의 차세대 국가기상슈퍼컴퓨터 6호기 도입 사업이 전 세계적인 인공지능(AI) 열풍에 따른 부품 가격 급등으로 난항을...",
-            "link": "https://blog.naver.com/nbnnews1/224410877194",
+            "title": "AI가 촉발한 세기의 장비 전쟁: 벤처 글로벌 CEO가 경고한 LNG와 데이....",
+            "description": "요즘 뉴스를 보면 하루가 다르게 인공지능(AI)과 데이터센터 이야기가 쏟아져 나오죠. 하지만 화려한 AI 기술 이면에서 전 세계 산업 현장은 필수 장비와 전력을 확보하기 위한 치열한 전쟁을 치르고 있습니다....",
+            "link": "https://blog.naver.com/seanfwill/224411277958",
             "postdate": "20260914"
           },
           {
-            "title": "경기도 기후행동 OX·모니모 영어챌린지·케이뱅크 AI 퀴즈 정답 2026....",
-            "description": "정답: O (그렇다) 스마트농업은 인공지능과 사물인터넷, 빅데이터, 자동화 장비 등을 농업에... 케이뱅크 AI 퀴즈 챌린지 Q. 2026년 개봉한 크리스토퍼 놀런 감독 영화 오디세이에서 트로이 목마...",
-            "link": "https://blog.naver.com/carismawrap/224410876827",
+            "title": "마블이 캐릭터와 이야기를 만들 때 적용하는 원칙 &quot;5H&quot;",
+            "description": "출처, 매일경제 신문에서 본 내용 발췌 “스파이더맨의 피터 파커처럼 마음을 움직이는건 인간미” “인공지능(AI)이 절대로 대체할 수 없는 것이 하나 있습니다. 바로 인간의 경험입니다.” AI가 실제 인간...",
+            "link": "https://blog.naver.com/dalbit_salon/224411278831",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;내년 말이면 통제 불능&quot; 인공지능(AI) 업계 내부자들의 잇단 경고",
-            "description": "안전을 담보할 수 있는 실효성 있는 규제와 국제적 공조 방안이 그 어느 때보다 절실한 시점입니다. #인공지능 #앤트로픽 #AI위험성 #초지능 #오픈AI #AI개발경쟁 #테크뉴스 #미래기술 #글로벌이슈 #인류멸망경고",
-            "link": "https://blog.naver.com/ecolog-/224410876237",
+            "title": "미국 AI 규제, 연방 선점과 자치권 충돌",
+            "description": "2025년 12월 11일, 미국 백악관이 AI(인공지능) 정책의 전국적 통일을 추진하는 행정명령을 발표했습니다. 주정부 AI 법률에 법적으로 이의를 제기할 소송 태스크포스 구성도 지시했습니다. 기업에 하나의 규칙을...",
+            "link": "https://blog.naver.com/bankplus/224411275011",
             "postdate": "20260914"
           },
           {
-            "title": "AI, 신기술 제품 광고하려면 이걸 꼭 지켜야 해요! 「표시·광고 내용....",
-            "description": "예를 들어 “인공지능(AI) 기술로 더 안전한” 등과 같이 AI 기술의 활용 여부나 그에 따른 성능을 사실로 주장한다면 이를 뒷받침할 수 있는 실증자료를 갖추어야 합니다. 즉, 광고에 ‘AI’라는 단어를...",
-            "link": "https://blog.naver.com/ftc_news/224410875694",
+            "title": "앤스로픽 상장 거래소 나스닥 선택 배경과 남은 일정",
+            "description": "글로벌 생성형 인공지능 시장에서 오픈AI와 양강 구도를 형성하고 있는 앤스로픽이 사상 최대 규모의 기업공개를 앞두고 최종 상장 거래소로 뉴욕증권거래소가 아닌 나스닥을 공식 낙점했습니다. 최대...",
+            "link": "https://blog.naver.com/jundemon/224411273994",
             "postdate": "20260914"
           },
           {
-            "title": "AI 속도조절론에 트럼프 중시한 승리방식 유지 논쟁",
-            "description": "#AI속도조절론 #트럼프AI정책 #미국기술패권 #빅테크투자 #인공지능규제 #미중기술전쟁 #노후대비재테크 #안전자산관리 #주식투자전략 #소액투자법 #기술주분할매수 #반도체전망 #리스크관리 #생활밀착재테크...",
-            "link": "https://blog.naver.com/wvncco970/224410816676",
+            "title": "[특집/CIPAC 2026①] “AI·6G·SEP가 바꾼 IP 질서”... CIPAC 2026, 중국의 ‘....",
+            "description": "화웨이·샤오미·노키아·퀄컴, 개방과 보호의 새 균형 제시 지난 9월 8일 CIPAC 2026 개막식(사진출처=CIPAC) © 특허뉴스 인공지능(AI)과 6G, 표준필수특허(SEP)를 둘러싼 글로벌 기술패권 경쟁이 거세지는 가운데...",
+            "link": "https://blog.naver.com/patentnews/224411270829",
             "postdate": "20260914"
           },
           {
-            "title": "자료 준비부터 앱 실행까지, 나만의 AI 설계 딥코 스튜디오",
-            "description": "인공지능을 이해하는 가장 확실한 방법, 직접 만들어보는 것입니다. 이미 완성된 AI 서비스를 사용해보는 데서 그치지 않고, 어떤 자료를 준비하고 어떻게 학습시키는지 경험하면 AI가 작동하는 과정을 한층...",
-            "link": "https://blog.naver.com/ubion_corp/224410872665",
+            "title": "[이혁중 CISO 칼럼] IoT/OT 이게 뭐길래?",
+            "description": "https://www.dailysecu.com/news/articleView.html?idxno=208435 IoT/OT 보안: 가상공간을 넘어 현실 세계의 안전을 지키는 필수 과제 최근 인공지능(AI)과 IT 보안에 관심이 집중되고 있으나, 우리 사회의 핵심 기반인 IoT...",
+            "link": "https://blog.naver.com/gur0/224411268627",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;AI 늦추자는 건 부정적 세력의 헛소리&quot;… 트럼프, '속도조절론' 전격....",
-            "description": "&quot;AI 늦추자는 건 부정적 세력의 헛소리&quot;… 트럼프, '속도조절론' 전격 일축 도널드 트럼프 미국 대통령이 인공지능(AI) 기술 개발의 위험성을 경고하며 제기된 이른바 'AI 속도조절론'에 대해 강한 불만을...",
-            "link": "https://blog.naver.com/honghonghong222/224410871987",
+            "title": "멀티모달 로봇 AI, 로봇 파운데이션 모델, 분산형 로봇 지능, 촉각센....",
+            "description": "시각·언어·행동을 연결하는 인공지능과 정밀 센싱 기술이 발전하면서 피지컬 AI 로봇 시스템 분야의... 로봇 AI, 로봇 파운데이션 모델, 분산형 로봇 지능, 촉각센서 기반 제어와 관련된 기존 특허와 공개...",
+            "link": "https://blog.naver.com/tngmlaldnj/224411266720",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;설마 내가 당하겠어?&quot; 눈 뜨고 코 베이는 신종 수법 3",
-            "description": "나날이 교묘해지는 신종 보이스피싱 수법, 최근에는 인공지능(AI) 기술과 위조 우편물까지 악용하며 누구나 타깃이 될 수 있을 만큼 정교해졌습니다. 네이버 블로그 이웃들과 방문자들의 자산을 지키기 위해...",
-            "link": "https://blog.naver.com/yunjiulove/224410869351",
+            "title": "앤트로픽, IPO 앞두고 2분기 연속 흑자 전망…&quot;현금 소진 우려 씻는다....",
+            "description": "(사진=AI포스트 DB) 대규모 기업공개(IPO)를 앞둔 인공지능(AI) 기업 앤트로픽이 현금 소진에 대한 시장의 우려를 불식시키고 2개 분기 연속 조정 영업이익 흑자를 낼 것이라고 투자자들에게 전했다....",
+            "link": "https://blog.naver.com/aipostkoreayhd/224411267745",
             "postdate": "20260914"
           },
           {
-            "title": "“샘 올트먼도 머스크도 ‘잠깐 멈춰’…AI 공룡기업 수장들이 먼저....",
-            "description": "누가 먼저 인간 수준의 지능에 가까워지느냐를 놓고 실리콘밸리는 거대한 경주를 벌였습니다. 그런데... #AI #인공지능 #AI뉴스 #생성형AI #AI에이전트 #OpenAI #샘올트먼 #Anthropic #앤스로픽 #다리오아모데이...",
-            "link": "https://blog.naver.com/aha-momentum/224410869745",
+            "title": "&quot;브레인 AI에 피지컬 AI 더한다&quot;…SK이노, 울산CLX AX 속도",
+            "description": "이재철 SK에너지 AI 혁신기술실 실장은 지난 11일 울산전시컨벤션센터(UECO)에서 열린 '2026 울산포럼'에서 울산 CLX의 인공지능 전환(AX) 방향과 피지컬 AI 활용 사례를 소개했습니다....",
+            "link": "https://blog.naver.com/dealsite/224411121004",
             "postdate": "20260914"
           },
           {
-            "title": "AI 여러 명이 엔지니어처럼 협업한다. 설계, 해석, 제조 자동화 기술",
-            "description": "중앙대 이수영 교수 연구팀 역시 앞서 물리기반 AI와 도메인 특화 LLM 등 제조 분야 인공지능 연구를 이어왔습니다. 2026년 8월 대한기계학회 심포지엄에서도 이수영 교수는 물리성과 공학적 제약을 반영한...",
-            "link": "https://blog.naver.com/ykd2880/224410865395",
+            "title": "최태원 &quot;울산은 AI시티 돼야&quot;…제조AI·아트울산 비전 제시",
+            "description": "(사진=SK) 최태원 SK그룹 회장이 인공지능(AI)과 예술을 결합한 울산의 미래 발전 발향을 제시했습니다. 제조 경쟁력을 강화하며 AI로 시민의 행복을 높이는 한편 산업도시에...",
+            "link": "https://blog.naver.com/dealsite/224411123557",
             "postdate": "20260914"
           },
           {
-            "title": "의료 AI 시대, 기술보다 먼저 물어야 할 것들_행정원 강지언",
-            "description": "최근 보건의료 분야에서 인공지능(AI)은 더 이상 먼 미래의 기술이 아니다. 영상 판독을 돕고 진료기록을 작성하거나 환자의 상태를 분석하는 등 이미 의료현장의 여러 영역에서 활용되고 있다. 정부도 지난...",
-            "link": "https://blog.naver.com/gnpi0624/224407375092",
+            "title": "AI, 인류 멸종 초래한단 경고",
+            "description": "AI 연구원은 “인류 멸종”, 美 국방부는 “공포몰이”… 누구 말이 맞나 인공지능(AI) 연구원들은 AI의 기술력이 ‘인류를 멸망시킬 수 있는 수준’까지 발전했다고 경고하고 있습니다. 반면 미국 국방부는...",
+            "link": "https://blog.naver.com/scoopnews/224411240508",
             "postdate": "20260914"
           },
           {
-            "title": "“강원도민 74%가 AI 데이터센터 찬성…그런데 54%가 요구한 조건은 ....",
-            "description": "도민 74%가 ‘적절하다’고 답한 이유 인공지능(AI)이 산업의 중심으로 빠르게 자리 잡으면서 이제는 AI를 얼마나 잘 활용하느냐뿐만 아니라 AI를 실제로 움직이는 인프라를 어디에 구축할 것인가도 중요한...",
-            "link": "https://blog.naver.com/lske777/224410863554",
+            "title": "한·프랑스 ‘뤼미에르 파트너십’ 발표··· ‘글로벌 영화·영상산....",
+            "description": "국내 기업·기관도 유럽 파트너와 지식재산(IP)·인공지능(AI)·인재 양성 분야에서 협력에 나서면서 K-콘텐츠의 유럽 리메이크와 공동제작, 현지 유통이 확대될 전망입니다. “영화·영상산업에 5년간 8000억씩...",
+            "link": "https://blog.naver.com/mcst_pr/224411192169",
             "postdate": "20260914"
           },
           {
-            "title": "[AI 딥다이브] 2026.09.14 메타 '비밀 프로젝트' 실패와 AI 노동비용의 역....",
-            "description": "2026년 9월 14일 월요일 글로벌 AI 딥다이브 테크 인텔리전스 리포트 2026년 9월 14일 새로운 한 주가 밝아오는 오늘, 전 세계 인공지능(AI) 산업은 화려한 기술적 기대감(Hype)의 거품을 걷어내고 '냉혹한...",
-            "link": "https://blog.naver.com/yumjihun/224410862211",
+            "title": "인공지능 2027년 통제 불능 전망과 우리에게 미칠 영향 분석",
+            "description": "2027년이면 AI가 인간의 통제를 벗어날 수 있다는 관측이 나오면서 기술의 향방에 대한 관심이 어느... 참고로 초인공지능(ASI)은 인간의 지능을 모든 방면에서 압도하는 단계의 지능을 의미합니다....",
+            "link": "https://blog.naver.com/kimdw331/224409975746",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;속도조절 외치더니 뒤에선 흑자 잭팟?&quot;… '앤트로픽'이 주주들에게....",
-            "description": "막대한 AI 설비투자 비용 공포 뚫었다… '앤트로픽'이 조정 영업이익으로 증명한 생존력 최근 글로벌 인공지능(AI) 업계를 관통한 가장 뜨거운 화두는 단연 거물들이 일제히 외친 'AI 속도조절론'이었다....",
-            "link": "https://blog.naver.com/sinyboy/224410861791",
+            "title": "현대차그룹, 2029년 '아트리아 AI' 기반 L2++ 차 양산",
+            "description": "(사진=최유라 기자) 현대자동차그룹이 자체 자율주행 인공지능(AI) ‘아트리아 AI(Atria AI)’ 고도화에 나섰습니다. 외부 협업으로 양산 시점을 앞당기는 동시에 자체 AI 기술을 내재화하는...",
+            "link": "https://blog.naver.com/dealsite/224411121600",
             "postdate": "20260914"
           },
           {
-            "title": "260911_인천을 대한민국 AI 혁신의 거점으로!",
-            "description": "오늘 인천시청 미래과학과로부터 인공지능(AI) 산업 육성 계획을 보고받았습니다. 인천시는 2026년부터 2031년까지 총 3,200억 원 규모로 ‘인천 피지컬 AI 실증거점’ 조성을 추진할 계획입니다. 인천은 공항...",
-            "link": "https://blog.naver.com/sunhklee4862/224410861458",
+            "title": "현대차그룹, 자율주행 양산 속도 대신 완성도 택했다…&quot;일부러 늦춰....",
+            "description": "(사진=최유라 기자) 현대차그룹이 자체 개발 자율주행 인공지능(AI) '아트리아(Atria) AI'를 적용한 레벨2++(L2++) 양산차 출시 시점을 기술 개발 속도가 아닌 전략적 판단에 따라 늦췄다고 밝혔습니다. 인력을...",
+            "link": "https://blog.naver.com/dealsite/224411127006",
             "postdate": "20260914"
           },
           {
-            "title": "너무 빠른 AI 시대, 브레이크가 필요할까? 앤트로픽 CEO가 던진 화두",
-            "description": "최근 챗GPT를 비롯한 인공지능(AI) 기술, 정말 하루가 다르게 똑똑해지고 있죠? 편리하기도 하지만, 가끔은 '이렇게 빨리 발전해도 괜찮은 걸까?' 하는 막연한 두려움이 들 때도 있습니다. 그런데 놀랍게도, 이...",
-            "link": "https://blog.naver.com/jjonga1216/224410859189",
+            "title": "핵무기보다 통제하기 힘든 'AI-바이오'의 습격: 왜 우리는 '보복'이 ....",
+            "description": "'바이오컨버전스'라는 이름의 가속 페달, 그리고 안보의 임계점 우리는 지금 생물학, 인공지능(AI), 바이오 엔지니어링, 그리고 디지털 인프라가 전례 없이 융합되는 '바이오컨버전스(Bioconvergence)'의...",
+            "link": "https://blog.naver.com/econlife-globe/224411266175",
             "postdate": "20260914"
           },
           {
-            "title": "카카오톡 AI'카나나 인 카카오톡'을 본격 확산",
-            "description": "안 보면 마케팅 예산만 날린다: AI와 플랫폼이 뒤흔든 2026 최신 마케팅 이슈 7 플랫폼의 인공지능 도입과 사용자 이용 행태 변화로 디지털 마케팅 환경이 빠르게 재편되고 있습니다. 실무자가 즉각 파악해야...",
-            "link": "https://blog.naver.com/dnglgl930/224410858913",
+            "title": "AI 데이터센터 CPO 방식에 관심이 커지는 이유와 핵심 원리",
+            "description": "#AI #인공지능 #데이터센터 #인공지능데이터센터 #CPO #CPO방식 #CPO기술 #코패키지드옵틱스 #광인터커넥트 #광통신 #광부품 #스위치칩 #네트워크장비 #데이터센터전력 #서버통신 #인공지능서버...",
+            "link": "https://blog.naver.com/taebala/224411249781",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;최대 5000만 주 매각 계획 철회&quot;… '오라클' 래리 엘리슨 의장이 던진....",
-            "description": "2027년 자본지출만 950억 달러… '오라클'의 메머드급 투자 광풍과 현금 흐름의 경고등 글로벌 빅테크 진영의 인공지능(AI) 골드러시 최전방에서 컴퓨팅 자원을 공급하는 인프라 거인, 오라클(NYSE:ORCL)의 안방이...",
-            "link": "https://blog.naver.com/sinyboy/224410859011",
+            "title": "인공지능의 특이점은 이미 왔다: 'GPT-6 아스트라'가 바꾼 2026년 AI 시....",
+            "description": "우리가 알던 AI의 시대는 끝났다 지금까지의 인공지능(AI)은 '똑똑한 답변기'에 불과했습니다. 하지만 2026년 가을, 오픈AI가 공개한 'GPT-6 아스트라(Astra)'는 우리가 알던 AI의 정의를 완전히 바꿨습니다....",
+            "link": "https://blog.naver.com/ziugae_blog/224411102486",
             "postdate": "20260914"
           },
           {
-            "title": "AI가 수학의 불가능을 깼다? 'GPT-6 아스트라' 기반 내부 모델의 놀라....",
-            "description": "최근 인공지능(AI) 기술이 비약적인 발전을 거듭하며 인간의 영역으로 여겨졌던 고난도 수학 난제까지 해결해 내는 놀라운 소식이 전해졌습니다. 하지만 이와 동시에 경쟁사 연구진과의 우선권 다툼 및...",
-            "link": "https://blog.naver.com/ecolog-/224410858296",
+            "title": "AI·반도체가 이끄는 3%대 성장…가계 회복은 ‘글쎄’",
+            "description": "올해 성장률 3.3% 전망에도 실질임금 0.3% 성장…소비·청년 고용 회복은 더뎌 (그래픽=챗GPT) 한국 경제가 반도체와 인공지능(AI) 관련 투자 호조에 힘입어 올해 3%대 성장이 예상되지만 경기...",
+            "link": "https://blog.naver.com/dealsite/224411130323",
             "postdate": "20260914"
           },
           {
-            "title": "[2026 최신] 오픈AI, 'GPT-6 아스트라' 수요 폭증에 월 200달러 프로 요금....",
-            "description": "챗GPT 개발사 오픈AI가 새롭게 선보인 인공지능(AI) 모델 '아스트라'의 폭발적인 수요를 감당하지 못해 최상위 유료 요금제의 신규 가입을 잠정 중단했습니다. 전 세계적인 관심이 집중되고 있는 이번 조치의...",
-            "link": "https://blog.naver.com/ecolog-/224410857797",
+            "title": "구글 제미나이 3.8 Flash 업데이트 분석과 비즈니스 활용 전략",
+            "description": "구글이 최신 인공지능 모델인 제미나이 3.8 플래시(Gemini 3.8 Flash)를 기습 발표했습니다. 이번 출시의 핵심 명제는 '더 열심히 일하는 AI(Works Harder)'입니다. 이전 3.7 Flash 모델이 공개된 지 불과 3주...",
+            "link": "https://blog.naver.com/rotater/224410873758",
             "postdate": "20260914"
           },
           {
-            "title": "[2026 최신] 세계적 벤처캐피탈 a16z, 11억 달러 규모 '머신 에이지 펀드....",
-            "description": "세계적인 실리콘밸리 벤처캐피탈 앤드리슨호로위츠(a16z)가 인공지능(AI) 인프라와 하드웨어 분야에 집중 투자하는 대규모 전용 펀드를 신설해 이목이 집중되고 있습니다. 특히 첫 해외 거점으로 서울을...",
-            "link": "https://blog.naver.com/ecolog-/224410857320",
+            "title": "글로벌 AI 리더들, 통제 불능 '초지능' 위협에 개발 속도 조절 전격 ....",
+            "description": "불능 '초지능' 위협에 개발 속도 조절 전격 촉구 [사진=시사큐브] 다리오 아모데이 앤트로픽 최고경영자(CEO)가 인공지능(AI) 모델의 성능 향상 속도를 늦춰야 한다는 공식 제안을 내놓은 가운데, 샘 올트먼...",
+            "link": "https://blog.naver.com/sugitoyang/224411259968",
             "postdate": "20260914"
           },
           {
-            "title": "서울디지텍고 어떤 학교일까?｜학과·입결·교복·급식·기숙사·입....",
-            "description": "#서울디지텍고 #서울디지텍고등학교 #특성화고 #서울특성화고 #게임특성화고 #게임개발과 #게임고등학교 #인공지능개발 #AI고등학교 #특성화고입시 #특성화고입학 #특성화고면접 #특성화고교복 #특성화고급식...",
-            "link": "https://blog.naver.com/kokori824/224410857418",
+            "title": "메모리 만으론 안 된다! AI 반도체의 진짜 승부처, 미국 인디 애나 첨....",
+            "description": "서론: AI 반도체 패러다임의 전환과 '패키징'의 부상 인공지능(AI) 시대의 도래는 반도체 산업의... 대한민국이 'AI 지능 수출국'으로 거듭나기 위한 수석 애널리스트로서의 세 가지 제언은 다음과...",
+            "link": "https://sskn.tistory.com/4985",
             "postdate": "20260914"
           },
           {
-            "title": "삼성SDS와 LG CNS 주가 전망: IT 서비스 양대산맥드 2026년 실적 및 AI 전....",
-            "description": "삼성SDS와 LG CNS 주가 전망: IT 서비스 양대산맥 2026년 실적 및 AI 전략 분석 국내 IT 서비스 시장을 양분하고 있는 삼성SDS와 LG CNS는 최근 기업들의 인공지능(AI) 전환(AX) 수요 급증과 함께 핵심...",
-            "link": "https://blog.naver.com/okeru/224410166619",
+            "title": "&quot;월 200달러 대란?&quot; OpenAI 최신 'GPT-6 아스트라(Astra)' 프로 구독 일시 중....",
+            "description": "인공지능(AI) 트렌드를 빠르게 전해드리는 블로그입니다. 최근 오픈블록(OpenAI)에서 야심 차게 선보인 최신 대형언어모델 'GPT-6 아스트라(Astra)'와 관련하여 전 세계 테크 시장이 들썩이고 있습니다. 출시...",
+            "link": "https://blog.naver.com/kitty8646/224411253833",
             "postdate": "20260914"
           },
           {
-            "title": "인류 멸망 시나리오 결국 터졌습니다, AI 위험론 공방과 트럼프 발언....",
-            "description": "인공지능 위험론은 AI가 인류의 통제를 벗어나 독자적인 의지로 파괴적인 행동을 할 가능성을 경고하는 담론입니다. 기술의 발전 속도가 안전성 검증을 압도하면서 사회 시스템 전체를 위협할 수 있다는 것이...",
-            "link": "https://blog.naver.com/newsforwarder/224410854081",
+            "title": "AI 자동매매 사기 피해 예방과 대응 방법",
+            "description": "AI 자동매매 사기의 실체와 특징 AI 자동매매 사기는 주로 인공지능 기술을 이용해 투자자에게 높은 수익을 약속하며 접근하는 수법입니다. 이들은 실제로 존재하지 않는 고수익 투자 프로그램을 내세우거나...",
+            "link": "https://blog.naver.com/yjxh3nlrz/224411254538",
             "postdate": "20260914"
           },
           {
-            "title": "코딩 몰라도 업무 앱 뚝뚝, LG디스플레이가 주도하는 전사 AI 전환 혁....",
-            "description": "최근 기업들의 인공지능 도입 속도가 빨라지면서 단순한 도구 활용을 넘어 전사적인 업무 방식을 바꾸는 혁신이 주목받고 있습니다. 이번 글에서는 현업 직원이 직접 AI를 활용해 업무용 애플리케이션을...",
-            "link": "https://blog.naver.com/ecolog-/224410853390",
+            "title": "2026 반도체 핵심 3대 소재(웨이퍼·특수가스·포토레지스트) 공급망 ....",
+            "description": "글로벌 인공지능(AI) 반도체 및 HBM4의 폭발적 수요와 더불어 TSMC, 삼성전자, 인텔이 주도하는 2나노·3나노 게이트올어라운드(GAA) 미세공정 전환이 본격화되면서, 반도체 제조 생태계의 무게중심은...",
+            "link": "https://blog.naver.com/football_stratis/224411079805",
             "postdate": "20260914"
           },
           {
-            "title": "9월 14일 KB스타뱅킹 스타퀴즈 정답｜오늘 KB 퀴즈 바로 확인",
-            "description": "오늘 문제는 최근 관심이 높은 인공지능(AI) 글로벌 기업과 관련해 출제됐어요. 9월 14일 KB 스타퀴즈 Q. 인공지능 분야를 이끄는 글로벌 핵심 기업 5곳의 앞글자를 딴 표현에 해당하지 않는 기업은? 보기에는...",
-            "link": "https://blog.naver.com/qkrwnrnal/224410852455",
+            "title": "전자세금계산서까지 감시하는 AI 세무조사, 절세전략 및 리스크 관....",
+            "description": "국세청의 세무 행정이 인공지능 기술을 도입하며 한층 더 정밀해지고 있어요. 전자세금계산서 데이터를 실시간으로 분석해 탈루 혐의를 찾아내는 AI 시스템 덕분에 이제는 작은 실수도 사전에 차단해야...",
+            "link": "https://blog.naver.com/newnewzizi_/224411021236",
             "postdate": "20260914"
           },
           {
-            "title": "[2026.문화시민강좌] 곽재식 교수의 「인공지능에 대한 오해와 진실....",
-            "description": "2026.동작문화원 문화시민강좌 「인공지능에 대한 오해와 진실」 일상화된 인공지능(AI) 어디까지 알고 계시나요? 막연히 두려워하고 있지는 않으신가요? 인공지능(AI)이 가져올 일상의 변화와 미래...",
-            "link": "https://blog.naver.com/dongjakculture/224410850145",
+            "title": "트럼프 AI 규제 전략과 인공지능 패권 경쟁의 뜻과 의미 속도조절을 ....",
+            "description": "AI 규제 중국 추월 미국 패권 인공지능 전망 AI가 너무 빨리 발전하고 있다는 경고가 쏟아지는데, 왜 트럼프는 오히려 더 빨리 달리려 할까요? 겉으로 보면 단순합니다. AI 안전을 걱정하는 사람들은 속도를...",
+            "link": "https://blog.naver.com/macdcross/224411246886",
             "postdate": "20260914"
           },
           {
-            "title": "HD현대, 세계 최대 가스 전시회 '가스텍 2026' 참가",
-            "description": "HD현대가 세계 최대 가스 전시회인 '가스텍 2026'에서 인공지능(AI)과 친환경 기술을 대거 접목한 차세대 선박 솔루션을 선보입니다. 주요 전시 및 기술 공개 내용 ✔️ 미래형 LNG 운반선 설계: 로이드선급...",
-            "link": "https://blog.naver.com/ecolog-/224410850364",
+            "title": "클로드 페이블 5.1 성능 분석 차원이 다른 AI 모델 비교 테스트",
+            "description": "인공지능 시장의 기술 경쟁이 한층 더 격화되는 가운데 앤스로픽이 차세대 AI 모델인 페이블 5.1을 발표하며 큰 주목을 받고 있습니다. 이번 업데이트는 단순한 번호 변경 수준을 넘어 에이전트 능력과 지식...",
+            "link": "https://blog.naver.com/dreamcar100/224411247343",
             "postdate": "20260914"
           },
           {
-            "title": "전북, 전남 진로 직업 체험은 꿈드림혁신교육 - 오룡중학교 진로 직....",
-            "description": "오룡중학교 진로 직업 체험 현장 꿈드림혁신교육 AI인공지능 · 감성조명 · 경찰 · 네일아트 · 방송 · 쇼콜라티에 · 웹툰작가 · 의료 탐구하고, 빛을 디자인하고, 지키고, 꾸미고, 표현하고, 만들고, 그리고...",
-            "link": "https://blog.naver.com/ktids/224410847052",
+            "title": "트럼프 미 대통령, 인공지능 '속도조절론' 일축…&quot;미국이 AI 경쟁 승....",
+            "description": "13일 인공지능(AI) 산업의 '속도조절론'에 대해 반대 입장을 분명히 했다. 미중 기술 패권 경쟁에서 우위를 지키는 것이 최우선 과제라는 점을 강조한 발언으로 풀이된다. 아일랜드를 방문 중인 트럼프 대통령은...",
+            "link": "https://blog.naver.com/sugitoyang/224411246044",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;주가 정점서 10조 현금화&quot;: 오라클 창업자의 5000만 주 매각과 오픈AI ....",
-            "description": "오픈AI와의 초대형 클라우드 공급 계약을 발판 삼아 인공지능(AI) 인프라의 새로운 황제로 군림하던... 오라클을 AI 컴퓨팅 인프라 기업으로 탈바꿈시킨 주인공입니다. 백악관에서 샘 올트먼 오픈AI CEO...",
-            "link": "https://blog.naver.com/youthbooks/224409591884",
+            "title": "글로벌 비즈 브리핑: AI 속도조절론 대두 속 앤트로픽·오라클·테슬....",
+            "description": "최근 인공지능(AI) 산업의 급격한 성장에 따른 통제력 우려와 함께 기술 패권 경쟁이 심화하는 가운데, 글로벌 주요 기업들의 투자와 신제품 출시 행보가 이어지고 있다. 엔비디아와 앤트로픽의 대규모 투자...",
+            "link": "https://blog.naver.com/sugitoyang/224411240180",
             "postdate": "20260914"
           },
           {
-            "title": "AI 속도 전쟁, 정작 돈은 어디로 흐르는가",
-            "description": "인공지능은 지금 얼마나 빨리 달려야 하는가. 이 질문 하나에 워싱턴과 실리콘밸리가 정면으로... 오픈AI의 잭 파초키와 샘 올트먼은 양다리를 걸친다. 이들은 초지능을 '외계의 정신(An Alien Mind)'이라 부르며...",
-            "link": "https://blog.naver.com/dudmlehwkqhs/224410846063",
+            "title": "마이크론·애플·테슬라·엔비디아 주식 분석 2026 하반기",
+            "description": "마이크론 테크놀로지 (MU)마이크론 테크놀로지는 글로벌 고대역폭 메모리(HBM) 시장의 핵심 공급사로서 인공지능(AI) 인프라 확장의 최대 수혜주로 꼽힙니다. 생성형 AI 모델이 고도화될수록 더 빠르고 거대한...",
+            "link": "https://blog.naver.com/myincome/224411186239",
             "postdate": "20260914"
           },
           {
-            "title": "송금 실수 줄이는 시니어 모바일뱅킹 확인 습관",
-            "description": "광고, 인공지능(AI)을 기반으로 생성된 가상인물이 포함된 게시물입니다. 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 0대가 되고 나서 모바일뱅킹을 더...",
-            "link": "https://blog.naver.com/qjaehghltk/224397907070",
+            "title": "AI 시대, 청소년이 안전한 디지털 세상을 만든다2027 UN 청소년 대표단....",
+            "description": "kr #해시태그 #BTF푸른나무재단 #푸른나무재단 #로드투UN #UN청소년대표단 #2027UN청소년대표단 #UN청소년 #청소년대표단 #UN #유엔 #뉴욕UN본부 #AI시대 #인공지능 #디지털안전 #안전한디지털세상 #사이버폭력...",
+            "link": "https://blog.naver.com/booo2580000/224411238203",
             "postdate": "20260914"
           },
           {
-            "title": "l 미국 주식 분석 l AI 데이터센터 액체냉각 수혜주, 엔벤트 일렉트릭....",
-            "description": "출처: nvent 최근 엔비디아를 필두로 한 AI(인공지능) 열풍이 식지 않으면서, 시장의 시선은 단순한 칩 제조사를 넘어 'AI 인프라'로 빠르게 확장되고 있습니다. AI 고성능 컴퓨팅(HPC)을 구현하기...",
-            "link": "https://blog.naver.com/shopper92/224375389653",
+            "title": "스탠퍼드에서 미친듯이 가르치는 AI시대 생존 역량, 지식인초대석",
+            "description": "&quot;나는 한국에서 초중고 시절 성적 하위 1%였다.&quot; 매일 학교에서 매를 맞으며 공부를 포기했던 소년이 어떻게 세계 최고의 대학에서 인공지능(AI) 시대를 설계하는 석학이 되었을까요? 카자흐스탄...",
+            "link": "https://blog.naver.com/probaby7/224411237022",
             "postdate": "20260914"
           },
           {
-            "title": "본교 인공지능융합학과 AI+X 교육연구단, 4단계 BK21 AI+X 융합형 시범....",
-            "description": "본교 인공지능융합학과 「AI+X 기반 몰입형 학습혁신 교육연구단」이 교육부 4단계 BK21 AI+X 융합형... 학습지능, 몰입형 XR, 게임·콘텐츠 3개 심화 트랙을 통해 학습자 상태 이해와 개인화 학습 설계, 디지털휴먼...",
-            "link": "https://blog.naver.com/skkupr1398/224410844320",
+            "title": "[KIMST] AI 시대, 2026 KIMST AI 친화 공공데이터",
+            "description": "인공지능(AI) 기술이 빠르게 발전하면서 양질의 데이터를 확보하고 활용하는 것이 그 어느 때보다 중요해진 요즘인데요! 해양수산 분야에서도 연구자와 기업, 그리고 국민 여러분이 더 쉽게...",
+            "link": "https://blog.naver.com/kimst3460/224411236957",
             "postdate": "20260914"
           },
           {
-            "title": "AI 개발 속도 조절 선언, 빅테크 4대 거물이 급브레이크 밟은 진짜 이....",
-            "description": "AI 개발 속도 조절 선언, 빅테크 4대 거물이 급브레이크 밟은 진짜 이유 혁신을 향해 브레이크 없는 가속 페달만 밟던 인공지능 시장에 초유의 사건이 일어났습니다. 앤트로픽, 오픈AI, xAI, 구글 딥마인드 등...",
-            "link": "https://blog.naver.com/vitamin2230/224410843018",
+            "title": "안경이 말을 걸어온다? 요즘 나오는 'AI 안경' 정리",
+            "description": "카메라와 인공지능이 들어간 'AI 안경'입니다. 올해 5월 국내에 정식 출시됐고, 삼성전자도 7월에 자체 제품을 공개했습니다. 애플까지 연말에 합류한다고 하니, 올해가 이 시장의 원년이 된 셈이에요. 뭘 할 수...",
+            "link": "https://blog.naver.com/ndev_note/224411234711",
             "postdate": "20260914"
           },
           {
-            "title": "인공지능, 어디까지 알고 계신가요? 핵심 원리 쉽게 파헤치기",
-            "description": "인공지능(AI)은 우리 삶 곳곳에 스며들고 있으며, 그 중요성은 날로... 딥러닝은 인간의 신경망 구조를 모방한 ‘인공 신경망(Artificial... 쌓고 ‘지능’을 키워나가죠. 머신러닝과 딥러닝은 이러한 학습 과정을...",
-            "link": "https://blog.naver.com/asascho/224410842750",
+            "title": "Physical AI 로봇 인공지능 로봇개발 부트캠프 설명회(비대면/무료)",
+            "description": "특강 개요 - 행사명: Physical AI 로봇 인공지능 로봇개발 부트캠프 설명회(비대면/무료) - 일시: 1차: 2026년 9월 21일(월) 오후 6시 30분 2차: 2026년 10월 7일(수) 오후 7시 30분 - 장소: 온라인 비대면...",
+            "link": "https://blog.naver.com/gnu_jobs/224411234093",
             "postdate": "20260914"
           },
           {
-            "title": "대전 목원대 이희학 총장 연임…“AI 대학 도약”",
-            "description": "이 총장은 인공지능을 중심으로 교육과 문화예술, 국제화와 지역혁신 전반의 체질을 바꾸겠다는 구상을 내놨다. ‘목원 비전 2030’을 통해 지역과 함께 성장하는 AI 특화 대학으로 도약한다는 계획이다....",
-            "link": "https://blog.naver.com/2013jjctv/224410841573",
+            "title": "HD현대중공업 - 육상용 발전엔진과 소형모듈원자로(SMR)에 1조원대의 ....",
+            "description": "1.HD현대중공업 - 육상용 발전엔진과 소형모듈원자로(SMR)에 1조원대의 대규모 투자를 단행 1)HD현대중공업 ㄱ)최근 빠르게 증가하는 인공지능(AI) 데이터센터 전력 수요에 선제적으로 대응해 미래...",
+            "link": "https://blog.naver.com/rfkang49/224411227377",
             "postdate": "20260914"
           },
           {
-            "title": "삼성 비스포크 AI 김치냉장고 4도어 490L 1등급 구성과 공간 활용에 중....",
-            "description": "AI 맞춤형 온도 조절 기능 삼성 비스포크 AI 김치냉장고는 인공지능 기술을 활용해 사용자 환경과 식품 상태에 맞춘 최적의 온도를 자동으로 조절합니다. 이를 통해 김치와 기타 식품들이 가장 알맞은 온도에서...",
-            "link": "https://blog.naver.com/swqlrfskpb/224410841203",
+            "title": "AI가 AI에게 일을 맡기는 시대, 우리에게 필요한 진짜 지혜",
+            "description": "각박한 세상 속에서 삶의 지혜와 따뜻한 리더십에 대해 편안하고 정감 있게 소통하는 채널입니다. #AI외주 #인공지능시대 #지혜 #리더십 #지통마을 #삶의철학 #미래준비 #지혜와리더십",
+            "link": "https://blog.naver.com/metayoung/224411227924",
             "postdate": "20260914"
           },
           {
-            "title": "삼성 비스포크 AI 김치냉장고 4도어 490L 관리 편리함과 세척 포인트....",
-            "description": "비스포크 AI 김치냉장고 특장점 삼성 비스포크 AI 김치냉장고는 첨단 인공지능 기능을 갖춘 4도어 모델입니다. 490리터 용량으로 다양한 김치를 보관하기에 알맞고, 깔끔한 디자인과 함께 세척과 관리도...",
-            "link": "https://blog.naver.com/yxntwahznb2/224410839783",
+            "title": "사람답게",
+            "description": "매번 AI가 대단하다고 말하지만, 실제 내용을 보면 항상 인간이 인공지능을 관리를 못한다는거다. 애당초 컨트롤도 못하는 상황에서 권한만 부여한 것이다. 3. 거듭 말하지만 감각기관도 없는 AI에게 환각같은...",
+            "link": "https://blog.naver.com/nartex/224411225305",
             "postdate": "20260914"
           },
           {
-            "title": "인공지능 AI 개발을 늦춰야 한다는 주장…정말 지금 필요한 건 속도 ....",
-            "description": "요즘 인공지능 AI가 발전하는 속도를 보면 가끔 이런 생각이 듭니다. “이렇게까지 빨리 발전해도 괜찮은 걸까?” 불과 몇 년 전까지만 해도 AI는 질문에 답해주거나 간단한 글을 만들어주는 정도라고...",
-            "link": "https://blog.naver.com/churry0078/224410839667",
+            "title": "[정보/서비스] 모두의연구소/아이펠 ㅣ AI 데이터 분석 시대, 차별화....",
+            "description": "인공지능이 복잡한 데이터 집계와 시각화, 기초 모델링까지 빠르게 처리하는 시대라, 이제 단순한 데이터 가공이나 통계 지식만으로는 채용 시장에서 강점을 갖기 어려워졌습니다. AI가 분석의 99%를 대신해...",
+            "link": "https://blog.naver.com/jasmineordinarytrvl/224410107659",
             "postdate": "20260914"
           },
           {
-            "title": "AI 및 ESS 수요 폭증! MLCC 관련주 4종목에 돈이 몰린 이유와 핵심 종목 ....",
-            "description": "인공지능(AI) 전용 서버 확충과 에너지저장장치(ESS) 시장의 폭발적인 성장이 맞물리면서 고성능 MLCC의 공급 부족 우려가 커진 영향입니다. 주요 기업의 대규모 장기 공급계약과 가격 인상 기대감이 시장에...",
-            "link": "https://blog.naver.com/joonconomy/224409979607",
+            "title": "“AI가 스스로 탈출하고 시스템까지 해킹”... AI 위험 대응 특허 2년 ....",
+            "description": "한국은 5%·해외출원 비중 18.1%에 그쳐 대응전략 시급 출처=생성형 AI 이미지 © 특허뉴스 격리된 인공지능(AI) 모델이 스스로 보안장벽을 뚫고 외부 시스템에 침투하는 현실이 나타나면서 AI 위험 방지...",
+            "link": "https://blog.naver.com/patentnews/224411222441",
             "postdate": "20260914"
           },
           {
-            "title": "당진에 1조 2405억 쏟는다! 100MW급 AI 데이터센터 들어선다",
-            "description": "당진에 1.2조 인공지능(AI) 데이터센터 유치 - 도, 9일 당진시·이에프디·엔에프디코리아와 투자 협약 체결 - - 송산2일반산단 내 100㎿ 규모 건립…인공지능(AI) 생태계 구축 ‘박차’ - AI 도정뉴스 한입요약...",
-            "link": "https://blog.naver.com/sinmunman/224410483569",
+            "title": "오늘 당대표 법률특보로 임명되었습니다.",
+            "description": "또한 새롭게 발족한 ‘AI(인공지능)시대 격차 해소, 품격 사회 민생추진단’의 법 제도개선 분과 위원으로도 임명되었습니다. 양극화 해소는 우리 사회가 반드시 해결해 가야 할 시대적 과제입니다. 국민의 삶을...",
+            "link": "https://blog.naver.com/saam0615/224411221905",
             "postdate": "20260914"
           },
           {
-            "title": "“핸즈프리로 강남을 달린다” — 현대차의 야심",
-            "description": "현대자동차그룹이 자체 개발한 자율주행 인공지능 아트리아 AI(Atria AI) 를 서울 도심 실도로에서 검증하고, 2029년 하반기 양산차에 적용할 계획을 발표했습니다. 강남대로의 갑작스러운 끼어들기, 광화문의...",
-            "link": "https://blog.naver.com/limits2026/224410527472",
+            "title": "유튜브뮤직 이렇게 쓰면 계정 날아갑니다, 알고리즘·AI슬롭·대처법",
+            "description": "✔ 이 글의 핵심 요약 • AI 음원 유입: 정체 모를 인공지능 음악이 플레이리스트를 오염시키는 현상 • 알고리즘 대처: 관심 없음 및 추천 안 함 기능을 통한 즉각적인 소스 차단 • 계정 안전 대책: 우회 결제나...",
+            "link": "https://blog.naver.com/sharejoa/224411220113",
             "postdate": "20260914"
           }
         ],
-        "lastBuildDate": "Mon, 14 Sep 2026 10:34:34 +0900",
+        "lastBuildDate": "Mon, 14 Sep 2026 16:21:02 +0900",
         "start": 1,
         "display": 100
       },
@@ -1555,43 +1438,43 @@
       },
       "result_sample": [
         {
-          "title": "2026.9.18~19 제8회 금천과학축제 G-Science Festival 일정 및 프로그램 안내",
+          "title": "부산 센텀시티 '스마트도시 특화단지' 최종 선정… 기대효과는?",
           "postdate": "20260914"
         },
         {
-          "title": "최태원 “AI, 스스로 돈 벌고 재투자하는 지속 가능한 구조 필요”",
+          "title": "디지털 문해력 똥손도 10분 만에 캔바 캡컷으로 AI 영상 만드는 완벽....",
           "postdate": "20260914"
         },
         {
-          "title": "[손잡경] 인공지능 감속론 | 중국차 미국 진출 | KRX 애프터마켓 | 26091....",
+          "title": "AI가 인류 말살?…챗GPT에 물었더니",
           "postdate": "20260914"
         },
         {
-          "title": "[NABS 2026 기획] AI 데이터 폭증에 스토리지 비용·전력 부담…씨게이....",
+          "title": "AI 주식 수익률 96%? 암 진단 4주를 하루로 줄인 LG 엑사원의 반격",
           "postdate": "20260914"
         },
         {
-          "title": "빅테크 CEO들이 먼저 외친 AI 속도 조절론 : 인류에게 위협으로 다가....",
+          "title": "[KOHI 소식] AI와 돌봄의 만남! 보건복지 정책과 현장을 잇는 '2026년 미....",
           "postdate": "20260914"
         },
         {
-          "title": "트럼프 &quot;AI 규제론자는 부정적 세력&quot;…빅테크 '개발 속도 조절' 제동",
+          "title": "인공지능 AI 관련 최신 동향 확인 안 하면 손해입니다·농업 분야 활....",
           "postdate": "20260914"
         },
         {
-          "title": "9월 14일 KB스타뱅킹 퀴즈 정답, AI·한국사 오늘 답은?",
+          "title": "인공지능 윤리, 우리가 반드시 알아야 할 5가지 핵심 문제",
           "postdate": "20260914"
         },
         {
-          "title": "‘군소도서개도국 기후기술 협력 및 인공지능(AI) 활용 포럼’ 인천 ....",
+          "title": "KOSA 주간 소식 모음 | 2026년 9월 2주",
           "postdate": "20260914"
         },
         {
-          "title": "[충청중심뉴스]홍성군, AI 건강 내비게이션 대상자 사전모집",
+          "title": "AI가 일자리를 빼앗는 진짜 이유: 사라지는 일자리와 살아남는 '문해....",
           "postdate": "20260914"
         },
         {
-          "title": "이례적인 韓 개발자 채용…샌디스크, 낸드 인력 확보 총력",
+          "title": "반도체 기업 성과급 지급 소식 화제: 호황의 배경과 보상 구조 완벽 ....",
           "postdate": "20260914"
         }
       ]
@@ -1599,739 +1482,686 @@
     {
       "category": "travel",
       "query": "여행",
-      "result_count": 42818931,
+      "result_count": 42844121,
       "candidates": [
         {
-          "category": "travel",
-          "query": "여행",
-          "topic": "항목 내용 여행사",
-          "search_intent": "개념",
-          "discovery_score": 707,
-          "supporting_results": 7,
-          "occurrences": 7,
-          "source_result_indexes": [
-            31,
-            36,
-            42,
-            59,
-            67,
-            83,
-            86
-          ],
+          "topic": "교토 당일치기 코스 추천",
+          "search_intent": "방법",
+          "content_angle": "오사카에서 출발하는 교토 당일치기 일정",
           "related_keywords": [
-            "기간 3박",
-            "기간 3박 5일",
-            "3박 5일 출발지",
-            "5일 출발지",
-            "출발지 인천"
+            "기요미즈데라",
+            "산넨니넨자카",
+            "뚜벅이 여행 루트"
           ],
-          "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162"
+          "extraction_rationale": "교토의 대표 명소와 이동 동선을 함께 확인할 수 있어 실제 여행 계획에 유용하다.",
+          "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd"
         },
         {
-          "category": "travel",
-          "query": "여행",
-          "topic": "항목 내용",
-          "search_intent": "개념",
-          "discovery_score": 707,
-          "supporting_results": 7,
-          "occurrences": 7,
-          "source_result_indexes": [
-            31,
-            36,
-            42,
-            59,
-            67,
-            83,
-            86
-          ],
+          "topic": "후지산 요시다 루트",
+          "search_intent": "방법",
+          "content_angle": "후지산 일출 등반 준비와 일정",
           "related_keywords": [
-            "기간 3박",
-            "기간 3박 5일",
-            "3박 5일 출발지",
-            "5일 출발지",
-            "출발지 인천"
+            "1박 2일",
+            "일출 등반",
+            "산장 예약"
           ],
-          "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162"
+          "extraction_rationale": "요시다 루트의 산장 예약부터 1박 2일 등반 준비까지 구체적인 정보를 찾는 독자에게 적합하다.",
+          "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd"
         },
         {
-          "category": "travel",
-          "query": "여행",
-          "topic": "내용 여행사",
-          "search_intent": "개념",
-          "discovery_score": 707,
-          "supporting_results": 7,
-          "occurrences": 7,
-          "source_result_indexes": [
-            31,
-            36,
-            42,
-            59,
-            67,
-            83,
-            86
-          ],
+          "topic": "상하이 여행 준비물 추천",
+          "search_intent": "방법",
+          "content_angle": "상하이 여행의 데이터 연결 준비",
           "related_keywords": [
-            "기간 3박",
-            "기간 3박 5일",
-            "3박 5일 출발지",
-            "5일 출발지",
-            "출발지 인천"
+            "중국 이심",
+            "5G 데이터 무제한",
+            "데이터 연결"
           ],
-          "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162"
+          "extraction_rationale": "상하이 여행에서 필요한 준비물과 중국 이심 사용 정보를 함께 다룰 수 있다.",
+          "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd"
         },
         {
-          "category": "travel",
-          "query": "여행",
-          "topic": "5일 패키지",
-          "search_intent": "개념",
-          "discovery_score": 404,
-          "supporting_results": 4,
-          "occurrences": 4,
-          "source_result_indexes": [
-            3,
-            31,
-            42,
-            83
-          ],
+          "topic": "코타키나발루 반딧불투어",
+          "search_intent": "방법",
+          "content_angle": "반딧불투어 일정과 주요 체험",
           "related_keywords": [
-            "기간 3박",
-            "기간 3박 5일",
-            "3박 5일 출발지",
-            "5일 출발지",
-            "출발지 인천"
+            "뚜아이 원숭이",
+            "선셋",
+            "일정",
+            "시간"
           ],
-          "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162"
+          "extraction_rationale": "선셋과 원숭이 관찰을 포함한 투어 일정과 시간을 확인하려는 여행자 수요가 분명하다.",
+          "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd"
         },
         {
-          "category": "travel",
-          "query": "여행",
-          "topic": "3박 5일",
-          "search_intent": "개념",
-          "discovery_score": 404,
-          "supporting_results": 4,
-          "occurrences": 4,
-          "source_result_indexes": [
-            31,
-            42,
-            59,
-            83
-          ],
+          "topic": "신혼여행 리조트",
+          "search_intent": "비교",
+          "content_angle": "신상 리조트와 오래된 유명 리조트 선택 기준",
           "related_keywords": [
-            "기간 3박",
-            "5일 출발지",
-            "출발지 인천",
-            "5일 출발지 인천",
-            "내용 여행사 모두투어"
+            "신상 리조트",
+            "오래된 유명 리조트",
+            "신축",
+            "비교하기"
           ],
-          "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162"
+          "extraction_rationale": "신혼여행 리조트를 고를 때 신축 여부와 검증된 시설 사이의 선택을 비교할 수 있다.",
+          "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd"
         }
       ],
-      "discovery_response_sha256": "378da0aa5dd68af9f9fc8fe94a2511a590f47c6aaeb4136c29e44e49dbd7d162",
+      "discovery_response_sha256": "0b12392fe51c281e869d9b4a9ceabf63fdb2ec01b8a3fa1791bb7326aba492dd",
+      "extraction": {
+        "extractor": "model",
+        "model": "codex-plan-default",
+        "extraction_input_sha256": "3ee9808c349f1d94488aec8d8bfac4fd9cece4fa6e73e16a677e207bf6b41b74",
+        "extraction_raw_sha256": "98c41aa0f8baa1f286176051e00746f82d53a72ee92f20821f454d19077a2fea",
+        "over_cap_dropped": [],
+        "triage_rejected": [],
+        "triage_merged": []
+      },
       "response": {
-        "total": 42818931,
+        "total": 42844121,
         "items": [
           {
-            "title": "온라인최저가 353만원대 1차 예약 공식 애플 아이폰 18 프로 장점 단....",
-            "description": "여행 가서 예쁜 풍경이나 아이들의 귀여운 모습을 영상으로 남기려는데 '저장 공간이 부족합니다... 스토리지 여행 브이로그와 고용량 게임을 마음껏 저장하는 여유 어둠 속에서도 빛나는 프로급 카메라...",
-            "link": "https://blog.naver.com/enzzuya/224410929843",
+            "title": "다이도 가든 호텔 교토 고를 때 살펴볼 예약 전 확인 사항",
+            "description": "다이도 가든 호텔 교토 고를 때 살펴볼 예약 전 확인 사항 교토 여행을 계획하면서 숙소를 고르는... 선택지가 되고요. 교토를 방문할 때는 자신의 여행 스타일에 맞춰 선택하시면 좋을 것 같아요!",
+            "link": "https://blog.naver.com/dc4wtxoab8n9mbnxvv0/224411372118",
             "postdate": "20260914"
           },
           {
-            "title": "비오는 오사카 교토 나라 여행하기",
-            "description": "2026.0905~10 우메다 교토 나라 여행 비오는 오사카 나름 괜찮았습니다.",
-            "link": "https://blog.naver.com/kimjk1129/224410930145",
+            "title": "해운대 가볼만한곳 전통시장 야시장 부산 시장, 안 가면 섭섭한 필....",
+            "description": "여행에서 제가 좋아하는 코스 중 하나입니다. 이번에도 엄마와 대표... 지난 9월 9일 엄마와 1박 2일 항구도시 여행을 다녀왔습니다. 낮부터... 먹거리시장까지 걸어서 갈 수 있어 대중교통을 이용한 여행에서도...",
+            "link": "https://blog.naver.com/ldh88910/224411371240",
             "postdate": "20260914"
           },
           {
-            "title": "횡성한우축제 한우먹고 국순당 막걸리 만들기 체험까지",
-            "description": "여행인플루언서 예똥구리입니다.♀️ 대학교 친구들과 오랜만에 만나기로 한 만큼 맛있는 것도 먹고... 다양한 체험까지 즐겨봐도 괜찮을듯합니다.‼️ 다음에는 또 다른 여행지 포스팅으로 인사드릴게요.",
-            "link": "https://blog.naver.com/ohb0102/224410929656",
+            "title": "올 가을 필수! 골프항공커버 추천템 모음",
+            "description": "골프백을 안전하게 보호해주니 안심하고 여행할 수 있었어요. 1.Hi therE 골프 항공 커버 골프백... 5.고플라 골프 항공 커버 항공백 커버백 ￦ 16,900원 별점 : ⭐⭐⭐⭐⭐ 구매하러 가기 ▶ 여행 가는...",
+            "link": "https://blog.naver.com/sfkhhxozbdkp/224411370616",
             "postdate": "20260914"
           },
           {
-            "title": "나트랑과 달랏 5일 패키지 여행, 자연과 문화 모두 만끽하기",
-            "description": "이번에 나트랑과 달랏을 포함한 5일간의 베트남 패키지 여행 상품을 정리해봤어요. 여행지를 한눈에 파악할 수 있도록 주요 관광지와 일정을 소개합니다. 나트랑과 달랏을 잇는 5일 여행 개요 이 5일 일정은...",
-            "link": "https://blog.naver.com/qf0edfktpz/224410928621",
+            "title": "영종도 근처 일본을 맛보자 ‘하나레 야끼니꾸’",
+            "description": "이번에 꼬순이(여자친구)랑 200일 기념으로 영종도 여행을 했습니다~! 좀 분위기 있는 야끼니꾸 집을 찾아보다가 우연히 발견한 ‘하나레 야끼니꾸’ 저희는 1인 기준 49000원 ‘블라썸 코스’를 시켰습니다!...",
+            "link": "https://blog.naver.com/s1321301ho/224411369696",
             "postdate": "20260914"
           },
           {
-            "title": "추자도의 모든것_SP편_올가을 추자도 여행, 최대 10만 원 지원받고 떠....",
-            "description": "섬 여행이 조금 부담스러웠다면, 올가을은 좋은 기회가 될 수 있습니다.... 섬을 찾는 여행객의 부담을 덜고 섬 지역 관광을 활성화하기 위해, 1박 이상 섬을 여행하는 사람에게 여행경비를 지원하는 사업이...",
-            "link": "https://blog.naver.com/binjib_ter/224410928608",
+            "title": "[#12 후쿠오카 여행] 하카타역 짐 보관/일본 다이소/일본 돈키호테 쇼....",
+            "description": "안녕하세요 이날은 후쿠오카 여행 마지막 날입니다 이날 호텔 체크아웃을 하고 짐을 맡길 곳이... 후쿠오카 여행 첫날에도 방문한 모츠나베집인데요 여행하면서 이렇게 똑같은 식당을 두 번 방문한 건...",
+            "link": "https://blog.naver.com/0123story/224411369753",
             "postdate": "20260914"
           },
           {
-            "title": "[여수 중앙동] 여수여행 이순신광장 먹거리 디저트 맛집 여수당 쑥....",
-            "description": "여수에 놀러갔다. 사실 대단히 할만한게 있지는 않다. 이순신광장에 갔다. 그 거리가 다 디저트로 난리가 났다. #여수당 * 영업시간 07:30-23:00 옛날에는 쑥이 싫었는데 이제는 향이 은은하게 느껴져서 좋더라....",
-            "link": "https://blog.naver.com/effort_glory/224410929021",
+            "title": "그라나다 호텔 노이 가는법 공개 평점 정보 정리",
+            "description": "그라나다 호텔 노이 가는법 공개 평점 정보 정리 그라나다 여행을... 젊은 여행자들에게 인기가 많아요. 3위 — 호텔 발네아리오 데... 스파 시설이 잘 갖춰져 있어 여행의 피로를 풀기 좋아요. 4위 — 호텔...",
+            "link": "https://blog.naver.com/hvois45s5b5/224411370158",
             "postdate": "20260914"
           },
           {
-            "title": "기장여행 조식맛집 골든리지 마티에 오시리아 존맛 후기",
-            "description": "도리입니다 :) 오늘은 부산 기장여행을 하며 아침일찍 아주 맛있게... 기장여행 조식 먹으러 가기 좋은 골든리지 마티에 오시리아... 기장여행 조식맛집, 골든리지 마티에 오시리아는 주로 한식메뉴로 구성이...",
-            "link": "https://blog.naver.com/doori_97/224410927653",
+            "title": "[내돈내산] 몽골여행 도시락 이심 사용 후기",
+            "description": "몽골 여행하며 잘 사용했던 이심 후기를 쓰려고 합니다! (내돈내산) 유심은 바꿔끼기도 번거롭고... 해외여행 갈 때도 잘 사용했어서 이번 몽골 여행에서도 구입했어요 20일간 25GB를 쓰는 상품인데 저는...",
+            "link": "https://blog.naver.com/cookie2949/224411370487",
             "postdate": "20260914"
           },
           {
-            "title": "[부모님 백두산 패키지여행 준비] 중국 유심 추천 및 하나은행 100위....",
-            "description": "패키지여행을 떠나시게 되었어요 혼자 패키지여행을 가시는 부모님을 위해 출국 전 준비해 드렸던... 백두산 여행 준비 중이신 분들께 많은 도움이 되었으면 좋겠습니다 저희 엄마가 가시는 일정은 3박 4일...",
-            "link": "https://blog.naver.com/wwwseulcom/224409622179",
+            "title": "밀양 리더스CC 골프여행 후기｜3월, 5월에 이어 오늘 또 다녀왔어요 ....",
+            "description": "골프여행을 계획할 수 있다는 장점이 있습니다. 리더스CC 코스 소개｜HILL... 밀양 골프여행, 리더스CC와 함께라면 밀양은 골프뿐 아니라 자연과 지역의 매력을 함께 즐길 수 있는 여행지입니다. 리더스CC에서...",
+            "link": "https://blog.naver.com/onnurirotour/224411370085",
             "postdate": "20260914"
           },
           {
-            "title": "[3주 유럽여행⑬] 이탈리아 피렌체｜토스카나 투어, 피렌체 근교로 ....",
-            "description": "ㄴㄴ",
-            "link": "https://blog.naver.com/uirecp/224405695145",
+            "title": "여행과 일상 모두를 담은 스마트한 선택",
+            "description": "여행과 일상 모두를 담은 스마트한 선택 AI 스마트 안경 2K 카메라... 포함 여행 및 나들이에 적합 1. AI 스마트 안경 2K 카메라 800만... 포함 여행 및 나들이에 적합 해외여행 중 실시간 번역이 가능해...",
+            "link": "https://blog.naver.com/nifddmqmsb2/224411370162",
             "postdate": "20260914"
           },
           {
-            "title": "카론 비치 카론 플레이스 가는법, 숙소 정보 살펴보기",
-            "description": "카론 비치 카론 플레이스 가는법, 숙소 정보 살펴보기 요즘 여행... 각자의 여행 스타일에 맞춰 선택하시면 좋을 것 같아요! 결국 여러분의 취향과 여행 목적에 따라 다르겠지만, 카론 비치에서 잊지...",
-            "link": "https://blog.naver.com/zope1jfmwi/224410927592",
+            "title": "[동남아] 필리핀 보홀 갈릭 레몬 Garlic 'n lemon bistro 보홀맛집",
+            "description": "꽤 늦은 시간이었지만 여행와서 꼬르륵 거리면서 잠들고 싶지않다. 혈당스파이크를 때려 맞으면서 꿀잠을 자고싶다... 영업중인 식당을 찾다가 호텔 옆 갈릭레몬은 영업중이길래 구글맵에서 대충 메뉴를...",
+            "link": "https://blog.naver.com/yolculuk/224411369810",
             "postdate": "20260914"
           },
           {
-            "title": "[맛집] 오키나와 북부/츄라우미 수족관 근처 맛집 /카진호피자",
-            "description": "이번에 태교여행으로 다녀온 오키나와 맛집 소개해드릴게요! 일본까지가서 피자야? 라고 할 수... 있지만 전 하나도 구매하지 않고 패스! 다음에 오키나와 여행갈 일 있으면 재방문 의사 16021680464% 입니다!!!!",
-            "link": "https://blog.naver.com/jlus9487/224410927836",
+            "title": "[KB페이] 26년 9월 14일 [리브메이트 오늘의 퀴즈] 정답",
+            "description": "Q. KB Pay 여행에서 제공되는 신라면세점 혜택 3가지 중 틀린 것은? . . . 정답은? A. [ ③ 서울점 신라선불 3천원 ] #KB페이 #KBPay #리브메이트 #오늘의퀴즈 #앱테크 #소소한행복 #9월14일",
+            "link": "https://blog.naver.com/laze0403/224411369788",
             "postdate": "20260914"
           },
           {
-            "title": "백두산과 연길 자연 명소를 누리는 4일 럭셔리 패키지 여행",
-            "description": "다루는 여행 상품을 정리해봤어요. 자연과 역사, 트래킹 경험을 고루... 백두산과 연길을 만나는 4일간의 여정 이 여행 상품은 백두산의... 쇼핑이나 옵션 비용이 없고 명확한 포함사항 덕분에 편안하게 여행할 수...",
-            "link": "https://blog.naver.com/bmdr2cldtw/224410928027",
+            "title": "그라나다 젠틸 홈 라 파즈 II 예약 고를 때 살펴볼 예약 전 확인 사항",
+            "description": "그라나다 여행을 계획하면서 숙소를 선택하는 게 중요하죠. 특히... 도심과의 접근성이 뛰어나 여행하기에 딱 좋답니다 ㅎㅎ! 특히 이곳은 깔끔하고 현대적인 인테리어로 여행객들에게 긍정적인 평가를...",
+            "link": "https://blog.naver.com/m7yb5lpgc1urpgta5/224411368611",
             "postdate": "20260914"
           },
           {
-            "title": "이제, 당신의 색으로 유럽을 여행할 시간입니다. &lt;유럽의 사계절을 ....",
-            "description": "&quot;이제, 당신의 색으로 유럽을 여행할 시간입니다.&quot; 여행을 좋아하는 사람이라면 마음속에 하나쯤 품고... 어쩌면 여행은 떠나는 날보다 훨씬 전부터 시작되는 것인지도 모릅니다. 어느 날 우연히 본 한 장의...",
-            "link": "https://blog.naver.com/visioncorea/224410927855",
+            "title": "410.미서부여행 11",
+            "description": "세도나",
+            "link": "https://blog.naver.com/gonduda/224411369303",
             "postdate": "20260914"
           },
           {
-            "title": "스타워드 위스키 후기｜처음엔 진했지만 마실수록 부드러웠던 술",
-            "description": "호주 여행을 하면서 꼭 한번 마셔보고 싶었던 것 중 하나가 바로... 브리즈번 여행 중 동생들이 선물해준 호주 술이었다. 처음 잔에 따랐을... 무엇보다 브리즈번 여행 중 동생들이 선물해준 술이라 그냥 위스키 한...",
-            "link": "https://blog.naver.com/arichicken/224410927527",
+            "title": "&lt;출발확정&gt;부산출발 성도 황룡 구채구 3박5일/4박6일 노팁노옵션 프....",
+            "description": "중국 여행의 끝판왕, 구채구 중국 여행, 흔한 곳 말고 진짜 절경으로 가세요 성도부터 황룡·구채구까지 한 번쯤은 꼭 봐야 할 쓰촨의 압도적인 풍경 마감임박 9월17일 프리미엄 999,000원 출확...",
+            "link": "https://blog.naver.com/tomtour114/224411368731",
             "postdate": "20260914"
           },
           {
-            "title": "옌타이맛집 현지인들이 찾는 양꼬치 연태완다몰맛집 연태북개선생",
-            "description": "안녕하세요~헬렌입니다 ^^ 여행을 갔다오고 사진정리하면서 그때 감정을 느끼고 또한번 설렘을... 다음 여행을 준비할 수있는 자극이 되죠 계속해서 연태여행 후기로 쭈~욱 고고합니다 옌타이맛집...",
-            "link": "https://blog.naver.com/helene83/224410927872",
+            "title": "영주 왕초보 영어회화과외 오픽 직장인학원 토익 비즈니스 일상 여....",
+            "description": "일상 여행 추천 영어 문장을 읽으면 뜻은 이해되는데 직접 말하려고... 해외여행을 준비하는 주부라면 시험 표현보다 식당, 호텔, 교통... 영주동이나 휴천동에서 해외여행을 준비하는 경우에는 여행 순서에 맞춰...",
+            "link": "https://blog.naver.com/yhv235/224411369265",
             "postdate": "20260914"
           },
           {
-            "title": "[베트남 여행 1일차] 설렘 가득 안고 떠난 나트랑 자유여행, 드디어 ....",
-            "description": "여행 가기 전부터 '우리 싸우지 말고 잘 다니자' 다짐 또 다짐하며 출발했던 베트남 여행 1일차! 비행기에서 내려 베트남의 훅 끼쳐오는 이국적인 공기를 맡는 순간, '아, 우리 진짜 여행 왔구나!' 하고 심장이...",
-            "link": "https://blog.naver.com/kwom5749/224410365632",
+            "title": "2023년 9월 3일 ICN → HKT, 푸켓",
+            "description": "이 여행은 나에게 조금 특별하다. 처음으로 혼자 여행을 계획해서 떠난 여행이었기 때문이다. 하필 우기였다. 비가 내리는 날도 있었고, 날씨가 흐린 날도 많았다. 그런데 이상하게 싫지 않았다. 비가 와도...",
+            "link": "https://blog.naver.com/emmatravelnote/224411368470",
             "postdate": "20260914"
           },
           {
-            "title": "서울여행 2박3일 일정 다시 짜보기",
-            "description": "2박 3일 서울 여행 일정표 (10/3 ~ 10/5) 일차 시간 주요 일정 이동 및 참고사항 1일 차 (10/3 토) 08:45... 코스로 짜면 좋겠어서 타이거 버스를 이용하면 좋을 것 같았어요. 여행날 후기 가지고 올께요~^^",
-            "link": "https://blog.naver.com/qptlyj/224410927668",
+            "title": "코타키나발루 반딧불투어 후기 뚜아이 원숭이 선셋 일정 시간까지",
+            "description": "코타키나발루 여행하면서 제일 기억에 남았던 걸 하나 꼽으라면... 이것도 여행하다 보면 만날 수 있는 변수 중 하나인 것 같아요. 그리고... 여행 다녀오면 풍경 사진이나 개인 사진은 많은데 둘이 같이 찍은...",
+            "link": "https://blog.naver.com/sunset_128/224411369170",
             "postdate": "20260914"
           },
           {
-            "title": "성북천, 도심 속 작은 자연",
-            "description": "성북천, 도심 속 작은 자연 Seongbukcheon, A Little Nature in the City #성북천 #서울풍경 #서울여행 #seoultravel #greenphotography https://linktr.ee/seoul_4k ”이 포스팅은 쿠팡 인플루언서...",
-            "link": "https://blog.naver.com/seoul_4k/224410927428",
+            "title": "[후쿠오카] 4인 가족 숙소 추천 - 그랜드 하얏트 후쿠오카 트윈베드....",
+            "description": "이번 여행 때 숙소 정하는 것이 너무 어려웠다. 아무래도 아이들도 가는 일본 도시 여행이라 텐진 쪽은 괜찮은 숙소가 없고... 결혼 10주년 여행이라 미리 호텔에 메일을 남겨 결혼 10주년인데 베네핏이 있냐?...",
+            "link": "https://blog.naver.com/rehyungod/224411368902",
             "postdate": "20260914"
           },
           {
-            "title": "태안 몽산포 갯벌체험 4세 7세 아이와 부모님까지 3대 가족여행",
-            "description": "태안 몽산포 갯벌체험 4세 7세 아이와 부모님까지 3대 가족여행 후기 이번 태안 여행은 4세, 7세 아이 둘과 아버님, 어머님, 그리고 우리 부부까지 3대가 함께한 여행! 아이들이 재미있게 놀 수 있으며 부모님...",
-            "link": "https://blog.naver.com/felicino/224410927595",
+            "title": "파리 호텔 보르가드 근처 숙소 정보 정리",
+            "description": "파리 호텔 보르가드 근처 숙소 정보 정리 파리를 여행하면서 편안한 숙소를 찾는 건 정말 중요한... 또한 다양한 편의시설을 갖추고 있어서 여행객들의 만족도를 높이는 것 같아요. 2위 — 호텔 리브...",
+            "link": "https://blog.naver.com/ew49gr1irx5midv/224411368804",
             "postdate": "20260914"
           },
           {
-            "title": "제주 기념품샵 모찌마루 제주 여행 선물 추천 당일 생산 생과일모찌",
-            "description": "제주 기념품샵 모찌마루 제주 여행 선물 추천 당일 생산 생과일모찌 친구들이랑 제주 여행 계획을... 센스있는 여행 선물 찾으신다면 오늘 이 포스팅 꼭 읽어보셔야 해요. 1. 제주 기념품샵 오픈런 모찌마루는...",
-            "link": "https://blog.naver.com/findjeju/224410927792",
+            "title": "다낭과 호이안 4일 여행, 골든베이 5성 호텔과 바나힐 명소 탐방",
+            "description": "이번에는 다낭과 호이안을 중심으로 한 4일 패키지 여행 상품을 정리해봤어요. 5성급 호텔과 유명 관광지가 포함돼 있어요. 다낭과 호이안 4일 여행 상품 소개 이 여행은 다낭과 호이안 지역의 주요 명소를...",
+            "link": "https://blog.naver.com/uvsbikrkxf/224411368869",
             "postdate": "20260914"
           },
           {
-            "title": "후쿠오카 여행 필수 동선과 권역별 핵심 코스 완벽 가이드",
-            "description": "후쿠오카 여행 관련 상세 대표 사진자료 많은 분들이 궁금해하시는 후쿠오카 여행 일정을 짜면서 저도 처음엔 어디부터 둘러봐야 할지... 도심 여행지로 후쿠오카가 급부상한 배경과 지리적 이점 2. 하카타와...",
-            "link": "https://blog.naver.com/review_89/224410927208",
+            "title": "지네퇴치약 추천, 건강 위해 꼭 알아야 할 제품들",
+            "description": "브랜든 2세대 부피순삭 의류 이불 다용도 대형 압축 파우치 2매세트 이 압축 파우치는 여행이나 출장 시 공간을 확실히 줄여줘요. 여러 장씩 넣어도 부피 걱정 없고, 편리하게 사용 가능해서 좋아요. 1....",
+            "link": "https://blog.naver.com/rosujfr74w/224411368561",
             "postdate": "20260914"
           },
           {
-            "title": "남자아이, 여자아이, 영어 이름 어떻게 지어야 할까?",
-            "description": "특히 영어유치원이나 국제 학교, 해외여행, 어학연수 등을 준비하면서, 남자아이 영어 이름이나 여자아이 영어 이름을 처음 정하는 경우에는 어떤 기준으로 이름을 선택해야 할지 막막할 수 있습니다. 영어...",
-            "link": "https://blog.naver.com/j_honey21/224406719746",
+            "title": "전주 책방 여행! 책을 사면 보자기에 싸주는 책보책방",
+            "description": "오늘은~ 전주 여행 중 앞서 포스팅했던 카프카 독립서점과 함께, 또 다른 전주 완산구 전라감영 근처의... 전주 여행 가시면 꼭 책/도서관 테마로 가보셨으면 좋겠고, 책보책방에서 마음에 드시는 책이 있으시면...",
+            "link": "https://blog.naver.com/game-webtoon/224411369246",
             "postdate": "20260914"
           },
           {
-            "title": "뉴질랜드 남섬 여행 밀포드사운드 투어 퀸스타운 예약 후기",
-            "description": "파트너스활동으로 수수료받아요 뉴질랜드 남섬 여행 계획하다보니 동선이슈 복잡하게 느껴지더라고요. 첫 뉴질랜드여행이다보니... 게다가 물가 후덜덜한 여행지로 떠나는것이기만큼 여행경비 세이브할 수...",
-            "link": "https://blog.naver.com/mamasun3/224410928189",
+            "title": "홍콩에 전자담배 들고 입국하면 벌금, 그런데 ‘공항 환승’은 예외....",
+            "description": "해외여행 때 전자담배를 사용하는 사람이라면 홍콩은 특히... ㅤ 여행자가 개인적으로 사용할 물건이라고 해도 수량만으로 자동... 관계없이 여행객이 반입하는 경우에 적용된다고 명확히 설명하고...",
+            "link": "https://blog.naver.com/kenaround/224411368905",
             "postdate": "20260914"
           },
           {
-            "title": "짧은 여행 준비 : 산티아고순례길 걷기",
-            "description": "마음은 맨날 산티아고에 걱정도 되고 기대와 설렘도 있고, 매일 매일 준비하면서 시뮬레이션도 돌려보고 여행은 가는 것도 좋지만 준비하는 과정이 설렘으로 가득 차면서 정신적인 활력이 넘치는 것 같다....",
-            "link": "https://blog.naver.com/lj322/224410928004",
+            "title": "[강릉 로컬릿피자]유기농 채소로 굽는 화덕피자 맛집(흑백요리사 &amp;....",
+            "description": "오랜만의 동기모임 이젠 원주 삼척 태백 각지에 흩어져있어서 동기모임 할 때마다 강원도 여행하는 기분이 든당ㅋㅋ 이번 모임은 강릉에서 하기로 하고 맛집을 찾아보는데 태백 동기의 조건이 태백에서 먹을...",
+            "link": "https://blog.naver.com/princess9623/224411368741",
             "postdate": "20260914"
           },
           {
-            "title": "[부여] 장원막국수 부여여행 맛집 내돈내산 찐후기 막국수 수육 부....",
-            "description": "[부여] 부여당일치기 여행 시원한 막국수와 수육 &quot;장원막국수&quot; 출처 : 나 부여 당일치기 여행온김에 유명한 맛집 가보자! 해서 가본 &quot;장원 막국수&quot; ☆내돈내산 인증☆ 영업정보 1. 위치 : 충남 부여군 부여읍...",
-            "link": "https://blog.naver.com/yechive6093/224410927285",
+            "title": "아이와의 안전한 여행을 위한 필수 아이템",
+            "description": "아이와의 안전한 여행을 위한 필수 아이템 조이 듀알로 주니어 아이소픽스 카시트 분리형, 포르치니... 가족 여행을 더욱 즐겁게 만들어줄 아이템이니 꼭 고려해보세요! 한눈에 보는 상품 비교 상품명...",
+            "link": "https://blog.naver.com/eysb74/224411369223",
             "postdate": "20260914"
           },
           {
-            "title": "삿포로 스트림 호텔 스스키노 숙소추천 1분거리맛집 총정리",
-            "description": "삿포로 스트림 호텔 #위치최강 #중심가 #뚜벅이여행 원래는 울릉도 여행을 갈 예정이였지만 풍량중의보 결항으로 슬픔에 빠져있다가 당일결제하고 떠난 삿포로 여행 오히려 좋아 오히려 좋아 진짜 이번 여행은...",
-            "link": "https://blog.naver.com/a_r_324/224410927445",
+            "title": "포천 펜션 ‘청계호수 자작나무숲 펜션’ 프라이빗 풀빌라 C01 솔직....",
+            "description": "친구들과 서울 근교 여행을 알아보던 중 포천으로 펜션 여행을 떠나기로 했어요 ! 탁 트인 자연 속에서 온전히 여유를 즐기고 싶을 때, 가장 먼저 생각나는 곳이 바로 펜션 여행이 아닐까...",
+            "link": "https://blog.naver.com/qkdqkd_/224411369369",
             "postdate": "20260914"
           },
           {
-            "title": "인도네시아 페리 안전 수칙 자바해 날씨 확인 및 여행자보험 청구 ....",
-            "description": "오늘은 안전한 인도네시아 섬 여행을 위해 페리 탑승 전 필수 체크리스트부터 실시간 해상 날씨 확인법, 비상시 여행자보험 청구... 확인 여행 팁: 파도 높이가 2m를 초과하거나 강풍 주의보가 내려진...",
-            "link": "https://blog.naver.com/onneuru_/224410927667",
+            "title": "타이베이 중심지와 명소 탐방 4일 여행 상품 정리",
+            "description": "이번에 대만 타이베이 4일 여행 상품을 정리해봤어요. 주요 명소와... 타이베이 핵심 관광지와 일정 간략 소개 이 여행 상품은 타이베이의... 한눈에 보는 여행 정보 항목 내용 여행사 노랑풍선 여행 기간 3박 4일...",
+            "link": "https://blog.naver.com/pyywk5atzv/224411367651",
             "postdate": "20260914"
           },
           {
-            "title": "베트남 푸꾸옥 가족여행 체크리스트 (여행사 직원이 되...)",
-            "description": "씬짜오낭 낭이에요 작년에 다녀온 베트남 푸꾸옥 가족여행 무려 7명이 함께하는 대가족여행이라... 합니다 여행 가기 전 가족들에게 전달할 것들을 챙겨봤어요 7명은 처음이라... 계획만 두 달 가까이 짰던 것...",
-            "link": "https://blog.naver.com/rlagkssk0084/224410927794",
+            "title": "dawn 뜻 — 성경에서 ‘새벽·동틀 무렵’은 어떤 의미로 사용될까?",
+            "description": "고대 성경 세계에서 새벽은 자연광이 돌아오면서 여행과 노동, 전투와 일상 활동을 시작할 수 있게 되는 중요한 시간대였습니다. 성경에서는 실제 새벽뿐 아니라 밤에서 낮으로 전환되는 장면을...",
+            "link": "https://blog.naver.com/biblestory365/224411368373",
             "postdate": "20260914"
           },
           {
-            "title": "[일본여행] 도쿠시마 - 3박 4일 여행기",
-            "description": "요즘 인기가 많아진 일본 소도시 여행, 그 중에서 일본 시코쿠의 동쪽에 위치한 도쿠시마에서의 여행기를 소개해보려고 합니다. 3박... 홈페이지이니 여행 전 확인해 보시면 좋을 것 같습니다..! 1일차...",
-            "link": "https://blog.naver.com/dladudw022/224410926072",
+            "title": "8월의 기록..앙",
+            "description": "하하하 귀차니즘의 끝판왕이로다 아무래도 부산을 갔다온 게 가장 크겠지 여행도 아니고 오로지 어린 남자를 위해 왕복 10시간 거리 일박으로 다녀온 어떤 여자 강기 만나기 전에 먹은 수박주스 여기 ㄹㅇ...",
+            "link": "https://blog.naver.com/bbibbi-td/224411367614",
             "postdate": "20260914"
           },
           {
-            "title": "단양 도담삼봉 구경, 도담삼봉 말타기(아이랑 제천, 단양여행 가볼....",
-            "description": "사실 이 곳은 어릴 적 외가식구들과 여행에서 가족들과 단체로 이 삼봉을 배경으로 사진찍었던 기억이... 근처 밥집, 카페가 있어 초코아이스크림 먹으며 엔딩ㅋㅋ 단양, 제천여행은 여행하면서도 느끼지만...",
-            "link": "https://blog.naver.com/lovesiondong/224410926064",
+            "title": "60대 친구들과 1박 2일 어디로 갈까? 많이 걷지 않고 편하게 즐기는 ....",
+            "description": "나이가 들수록 여행은 누구와 가느냐가 참 중요해집니다. 마음 맞는 친구들과 떠나는 여행은 부부여행과는 또 다른 즐거움이 있습니다. 차 안에서 이런저런 이야기를 나누고, 맛있는 음식을 함께 먹고, 좋은 풍경...",
+            "link": "https://blog.naver.com/hosunnak/224411367981",
             "postdate": "20260914"
           },
           {
-            "title": "시드니대학교 아이와 가는법｜포토스팟부터 주변 관광지 연계 코스....",
-            "description": "시드니 여행을 준비하면서 아이들과 함께 가볼 만한 곳을 찾다가... 실제 여행 중 함께 들렀던 차이나타운·패디스마켓 등 주변 연계... 저도 아이들과 여행하면서 센트럴역에서 시드니대학교까지 직접...",
-            "link": "https://blog.naver.com/tinytravelersabroad/224410926759",
+            "title": "런던 호텔 트래블로지 처트시 공개 평점 정보 정리",
+            "description": "런던 호텔 트래블로지 처트시 공개 평점 정보 정리 요즘 여행 계획 세우실 때 숙소 선택이... 이곳은 특히 비즈니스 여행자보다는 여유로운 여행을 원하는 분들께 추천해요. 가격대도...",
+            "link": "https://blog.naver.com/cqeaamt3dtmfwb3g4fy1/224411368306",
             "postdate": "20260914"
           },
           {
-            "title": "방콕과 파타야를 잇는 5일 패키지 여행, 해양 액티비티부터 전통시....",
-            "description": "이번에는 방콕과 파타야 여행 상품을 정리해봤어요. 수상시장과... 패키지 여행입니다. 해양 스포츠를 즐길 수 있는 코럴 아일랜드... 한눈에 보는 여행 정보 항목 내용 여행사 하나투어 여행 기간 3박 5일 출발지...",
-            "link": "https://blog.naver.com/vymjwffqmbyz/224410926627",
+            "title": "카우든비스 현대적인 전체 아파트먼트 위치 공개 평점 정보 정리",
+            "description": "카우든비스 현대적인 전체 아파트먼트 위치 공개 평점 정보 정리 요즘 여행 계획을 세우면서 숙소... &quot;카우든bis 현대적인 전체 아파트먼트&quot;는 높은 평점을 자랑하며 많은 여행객들에게 인기가 있답니다....",
+            "link": "https://blog.naver.com/pbxii4ghrvslv/224411367596",
             "postdate": "20260914"
           },
           {
-            "title": "귀주성 소수민족 마을 탐방 8박 9일 여행, 중국여행 추천",
-            "description": "뚱딴지여행에서 출발하는 2026년의 마지막 여행지는 중국 귀주성(贵州) 소수민족 마을 탐방이에요. 귀주... 유명한 관광지만 빠르게 둘러보는 여행이 아니라, 소수민족 마을에 머물면서 그들이 살아가는 모습과...",
-            "link": "https://blog.naver.com/koaram77/224410925991",
+            "title": "런던 호텔 Luxury Budget Flat in Middlesex 고를 때 살펴볼 숙소 정보",
+            "description": "런던 호텔 Luxury Budget Flat in Middlesex 고를 때 살펴볼 숙소 정보 최근에 여행을... 다른 옵션들도 각각의 매력이 있으니 본인의 여행 스타일에 맞춰 선택하시면 좋을 것 같아요.",
+            "link": "https://blog.naver.com/surqpiwpkv19/224411367088",
             "postdate": "20260914"
           },
           {
-            "title": "경주한우 초원암소숯불 외동 고기집 모화숯불단지맛집 후기",
-            "description": "경주 여행을 떠났다가, 마지막 날 특별한 점심 식사를 먹기 위해 검색 끝에 찾아간 경주 한우 맛집 초원암소숯불 ! 여행의 피날레는 역시... 있어 여행의 멋진 마무리가 되었어요 외동고기집모화숯불단지맛집...",
-            "link": "https://blog.naver.com/2939876/224410926117",
+            "title": "런던 호텔 트래블로지 런던 웸블리 공개 평점 정보 정리",
+            "description": "런던 여행을 계획하면서 숙소를 찾는 건 중요한 일이에요.... 이곳은 비즈니스 여행객부터 관광객까지 모두에게 적합한... 특히 가족 단위 여행객에게 적합할 것 같아요. ^^ 3위 — 시티 뷰...",
+            "link": "https://blog.naver.com/ecymo3nvhamhrc6yp/224411368066",
             "postdate": "20260914"
           },
           {
-            "title": "[서천 여행 코스] 비인면 성내리 맛집 '청송회관' &amp; 보물 '성북리 오....",
-            "description": "있어 여행의 시작을 기분 좋게 열어줍니다. * 영업시간 : 11:00~21:00 2.... #서천가볼만한곳 #충남서천여행 #서천맛집 #비인면맛집 #청송회관 #서천성북리오층석탑 #성북리오층석탑 #충남여행 #서천여행코스...",
-            "link": "https://blog.naver.com/guudle/224410926355",
+            "title": "김천 왕초보 영어회화과외 오픽 직장인학원 토익 비즈니스 일상 여....",
+            "description": "일상 여행 추천 영어를 다시 공부해야겠다고 생각해도 퇴근 후에는... 여행을 앞둔 사람이라면 업무 표현보다 공항, 숙소, 식당, 교통처럼... 신음동이나 부곡동에서 해외여행을 준비하는 경우에는 공부 범위를...",
+            "link": "https://blog.naver.com/yhv235/224411367138",
             "postdate": "20260914"
           },
           {
-            "title": "산방산 해물라면 오빠네에서 맛난 식사하세요.",
-            "description": "오늘은 제주도 여행코스로 빠지지 않는 산방산 방문입니다. 산방산 보문산. 산방산랜드. 용머리해안이 모여있어 제주도 여행지로 인기가 있죠. 관광객들이 모이다보니 음식점도 많답니다. 그 중 저는 산방산...",
-            "link": "https://blog.naver.com/happysoo1103/224410926592",
+            "title": "베네치아 팔라조 구아르디 가는법 알아보기: 공개 평점 정보",
+            "description": "베니스 여행을 계획하면서 숙박소를 찾는 건 정말 중요한 일이죠.... 많은 여행자들에게 사랑받고 있어요. 1위 — 팔라조 구아르디 1.... 본인의 여행 스타일과 예산에 맞춰 선택하시면 좋을 것 같습니다. ✨",
+            "link": "https://blog.naver.com/pruiyvbfmuztbefeag4/224411367359",
             "postdate": "20260914"
           },
           {
-            "title": "마나도에서 힐링하는 5일 휴양 여행, 바다와 자연 그리고 문화 체험",
-            "description": "이번에 마나도의 풍성한 자연과 문화를 경험할 수 있는 5일 여행 상품을... 5일 여행입니다. 휴양과 문화 체험이 어우러져 힐링과 탐방에 좋은 일정으로 알려져 있어요. 한눈에 보는 여행 정보 항목 내용 여행사...",
-            "link": "https://blog.naver.com/dpwlkimbkh/224410926099",
+            "title": "동해 묵호 소품샵 귀엽고 아기자기한 핸드메이드 소품이 가득한 묘....",
+            "description": "묵호 여행의 마지막 날에 방문한 소품샵이에요! 작가님들이 손수 제작한 핸드메이드 소품들을 구경할 수 있었는데, 특히 고양이와 관련된 소품들이 너무 귀여웠습니다..☺️ 귀여운 소품들로 가득했던 묘한...",
+            "link": "https://blog.naver.com/dlwjdtjddlek/224411368338",
             "postdate": "20260914"
           },
           {
-            "title": "서머셋 제주신화월드 76% 할인 25만원대 조식 패키지 4인 제주 가족여....",
-            "description": "단체 여행객이 함께 머물 숙소를 찾는 경우 객실 구성과 부대... 제주 여행을 준비할 때 객실과 다양한 부대 혜택을 함께 확인할 수... 가족여행이나 단체여행 숙소를 알아본다면 객실 타입과 혜택 조건을...",
-            "link": "https://blog.naver.com/bean_urse/224410926299",
+            "title": "안동 왕초보 영어회화과외 오픽 직장인학원 토익 비즈니스 일상 여....",
+            "description": "일상 여행 추천 영어 문제를 풀 때는 정답을 고를 수 있는데 누군가... 해외여행, 취업 준비, 오픽, 업무상 영어처럼 목적이 달라지면 필요한... 용상동이나 시내 생활권에서 해외여행을 준비한다면 공부 범위를...",
+            "link": "https://blog.naver.com/yhv235/224411367731",
             "postdate": "20260914"
           },
           {
-            "title": "차량을 어디에 맡길지 정리한 평일 낮 인천공항주차, 맘편한주차대....",
-            "description": "여행 준비를 정리하다가 인천공항 차량 맡길 방법을 다시... 여행 가방은 챙겼는데 머릿속에는 확인할 목록이 아직 남아 있더라고요.... 아까까지 차량 일정에 신경 쓰던 마음이 조금 가라앉으니 여행을...",
-            "link": "https://blog.naver.com/bishop3551/224410926337",
+            "title": "쾰른 호텔 Zehuus Gartenstudio mit Terrasse 예약 전 확인 사항 정리",
+            "description": "요즘 여행 계획 세우시느라 바쁘시죠? 특히 쾰른 여행을 준비하신다면 숙소 선택이... 약 83,099원에 이용이 가능하며, 주변 관광지와의 접근성도 뛰어나서 당일치기 여행객에...",
+            "link": "https://blog.naver.com/unq9cbpqjevvcb/224411367123",
             "postdate": "20260914"
           },
           {
-            "title": "샤먼 구랑위와 토루 여행, 낭만 해안과 역사 속으로 떠나는 4일",
-            "description": "4일 여행 상품을 정리해봤어요. 아름다운 해안과 독특한 문화가 어우러진 코스라 여행 준비에 도움이 되길 바랍니다. 샤먼과 구랑위, 토루를 잇는 4일 일정 소개 이 여행은 샤먼의 해변과 역사적인 토루, 그리고...",
-            "link": "https://blog.naver.com/s2ucucppkinl/224410926489",
+            "title": "옛적 정감을 찾아, 봄이 한창인 안동 하회마을 방문",
+            "description": "경북 안동시 하회마을 (2025.04.25 촬영) 낭만아재의 다른 이야기 삶의 조각조각 트레킹·산행 · 여행·나들이 · 일상의 사진 조각 삶이 글이 되고, 시가 되고 사진에 글을 얹다 · 세상사에 토달아 보기 아재의...",
+            "link": "https://blog.naver.com/elegani/224411366314",
             "postdate": "20260914"
           },
           {
-            "title": "일본여행 이심 1분이면 끝! 유심사 구매 아이폰 설치 사용법 총정리",
-            "description": "일본여행 가는데 유심이랑 이심 중에 뭐 사야 할지 아직도 고민하고 계신가요? 저도 여행 준비할 때 항공권, 숙소는 미리 예약하면서 꼭... 일본여행 준비하면서 많이 찾는 유심사 이심 구매부터 아이폰 설치...",
-            "link": "https://blog.naver.com/crazynael/224410926960",
+            "title": "그라나다 Albaicin 포사다 데 키하다 위치, 숙소 정보 살펴보기",
+            "description": "요즘 여행 계획을 세우면서 숙소 선택에 고민이 많으시죠? 특히... 현지 문화와 가까운 곳에서 특별한 체류를 원하는 여행객에게... 여러분의 여행 스타일에 맞춰 적합한 숙소를 선택해 보세요!",
+            "link": "https://blog.naver.com/ftr3yjb2wbobx/224411366514",
             "postdate": "20260914"
           },
           {
-            "title": "퇴근 후 먹성 터진 날(피카세리커피하우스,팔도보쌈,우야재남산)",
-            "description": "정란이가 친구들과 일본으로 잠시 여행을 떠났을 때 음식 사진을 하나씩 보내주는데 안되겠더라구요. 그래서 금요일 저녁에 남동생 아죠씨들과 기깔나게 먹고왔습니다. 그 리뷰 지금 시작해보겠습니다. (8월...",
-            "link": "https://blog.naver.com/ranichone/224410926449",
+            "title": "교토 당일치기 코스 추천 (기요미즈데라, 산넨니넨자카, 야사카 신....",
+            "description": "오사카 여행 2일차! 드디어 고대하던 교토 당일치기 코스를 직접... 뚜벅이 여행 루트를 정리해 본다. 오사카 우메다에서 교토로 출발!... 여행일정을 기록한 후 오사카 쿄토 맛집 포스팅을 따로 해볼 예정이다....",
+            "link": "https://blog.naver.com/moneytech777/224411366237",
             "postdate": "20260914"
           },
           {
-            "title": "장가계와 원가계 자연 만끽 5일 패키지 야경투어 정리",
-            "description": "장가계 자연과 명소를 두루 만나는 여정 본 여행 상품은 장사와 장가계 일대를 중심으로 천문산... 한눈에 보는 여행 정보 항목 내용 여행사 모두투어 여행 기간 3박 5일 출발지 인천 방문 도시 장가계, 창사...",
-            "link": "https://blog.naver.com/hqrtrsraighd/224410926543",
+            "title": "교토 호텔 기온의 빌라 (66m², 침실 3개, 프라이빗 욕실 1개), 공개 평....",
+            "description": "요즘 여행을 계획하면서 숙소를 고르는 게 참 고민이죠. 특히 혼자 여행하거나 소규모 그룹으로 갈 때, 편안하고 아늑한... 189,123원으로 가격이 저렴해서 예산이 한정된 여행객에게...",
+            "link": "https://blog.naver.com/pqo1206jq5u3u/224411365799",
             "postdate": "20260914"
           },
           {
-            "title": "속초 양양 한스오토캠핑장 아이들과 2박 3일 글램핑 추천 수영장 캠....",
-            "description": "오늘은 저희 여름 여행으로 다녀왔던 속초 양양오토캠핑장 기록을 남겨볼까 합니다. 가을에 여름 냄새!... 여행 가기 전에 들린 마트에서 구매한 만들기 하면서 즐거운 시간 보내기 첫날은 소소하게 마트에서 사...",
-            "link": "https://blog.naver.com/skygo2032/224410926281",
+            "title": "포항 여행 2.",
+            "description": "나름 일찍 일어나 조식으로 시작했던 포항 여행 둘째 날(이지만... 포항 여행) 니콘으로 남긴 사진.. 나오는 길엔 카페의 정원에서 사진을... 본 하늘을 마지막 사진으로 남기며 짧디짧은 1박2일 여행을 마무리했다 -",
+            "link": "https://blog.naver.com/babycheekvintage/224411366191",
             "postdate": "20260914"
           },
           {
-            "title": "스위스 신혼여행 8일차 &lt; 베른 / 감옥탑 / 연방궁전 분데스하우스 / ....",
-            "description": "오늘은 승태의 생일 !! 스위스에서 맞는 생일 특별하다 ! 추카추캉 이 날을 위해 미역국도 챙겨왔지요 ! 볶음김치는 왕창 사놓고 집 냉장고에 두고왔지만.. 냐미냐미 ! 오늘도 마무리는 요겉, ! 케이크도 샀었지이...",
-            "link": "https://blog.naver.com/zgzg2580/224410926927",
+            "title": "인디자인-포트폴리오",
+            "description": "표지 그림책 표지-황야에서 온 소녀의 여행 펼친 그림책-황야에서 온 소녀의 여행 그림책 표지-구슬나무거리의 특별한 날 펼친 그림책-구슬나무거리의 특별한 날 졸업작품 &lt;산책&gt;을 위한 일러스트 입체...",
+            "link": "https://blog.naver.com/yunmijo2013/224411365973",
             "postdate": "20260914"
           },
           {
-            "title": "&quot;분위기 어떨까?&quot; 싱가포르 차이나타운 호커센터 맥스웰 푸드센터 ....",
-            "description": "싱가포르 여행하면서 재밌었던 건 이 호커센터였고 적어도 2~3곳은 가보자고 하면서 찾아보다가 첫 날 숙소가 차이나타운이라서 그나마 가까운 맥스웰 푸드센터를 갔다. 여기서 밥 먹고 주변 차이나타운...",
-            "link": "https://blog.naver.com/agi45/224410926857",
+            "title": "경기도 안성 가볼만한 곳 &quot;BEST7 당일치기 여행코스&quot;",
+            "description": "당일치기 여행으로 다녀오기 좋아요. 탁 트링 목장부터 호수 산책길... 경기도 안성 가볼만한곳을 찾는 분들을 위해 여행코스로 묶기 좋은... 안성 여행을 계획하는 분들에게 특히 추천하고 싶어요 워낙 넓은...",
+            "link": "https://blog.naver.com/danji_51/224411367031",
             "postdate": "20260914"
           },
           {
-            "title": "시드니 패키지여행 일주 6일 후기, 직접 다녀와서 느낀 솔직한 장단....",
-            "description": "이 포스팅은 네이버 여행 파트너 활동의 일환으로, 예약 발생 시 수수료를 제공받습니다. ✔ 이 글의 핵심 요약 • 여행지: 호주 시드니... 가족 여행객 목차 1. 핵심 요약 2. 첫인상과 전체 일정 흐름 3. 주요 명소...",
-            "link": "https://blog.naver.com/sharejoa/224410925384",
+            "title": "상인동 왁싱, 바디왁싱, 겨드랑이, 배, 다리 &lt;글라디올 뷰티&gt;",
+            "description": "평소에는 크게 신경 쓰지 않다가도 옷차림이 가벼워지거나 여행... 약속이나 여행을 앞두고 관리받는 분들이 많은 이유를 조금 알 것... ㅋㅋ 여행이나 약속처럼 일정이 있을 때 챙겨도 좋지만 평소 바디 관리가...",
+            "link": "https://blog.naver.com/zhffhs02/224411366186",
             "postdate": "20260914"
           },
           {
-            "title": "중국 상하이여행 황푸강유람선 가격 예약 위치 후기",
-            "description": "중국 상하이여행 황푸강유람선 가격, 배 타는곳, 위치, 예약 후기 하하호호 안녕하세요, 중국여행을 준비하면서 가장 먼저 떠오르는 도시 중 하나가 바로 상해 일텐데, 크리에이터 하하호호가 오늘은 상하이여행...",
-            "link": "https://blog.naver.com/hohoj1/224410925698",
+            "title": "교토 호텔 [Kyoran - Oukate] - Vacation STAY 99302v, 숙소 정보 살펴보기",
+            "description": "교토 호텔 [Kyoran - Oukate] - Vacation STAY 99302v, 숙소 정보 살펴보기 교토 여행을 계획하면서... 모든 여행자에게 만족을 줘요. 특히 가족과 함께하는 여행에서 그 진가를 발휘하죠....",
+            "link": "https://blog.naver.com/rm2x1mh0bu816/224411366555",
             "postdate": "20260914"
           },
           {
-            "title": "배우 강성연 최근 근황! 재혼 후 더 단단해진 네 식구 가족 캠핑 소....",
-            "description": "최근 강성연 님의 소셜 미디어를 통해 가족 여행 모습이... 힐링 여행 사진과 함께 따뜻한 문구를 공유해 눈길을 끌었습니다.... 이번 여행으로 제대로 에너지를 충전한 네 식구는 벌써부터 다가오는 10월...",
-            "link": "https://blog.naver.com/gs525105/224410925120",
+            "title": "여행에서 빛나는 감성을 더해줄 제품들",
+            "description": "여행에서 빛나는 감성을 더해줄 제품들 타닥 로이스토 캠핑 랜턴... 제품들은 여행에서의 경험을 한층 풍부하게 만들어 줍니다. 어떤 스타일의 여행이라도 이 조명들로 멋진 추억을 만들어보세요....",
+            "link": "https://blog.naver.com/1qssln8j4/224411366397",
             "postdate": "20260914"
           },
           {
-            "title": "긴자 2박3일 여행 코스, 신주쿠·시부야까지 욕심내면 하루를 이동으....",
-            "description": "긴자 2박3일 여행 코스를 짤 때 저도 신주쿠, 시부 야, 아사쿠사를... 긴자 2박3일 여행 코스, 전체 흐름부터 잡아두세요 사흘을 '도착... 숙소는 여행 성격에 따라 갈리는데, 가족이라면 아파트형 객실이 있는...",
-            "link": "https://blog.naver.com/jbhno2/224410925895",
+            "title": "찰스앤키스 가방 뭐길래? 미야오 안나 공항패션 가방 부츠 정보",
+            "description": "해외여행 갔을 때 매장 보이면 한 번씩 들어가 보고, 가방도 구두도 완전 많이 비축해둔(?) 최애브랜드라 괜히 더 반가웠어ㅋㅋㅋ 명품처럼 가격대가 확 높은 건 아닌데 디자인은 트렌디하게 잘 뽑는 편이라...",
+            "link": "https://blog.naver.com/coralpink14/224411366046",
             "postdate": "20260914"
           },
           {
-            "title": "인스타360 X4 여행 준비 직접 해보니 28인치 초경량 캐리어가 넉넉할....",
-            "description": "준비하면 여행 짐을 넉넉하게 담을 대형 캐리어가 필요해집니다.... 이번 글에서는 인스타360 X4 여행 준비를 기준으로 이 캐리어의... 28인치 대형은 짐을 줄이는 가방이라기보다 촬영 장비와 여행용품을 한...",
-            "link": "https://blog.naver.com/k4r8gp4ps4w3c/224410925943",
+            "title": "오사카와 교토 아라시야마를 품은 4일 패키지 여행 알아보기",
+            "description": "오사카와 교토, 아라시야마를 포함한 4일 패키지 여행 상품을 정리해봤어요. 자유 일정도 포함되어 여유롭게 여행할 수 있는 일정입니다. 오사카와 교토의 핵심을 담은 4일 여행 오사카성과 도톤보리 같은 도심...",
+            "link": "https://blog.naver.com/lqxjslkkvmp/224411366137",
             "postdate": "20260914"
           },
           {
-            "title": "[경남 밀양] 배롱나무꽃 피는 7월 향교",
-            "description": "그러다 기억은 흐지부지되었고 일본여행으로 이미 여행을 했던터라 이대로 밀양여행은 무산되나?했지만 낯선쟁이들의 전체만남은 아쉬웠던거지~~ 여름휴가를 핑계삼아 다시 뭉친 우리들. 그리고 우리의...",
-            "link": "https://blog.naver.com/heeya_da/224410925741",
+            "title": "영화 경주기행 줄거리 후기 | 피해자가 복수의 가해자가 된다면",
+            "description": "수학여행을 떠났던 막내딸 경주가 돌아오지 못했다. 시간은 흘렀지만... 네 모녀는 똑같은 티셔츠를 맞춰 입고 경주로 가족여행을 떠난다. 겉으로만 보면 오랜만에 함께 떠나는 평범한 가족여행. 하지만 이들의...",
+            "link": "https://blog.naver.com/ddojunge/224411366520",
             "postdate": "20260914"
           },
           {
-            "title": "2026년 가을 태풍 한반도 북상 가능성 분석: 25호·26호·27호 전망 및 ....",
-            "description": "추석 연휴 기간 남해안 이동 및 일본 여행 시 대중교통 차질에... 추석 연휴 귀성길 및 제주도·일본 여행객은 특보 발생 시 비행기... (실제 경험 기반 대비책) 추석 연휴 귀성길 및 일본 여행 시 가을 태풍...",
-            "link": "https://blog.naver.com/snowball_lab_kr/224410925314",
+            "title": "제미나이 여행 계획표 실속 있게 이용하기",
+            "description": "제미나이 여행 계획표 이용 전 알아보기 안녕하셔요 요즘 같은... 그런데 아쉬운 점은 제미나이 여행 계획표 넷플릭스 유튜브에... 제미나이 여행 계획표 챗GPT 퍼플렉시티 클로드 같은 프리미엄 AI...",
+            "link": "https://blog.naver.com/zdmreference/224411366585",
             "postdate": "20260914"
           },
           {
-            "title": "포항시티호텔 멤버십 | 더 특별하고 알뜰하게 호텔을 이용하는 방법",
-            "description": "포항 여행이나 출장으로 호텔을 자주 이용하시는 분들이라면... 객실 업그레이드 여행에서 객실은 편안한 휴식을 결정하는 중요한... 보다 여유로운 객실에서 머물며, 포항에서의 여행을 한층 더 편안하게...",
-            "link": "https://blog.naver.com/phcityhotel1204/224410924913",
+            "title": "삼척 회포장 시장횟집, 삼척중앙시장에서 신선한 회 포장하기",
+            "description": "삼척 여행을 준비하면서 현지에서 회를 포장해 숙소에서 편하게... 있어서 여행 중 식사 메뉴를 고민할 때 참고하기 좋은 곳이랍니다.... 좋고, 여행 일정 중 회를 포장해서 숙소나 집에서 편하게 즐기고 싶을 때...",
+            "link": "https://blog.naver.com/eoqkrdl100/224411366466",
             "postdate": "20260914"
           },
           {
-            "title": "[타이베이] 융캉제 딘타이펑 신셩점 오픈런 방문 후기",
-            "description": "웨이팅으로 악명 높은 딘타이펑 부모님이랑 함께 가는 여행이라 웨이팅이 조금 부담스러워서 어찌할까 고민이 많았는데, 그렇다고 인터넷으로 미리 세트를 주문해서 가자니 좀 메뉴 구성이 맘에 안 들어...",
-            "link": "https://blog.naver.com/traveller_m/224410925785",
+            "title": "괌 PIC 슈페리어룸 3박5일 패키지, 자연과 역사 속 휴양 여행",
+            "description": "가족, 친구와 함께 자연과 역사를 겸비한 여행을 고민 중인 분들에게 도움이 될 거예요. &lt;&gt; 괌 자연과 역사를 담은 3박 5일 여행 이 상품은... 가족이나 친구 동반 여행객에게 적합한 일정입니다. 한눈에 보는...",
+            "link": "https://blog.naver.com/gqwqxigcrv/224411366095",
             "postdate": "20260914"
           },
           {
-            "title": "카말라 비치 더 리젠트 프라이빗 풀 빌라 근처 알아보기: 숙소 선택 ....",
-            "description": "카말라 비치 더 리젠트 프라이빗 풀 빌라 근처 알아보기: 숙소 선택 기준 요즘 여행을 계획할 때... 각 숙소마다 특색이 있으니 본인의 여행 스타일에 맞춰 선택하시면 좋겠습니다. 행복한 여행 되세요!",
-            "link": "https://blog.naver.com/pqpyj6xb9cuypafjqj/224410925391",
+            "title": "쾰른 호텔 Zimmer in Sülz in einer Wohnung 고를 때 살펴볼 공개 평점 정보",
+            "description": "쾰른 호텔 Zimmer in Sülz in einer Wohnung 고를 때 살펴볼 공개 평점 정보 쾰른 여행을 계획하면서 숙소를 고르기란 쉽지 않죠. 특히 Zimmer in Sülz in einer Wohnung이 왜 인기 있는지...",
+            "link": "https://blog.naver.com/jkr0khpu4m6fzoy/224411366773",
             "postdate": "20260914"
           },
           {
-            "title": "포항출발 울릉도 독도 2박3일｜엘도라도 타고 떠나는 특별한 섬 여....",
-            "description": "울릉도는 이상하게 늘 마음속 여행 목록에는 있는데 막상 떠나려면... 육지 여행과는 분위기부터 다릅니다. 짙은 푸른 바다 옆으로 절벽과... 것만으로도 여행 온 기분이 제대로 나죠. 사진으로 많이 봤던...",
-            "link": "https://blog.naver.com/ljy15768/224410924808",
+            "title": "상하이 여행 준비물 추천, e심나라 중국 이심 5G 데이터 무제한 덕에 ....",
+            "description": "상하이 여행 준비물 추천, e심나라 중국 이심 5G 데이터 무제한 덕에 성공적이었던 중국 여행 중국 상하이 여행을 계획하면서 가장 신경 쓴 부분 중 하나가 바로 데이터 연결이었다. 중국은 현지에서 스마트폰...",
+            "link": "https://blog.naver.com/sks2vv/224411365817",
             "postdate": "20260914"
           },
           {
-            "title": "바다와 도시를 가까이 누리는 하와이, '하얏트 플레이스 와이키키 ....",
-            "description": "마법같은 여행이 시작되는 곳, 마녀여행사 허니문 담당자입니다. 오늘 소개할 곳은 하와이 여행에서 숙소를 고를 때는 위치와 편안함, 그리고 여행 중 필요한 것들을 얼마나 쉽게 해결할 수 있는지를...",
-            "link": "https://blog.naver.com/manyeotour/224410925261",
+            "title": "쾰른 호텔 City Luxus Appartement nähe Köln Messe - LANXESS Arena 고를 때 살펴....",
+            "description": "쾰른 여행을 계획하면서 숙소를 찾는 건 중요한... 비즈니스 여행객에게도 최적이에요. 2위 — a&amp;o 쾰른... 다른 옵션들도 각기 장점이 있으니 자신의 여행 스타일에 맞춰...",
+            "link": "https://blog.naver.com/z4adxgaj8nxwz68/224411366614",
             "postdate": "20260914"
           },
           {
-            "title": "2026년 추석 연휴 (9월 28일 대체공휴일 적용 여부 + 연휴 일정 정리)",
-            "description": "명절을 앞두고 다가오는 추석 연휴 일정을 미리 체크하며 여행이나 휴식 계획을 세우는 분들이... 9월 28일 대체공휴일 미적용 소식 참고하셔서 차편이나 여행 계획 차질 없으시길 바랍니다. 연휴...",
-            "link": "https://blog.naver.com/crew_007/224410925854",
+            "title": "409.미서부여행10",
+            "description": "아치스 국립공원",
+            "link": "https://blog.naver.com/gonduda/224411366686",
             "postdate": "20260914"
           },
           {
-            "title": "괌 하얏트 오션프론트룸 3박5일 패키지 여행 일정과 관광지 소개",
-            "description": "&lt;&gt; 괌 여행 패키지 간단 소개 이 패키지는 괌에서 3박 5일 동안 하얏트 숙소에 머물면서 아일랜드 관광과... 원하는 여행객에게 적합합니다. 한눈에 보는 여행 정보 항목 내용 여행사 모두투어 여행 기간 3박 5일...",
-            "link": "https://blog.naver.com/mnbcoeoufyq/224410925412",
+            "title": "후지산 요시다 루트 1박 2일 일출 등반 총정리: 산장 예약부터 준비....",
+            "description": "신혼여행으로 후지산으로 갔다고? 저랑 남편은 신혼여행으로 어디를 갈지 정말 고민이 많았는데요. 버킷리스트 중 하나인 후지산 등반을 목표로 일본으로 떠나게 되었어요. 오래전부터 계획하던 거라 출발...",
+            "link": "https://blog.naver.com/4694035/224411365221",
             "postdate": "20260914"
           },
           {
-            "title": "[여행 필수템] 퀵클린 물없이 사용하는 일회용 미니 칫솔 민트향 휴....",
-            "description": "바쁜 일상과 여행길을 위한 실용성 아쉬운 점을 굳이 찾자면... 평소 여행이나 야외 활동을 자주 즐기시는 분들, 혹은 출퇴근길에... me/5hofEPtP #퀵클린 #미니칫솔 #일회용칫솔 #물없는칫솔 #휴대용칫솔 #여행용칫...",
-            "link": "https://blog.naver.com/fjqm202/224410925389",
+            "title": "엄마는 농장이 싫어요 31개월 5개월 육아일기",
+            "description": "엄마는 농장이 싫어요 31개월 5개월 육아일기 사진/글_ 올리비아의 여행일기 등원후 커피타임 한달에... 다이어트 얘기하다가 추억여행.. 저렇게는 못 돌아가도 근처라도 가보자_ 연말까지 화이팅!!! 내가...",
+            "link": "https://blog.naver.com/do_blin/224411365534",
             "postdate": "20260914"
           },
           {
-            "title": "9/21월[주다안] 아이랑 여행 갈 때, 주다안 첫 설렘 레디백 세트(키즈....",
-            "description": "",
-            "link": "https://blog.naver.com/ddssy09/224410925076",
+            "title": "후쿠오카 3인 가족 여행 숙소 추천, 더 로얄 파크 캔버스 후쿠오카 ....",
+            "description": "후쿠오카 3인 가족 여행 숙소 추천 더 로얄 파크 캔버스 후쿠오카... 후쿠오카 여행 위치도 좋고 객실도 깔끔해서 3인 가족이 편하게... 후쿠오카 여행하면서 주요 관광지를 오가기에도 좋았어요. 2. 우산 대여...",
+            "link": "https://blog.naver.com/reruns_/224411365759",
             "postdate": "20260914"
           },
           {
-            "title": "9월 2주차 차기록 (+ 아사가차관 방문기)",
-            "description": "당장 여행 한주 남았는데 놀라울 정도로 준비가 안된 상황이라 이번... 지난 대만 여행기에 상세히 기록했지만 작은 왕덕전 지점을 열심히... 예상되어 여행을 앞둔 몸을 아끼고자 전에 찍어뒀던 아사가차관을...",
-            "link": "https://blog.naver.com/mjhoichun/224410924876",
+            "title": "[포항] 포항 숙소 추천 호텔야자 포항쌍용사거리점 무료 조식 라면....",
+            "description": "포항 여행 중 편안하게 쉬면서 가성비 좋은 숙소를 찾다가 호텔야자... 덕분에 여행길 아침 식사 고민을 덜 수 있어 무척 실용적이었어요... 모두 편안하고 즐거운 여행 되세요 다음 리뷰로 찾아오겠습니다",
+            "link": "https://blog.naver.com/magaret142/224411365376",
             "postdate": "20260914"
           },
           {
-            "title": "괌 탕기슨 별빛투어 솔직 후기 | 별밤 자유여행 꿀투어 가성비 완전 ....",
-            "description": "✈️ 괌 자유여행 준비하다가 발견한 탕기슨 별빛투어, 진짜예요? 괌 자유여행 계획하면서 투어... 결론부터 말하면, 이 투어는 괌 자유여행 중에서 제가 한 선택 중에 가장 잘한 선택이었어요. 별밤투어가...",
-            "link": "https://blog.naver.com/hoontrip/224410925078",
+            "title": "미우새에 나온 몬자야키, 서울에서 먹어봤어요, 서울대입구 몬자야....",
+            "description": "일본 여행을 가야 제대로 먹을 수 있을 것 같았던 몬자야키인데, 서울에서도 먹어볼 수 있는 곳이... 다음 일본 여행 때 직접 먹어보고 한국에서 먹은 몬자야키와 비교해보면 재미있을 것 같네요. 오늘도 맛있는...",
+            "link": "https://blog.naver.com/lydaa91/224411364613",
             "postdate": "20260914"
           },
           {
-            "title": "제천 반값여행 후기 + 페이백 후기 온라인 사용처 등 내돈내산 여름....",
-            "description": "안녕하세요 오마입니당 오늘은 여름휴가로 제천 반값여행 다녀온 후기 들려드립니다 (큰 뒷북)... 일찍 예약했는데요 갑자기 회사동료분이랑 이야기하다가 제천 반값여행의 존재를 알게됨 프로여행러쌤 덕분에...",
-            "link": "https://blog.naver.com/wizardofoz887/224410925947",
+            "title": "[EBS 이지라이팅 260914] 젊은 세대의 여행 계획을 바꾸는 향수 열풍 Nos....",
+            "description": "젊은 세대의 여행 계획을 바꾸는 향수 열풍 nostalgia 향수 (명사)/ nostalgic 향수어린 (형용사) I feel nostalgic. 향수병이 있는 것 같아 generation 세대 gen z 처럼 표현할 순 있는데...",
+            "link": "https://blog.naver.com/ji_bbong/224411365518",
             "postdate": "20260914"
           },
           {
-            "title": "거제 프래밀리",
-            "description": "가족여행. 이번에는 인원이 많아 여러 명이 함께 머물 수 있는... 여럿이 함께하는 여행은 숙소가 좁으면 금세 불편해지는데, 이번 방은... 가족여행에서는 이런 시간이 가장 오래 기억에 남는 것 같다. 동갑내기...",
-            "link": "https://blog.naver.com/bunch20000/224410925347",
+            "title": "뉘른베르크 호텔 Pension Tokus 고를 때 살펴볼 예약 전 확인 사항",
+            "description": "사항 여행 계획을 세울 때 숙박 선택은 정말 중요하죠.... 단위 여행객에게도 인기가 많아요. 뉘른베르크 호텔 Pension... 젊은 여행자들에게 인기죠. ✨ 뉘른베르크 호텔 Pension...",
+            "link": "https://blog.naver.com/jlgq8v1ewqs3sx/224411365404",
             "postdate": "20260914"
           },
           {
-            "title": "[2026 최신] 영천 보현산 가을 드라이브 별빛전망대와 단풍길 여행 코....",
-            "description": "영천 보현산 가을 드라이브 별빛전망대와 단풍길 여행 코스는 매년 가을 수많은 여행객들의 발길을... 맑은 공기와 아름다운 자연경관 덕분에 매년 드라이브 동호인들과 가족 단위 여행객들에게 큰 사랑을 받고...",
-            "link": "https://blog.naver.com/nstartkkh/224410925568",
+            "title": "[남미] DAY11 - 칠레 국경넘기",
+            "description": "6시 구요 영어 실력이 나날히 상승중이에오 깜빡 졸았는데 풍경이 바뀜 이번여행을 함께한 동료 ㅍ..프리렌사마 즐거웠어요 버스야 힘내 칠레가 눈앞이야 볼리비아 출국 -완- 진짜 배낭 훔쳐갈까봐 사진도...",
+            "link": "https://blog.naver.com/imda_333/224411364616",
             "postdate": "20260914"
           },
           {
-            "title": "스페인과 포르투갈 9일 여행: 바르셀로나부터 리스본까지 다양하게 ....",
-            "description": "이번에는 스페인과 포르투갈을 아우르는 9일 패키지 여행 상품을... 스페인·포르투갈 대표 명소를 둘러보는 9일 일정 본 여행 상품은 8박... 한눈에 보는 여행 정보 항목 내용 여행사 참좋은여행 여행 기간 8박...",
-            "link": "https://blog.naver.com/7msafnvsqqh/224410924106",
+            "title": "문어빵빵 | 타코야끼",
+            "description": "제주 문어빵빵 월 - 토 15:00 - 24:00 23:30 라스트 오더 매주 일요일 정기휴무 오리지널 타코야끼 6.0 타코야끼만 보면 카드부터 꺼내던 행동이 어느덧 습관이 되었고 나는 제주 여행에서도 타코야끼를 포기하지...",
+            "link": "https://blog.naver.com/waltzfor__/224411365254",
             "postdate": "20260914"
           },
           {
-            "title": "비행기에서 자고 나면 목부터 아프다면? U자형과 다른 trtl 목베개",
-            "description": "일어났는데 여행 시작도 전에 목부터 뻐근했던 경험, 한 번쯤 있죠. 저도 여행용 목베개를 고른다면... 판매 페이지 기준 33% 할인된 131,260원으로 확인돼 흔한 여행용 목베개와 비교하면 확실히 높은...",
-            "link": "https://blog.naver.com/itempicklab/224410924385",
+            "title": "공주대 맛집 부대통령 뚝배기! 가격도 착하고 밥도 무한 리필",
+            "description": "공주여행 당일치기를 마무리하고 이제는 다시 서울로 돌아갈 시간! 마지막 저녁은 무엇을 먹을까 하다 시원한 순두부찌개가 땡겨 공주대 근처에 있는 공주 맛집 부대통령뚝배기에 방문했다! 다른 식당 가려...",
+            "link": "https://blog.naver.com/rowoon0_0/224411364832",
             "postdate": "20260914"
           },
           {
-            "title": "도쿄 호텔 泊家東神Hakuya toshin 고를 때 살펴볼 숙소 선택 기준",
-            "description": "기준 여행을 계획하면서 숙소를 고르는 건 정말 중요한... 많은 여행객들에게 사랑받고 있어요. 특히 교통 접근성이... 특히 가족 단위 여행객에게 적합한 선택일 거예요. 도쿄...",
-            "link": "https://blog.naver.com/n91ustb6u2q90/224410923889",
+            "title": "가족여행도 다녀오고 리프팅도받고 방탈출도 하고 술도먹는 8월일....",
+            "description": "비워짐이 시작됨 역시 말은 들어야한다 8월 7일 영월으로 가족여행... 가족여행 첫코스로 동굴을 갔는데요 동굴에 천국의계단이있어요... 그리고 아빠가 현장이 지금 영월이라서 영월로 가족여행을 온건데...",
+            "link": "https://blog.naver.com/roung93/224411364944",
             "postdate": "20260914"
           },
           {
-            "title": "전주 평화동1가 맛집, 태양곱창 전주평화점의 정직한 미식 여행",
-            "description": "전주 평화동1가 맛집 에서 마주한 곱창의 진수 가끔은 쫄깃한 식감과 진한 풍미가 간절하게 생각나는 날이 있잖아요. 그럴 때마다 머릿속에 자연스레 떠오르는 곳이 바로 이곳이에요. 전북 전주시 완산구 평화로...",
-            "link": "https://blog.naver.com/lgfgzujcfw240/224410924085",
+            "title": "국내여행_영종도) 영종도 에어비앤비에서 재택근무",
+            "description": "지금은 퇴사한 ㅎㅎ 회사는 매년 1월, 7월 일주일 재택 기간이 있다. Anywhere이어서 해외에서 근무하는 분들도 계시고, 본가로 내려가시는 분들도 계셨다. 나는 2년이 넘는 시간 동안 한 번도 어딜 가지 않고...",
+            "link": "https://blog.naver.com/qhfka8955/224411364820",
             "postdate": "20260914"
           },
           {
-            "title": "가평 설악 해장국 가마솥할머니해장국 유명산 아난티코드 근처 맛....",
-            "description": "얼마 전에 강원도로 여행을 갔다 왔는데 그때 이후로 노는 재미를 알아버려서 요즘 자꾸 어디론가... 강원도 여행 이후로 시작된 나들이 욕심 덕분에 가평까지 오게 됐는데 덕분에 가평 설악 해장국...",
-            "link": "https://blog.naver.com/sockay70/224410923905",
+            "title": "2026년 9월 1일~9월 10일, 스페인/포르투갈 여행(3편-총 3편으로)",
+            "description": "지난 1편과 2편에 이어, 본 3편 포스팅으로 스페인/포르투갈 여행에... 이번 여행의 시작점이자 다시 한국으로 돌아가야하는 장소이기도... 이번 여행의 주요 루트를 복기해 봅니다. AI로 그려본 이번 여행 주요...",
+            "link": "https://blog.naver.com/viocult8/224411364534",
             "postdate": "20260914"
           },
           {
-            "title": "중국 옌타이 여행 숙소추천 풀먼호텔 디럭스룸 후기",
-            "description": "옌타이 여행을 앞두고 숙소부터 알아보고 계신가요? 검색을 아무리... 검색해보니 한국 여행객들도 꽤 이용하는 것처럼 보여서, 크게... 중국 여행 특성상 이쪽이 마음이 편했습니다. 미니바에는 풀먼(Pullman)...",
-            "link": "https://blog.naver.com/tkddjrdl2/224410924507",
+            "title": "아이랑 겨울 상해여행 7박8일 계획하기",
+            "description": "후후와 해외여행은 매번 일본으로만 다니다가 (후쿠오카➡️오사카... 이용해 여행하고, 동남아 쪽은 정말 가고 싶지 않다 사실 상해도... 잘하면 여행이 쉽다고 하는데, 이미 가입하고 튕기고 또...",
+            "link": "https://blog.naver.com/wodkwodk13/224411365626",
             "postdate": "20260914"
           },
           {
-            "title": "다낭 10월 11월 날씨 우기 건기 여행 준비물",
-            "description": "다낭 10월 11월 날씨 우기 건기 여행 준비물 ©글/그림 칩칩이 다낭... ✅다낭 11월 날씨 기온이 확연히 선선해져서 여행하기엔 한결... 그래서 우기에 여행하는 분들은 여행지 동선을 잘 확인하시는 게...",
-            "link": "https://blog.naver.com/dennis0525/224410924309",
+            "title": "베켄리트 세라우슈 스위스 퀄리티 호텔 가는법 고를 때 살펴볼 공개....",
+            "description": "베켄리트 세라우슈 스위스 퀄리티 호텔 가는법 고를 때 살펴볼 공개 평점 정보 여행을 계획하면서... 맞춰 자신에게 가장 잘 어울리는 숙소를 골라보세요. 여러분의 여행이 더욱 특별해지길 바랍니다!",
+            "link": "https://blog.naver.com/lf3qm3bq4rgnqlsxywpk/224411365297",
             "postdate": "20260914"
           },
           {
-            "title": "방콕 이인(워크+스테이) 가는법 알아보기: 숙소 선택 기준",
-            "description": "방콕 여행을 계획하면서 숙소를 찾는 게 쉽지 않죠? 특히 일과 휴식을 동시에 즐기고 싶은 여행자들에게 적합한 곳을 고민했어요.... 이곳은 합리적인 가격과 뛰어난 위치 덕분에 많은 여행객들에게...",
-            "link": "https://blog.naver.com/liwm4gh7dibwfq5n/224410924048",
+            "title": "부산 국립해양박물관｜아이와 가볼 만한 곳, 바다를 배우고 즐기는 ....",
+            "description": "부산 여행을 계획하면서 아이와 함께 어디를 가볼까 고민된다면 한... 저희는 지난 부산여행에서 영도 근처에 숙소를 잡았고 일정이... 특히 부산에서 생활하거나 부산 여행을 온 아이들에게는 평소 가까이에서...",
+            "link": "https://blog.naver.com/nicechirpy/224411364789",
             "postdate": "20260914"
           },
           {
-            "title": "영국부터 이탈리아까지, 서유럽 4국+모나코 12일 여행 알아보기",
-            "description": "https://naver.me/xCjMiQz3 “이 포스팅은 네이버 여행 커넥트 활동의... 국가로 여행도 다니고 싶다는 생각을 한동안 했었거든요. 그런데 사람... 그런데 요즘 유럽여행 상품을 하나둘 찾아보다 보니 예전에 독일에...",
-            "link": "https://blog.naver.com/a_comfort/224410924622",
+            "title": "[강원 원주] 로컬 닭갈비 맛집 추천 '춘천우미닭갈비' 직영점",
+            "description": "안녕하세요, 행복한여행나눔입니다. 지난 주 9월 여주 출장에 갔다가 잠시 저녁엔 강원도 원주로 넘어가... 원주 지인들께서는 닭갈비 먹으러 춘천으로 가신다고 하여 이번엔 행복한여행나눔 블로그지기가...",
+            "link": "https://blog.naver.com/happytourshare/224411365204",
             "postdate": "20260914"
           },
           {
-            "title": "괌 남부투어 한인택시 전세택시로 4시간 완전정복 ✨ 공항픽업 무료....",
-            "description": "괌 자유여행, 남부투어 고민 끝냈습니다 괌 자유여행 준비하면서 가장 많이 고민하는 게 뭔지 아세요?... 저도 이번 괌 자유여행 준비하면서 진짜 오래 고민했거든요. 근데 직접 가보고 나서 느낀 건 딱 하나예요....",
-            "link": "https://blog.naver.com/guamwhale/224410923691",
+            "title": "안마스 B&amp;B 호텔 아네마스 에스트 가는법 숙소 선택 기준 정리",
+            "description": "요즘 여행을 계획할 때 숙소 선택은 정말 중요한 요소인 것 같아요. 특히 혼자 여행하는 분들이나 비즈니스 출장객들에게는... 이곳은 특히 젊은 여행자부터 커플까지 모두에게 적합한 곳이라고...",
+            "link": "https://blog.naver.com/i67x102j6xdgyiyhw/224411365143",
             "postdate": "20260914"
           },
           {
-            "title": "경북여행 대구 근교 가볼만한곳 영천 사과파이 체험 아이랑 추천",
-            "description": "영천 여행 코스 추천 ✔ 운영시간 : 오전 9시 - 오후 6시 ✔ 체험비... 경북여행에 푹 빠져있는데요 경북 구석구석 놀 거리가 정말... 묶어 여행하기 좋답니다 영천 사과 맛나게 즐기기 사과파이 체험에서 만나...",
-            "link": "https://blog.naver.com/bodoru/224410924113",
+            "title": "[추억 소환] 아이와 함께했던 완벽한 가족 여행, 싱가포르 만다린 오....",
+            "description": "아이와 함께하는 싱가포르 여행을 계획 중이신 분들께 도움이... 아이들을 위한 배려가 돋보이는 객실과 서비스 가족 여행객을 위한... 작은 디테일 하나하나가 아이와 함께하는 여행의 불편함을 덜어주었죠....",
+            "link": "https://blog.naver.com/dongdonggu_/224411365009",
             "postdate": "20260914"
           },
           {
-            "title": "일본여행에서 시작한 일본어 공부, 이제는 JLPT 자격증까지",
-            "description": "“일본 여행 가서 일본어로 직접 이야기해 보고 싶어서요.” 여행을 준비하며 일본어를 시작하고... ✈️ 일본여행을 위해 시작한 일본어 공부 처음에는 일본여행을 계획하면서 현지에서 간단한 일본어라도 직접...",
-            "link": "https://blog.naver.com/wjcaihong/224410924689",
+            "title": "또가고픈 우도여행 | 맛집추천",
+            "description": "작년에 울 마미랑 함께했었던 2박3일 제주 여행! 여행 중 가장 인상깊었던 우도♡ 배타고 들어가서... (싱싱한 해산물에 매콤한 김밥, 칼칼한 ) 아흨ㅜㅜ 사진보니 또 먹고프네 우도여행 중 또하나의 재미^^ 우도를...",
+            "link": "https://blog.naver.com/piano806/224411365702",
             "postdate": "20260914"
           },
           {
-            "title": "칭다오 핵심 관광과 미식 체험 3일 패키지 여행",
-            "description": "오늘은 칭다오를 중심으로 한 3일간의 여행 상품을 정리해봤어요. 청도의 대표 명소와 미식을 경험할 수 있는 일정 구성이 눈에 띕니다. 칭다오 여행, 핵심 명소와 미식의 조화 이번 여행은 칭다오의 상징적...",
-            "link": "https://blog.naver.com/dqjobespkagj/224410924069",
+            "title": "강원도 1박2일 여행코스｜평창·대관령·강릉·속초 가볼만한곳",
+            "description": "가을 여행을 계획하면서 어디로 갈지 고민된다면 강원도는 빠지지... 꽃밭까지 여행 스타일에 따라 다양하게 선택할 수 있어서 계절이 바뀔 때마다 다른 여행을 만들 수 있어요. 특히 가을에는 평창에서 꽃과...",
+            "link": "https://blog.naver.com/ssoyeon_yoon/224410839803",
             "postdate": "20260914"
           },
           {
-            "title": "나고야 갈고야 3 평화로운 나고야 근데 미식여행을 곁들인",
-            "description": "com/hxxxnnn/224407185820 평화로웠던 지난편은 요기 식도락 여행을 하러... 진짜 공항에서 먹은 음식인데도 이번 나고야 여행에서 손에 꼽게... 내 여행 스타일에는 진짜 잘 맞았다 관광지 미친 듯이 돌아다니는...",
-            "link": "https://blog.naver.com/hxxxnnn/224410923690",
+            "title": "아산 외암마을 숙소 신창댁 후기｜타임슬립한 듯한 찐 촌캉스",
+            "description": "천안 아산 여행 숙소 추천 외암민속마을 신창댁에서 1박 마을 입구... 중요한데요 여행중엔 특히 야식이 땡길 때가 있는데 신창댁은 마을... 아산 여행을 한다면 외암민속마을은 한 번쯤 들러볼 만한 곳이라고...",
+            "link": "https://blog.naver.com/chiangmai_jennie/224411365218",
             "postdate": "20260914"
           },
           {
-            "title": "일본 KALDI 칼디 추천템 ☕️ 프라이빗 클럽 프렌치 바닐라 플레이버 ....",
-            "description": "며칠 전에 일본 오사카 여행을 다녀왔어요 일본 여행을 가면 꼭 한 번씩 들르게 되는 곳이 있죠 바로... 많아서 여행 가면 꼭 들르는 편이에요 이번에도 칼디에 방문하기 전에 이것저것 추천템을 찾아보다가...",
-            "link": "https://blog.naver.com/thwltjq53/224410923975",
+            "title": "셍-삐에흐-엉-포씨늬 B&amp;B 호텔 생-피에르-앙-포시니 보네빌 가는법 알....",
+            "description": "정보 여행 중 편안한 숙소를 찾고 계신가요? 특히 셍-삐에흐-엉... 이곳은 합리적인 가격과 긍정적인 평점으로 많은 여행객들에게 사랑받고 있답니다. 평점이 7.8점에 달하는 이 호텔은 다양한 여행자들...",
+            "link": "https://blog.naver.com/r2twfuyz90tuwy/224411365247",
             "postdate": "20260914"
           },
           {
-            "title": "상해 3박 4일 1일차",
-            "description": "드디어간다 상하이 일본에서 사온 생명수를 일단 마셔본다 다같이 아침은 라운지 푸동공항으로 갈꺼에요~ 유미가 사준 아아 3일만에 다시 이 뷰라니 이번 여행은 저울추 인형 가보자 어 창문이 심히...",
-            "link": "https://blog.naver.com/dreamer_723/224410924197",
+            "title": "제주토지매매 ♠ 구좌읍 송당리 토지분양가이하매매 송당초교북쪽....",
+            "description": "제주토지매매 ♤ 구좌읍 송당리 토지분양가이하매매 송당초교북쪽편 나대지 375㎡ ♠ 맵부동산 시세 공장 토지매물 제주도창고전문 여행지도정보제공 ▼ 위치 보기 ▼ 아래 클릭 ▼ https://www.disco.re/m/mmobjfu2...",
+            "link": "https://blog.naver.com/jejulands/224411363314",
             "postdate": "20260914"
           },
           {
-            "title": "코타키나발루 5일 초특급수트라하버 패키지 상세 소개",
-            "description": "코타키나발루 5일 여행 패키지를 살펴봤어요. 휴양과 해양... 코타키나발루 5일 패키지 개요 이번 여행 상품은 말레이시아의... 한눈에 보는 여행 정보 항목 내용 여행사 노랑풍선 여행 기간 3박 5일 출발지 인천...",
-            "link": "https://blog.naver.com/sajtlpaafmhi/224410923882",
+            "title": "홋카이도 4일 온천 &amp; 자연 힐링 트립 후라노·비에이 명소 탐방",
+            "description": "여행 준비에 참고해보세요. &amp; 홋카이도 자연과 온천을 즐기는 4일 여행 이번 상품은 홋카이도의 대표 명소들을 효율적으로 둘러보면서... 한눈에 보는 여행 정보 항목 내용 여행사 하나투어 여행 기간 3박...",
+            "link": "https://blog.naver.com/fuykejkulify/224411363864",
             "postdate": "20260914"
           },
           {
-            "title": "추석 연휴에 뭐 먹지? 집에서 편하게 즐기는 배달음식 추천 5가지",
-            "description": "명절 연휴를 이용해 해외여행이나 국내여행을 떠나는 사람도 많아졌고, 복잡한 이동 대신 집에서... 열심히 명절을 보낸 뒤라면 배달음식으로 간단하게 한 끼를 해결하고, 여행을 다녀온 뒤라면 집에서 편하게...",
-            "link": "https://blog.naver.com/wellmade100/224410923855",
+            "title": "쁘항쥐 라 그랑주 데 페르 가는법 숙소 선택 기준 정리",
+            "description": "쁘항쥐 라 그랑주 데 페르 가는법 숙소 선택 기준 정리 여행 계획을 세우면서 숙소는 항상 중요한... 아네마스 에스트'도 훌륭한 대안이 될 것입니다. 여러분의 여행 스타일에 맞춰 최적의 숙소를 골라보세요!",
+            "link": "https://blog.naver.com/ulbx1p7fprf9m/224411364060",
             "postdate": "20260914"
           },
           {
-            "title": "제주도 카페 모찌마루 제주공항 근처 감성 디저트 카페",
-            "description": "제주도 카페 모찌마루 제주공항 근처 감성 디저트 카페 제주 여행... 제주 여행의 여운을 즐길 수 있었죠. 저희처럼 캐리어를 가지고... 여행지에서 바로 먹는 것과 집에 가져가 천천히 먹는 느낌이 또 다를 것...",
-            "link": "https://blog.naver.com/kci_kci/224410923925",
+            "title": "남자운동가방으로 추천하는 실용성 좋은 선택",
+            "description": "스포츠 여행용 신발 가방 1. 에노바 헬스가방 더플백 보스턴백 스포츠 여행용 신발 가방 이 가방은 넉넉한 수납 공간이 좋아서 여행이나 운동 갈 때 다 넣기 딱 좋아요. 신발 보관도 따로 되어 있어서...",
+            "link": "https://blog.naver.com/92b45ulgumeg/224411364341",
             "postdate": "20260914"
           },
           {
-            "title": "홍콩과 마카오 핵심 명소를 돌아보는 4일 시티투어 패키지",
-            "description": "홍콩과 마카오 핵심 관광지 탐방 이 여행은 홍콩과 마카오의 대표적인 관광지를 4일간 차분히 둘러보는... 한눈에 보는 여행 정보 항목 내용 여행사 노랑풍선 여행 기간 2박 4일 출발지 인천 방문 도시 마카오...",
-            "link": "https://blog.naver.com/goelyhhxomnu/224410922834",
+            "title": "광주 신상 카페 테사노테라스 동명동 데이트코스",
+            "description": "광주 신상 카페 동명동 데이트코스 테사노테라스 ⓒ 글/사진 라미랑마미랑 미미여행로그 라미랑마미랑입니다. 새로운 계절이 찾아올 때마다 아기자기한 골목길 사이로 예쁜 신상 카페들이 속속 들어서서...",
+            "link": "https://blog.naver.com/jooo_vely/224411363533",
             "postdate": "20260914"
           },
           {
-            "title": "통영 동원로얄CC 9월 1박2일 자차 패키지 국내골프여행 특가 안내",
-            "description": "가을 골프여행을 계획하고 계신다면 아름다운 바다와 산을 함께... 골프여행지로도 잘 어울립니다. 이번에 준비한 상품은 통영... 것보다 여행 분위기까지 함께 느끼기 좋은 곳입니다. ⛳ 9월 동원로얄CC...",
-            "link": "https://blog.naver.com/naby_bar/224410923518",
+            "title": "욕지도펜션 추천 무늬오징어 낚시포인트 근처 선상낚시체험 가능한....",
+            "description": "마지막 여행! 속세와 더 멀어지기 위한 마지막 발악(?)으로 욕지도... 욕지도여행인데 너무 즐거웠다~ 욕지도펜션으로 욕지노을펜션... 욕지도아기랑 #욕지도아이랑 #욕지도여행 #욕지도민박 #서이추 #서이추환영",
+            "link": "https://blog.naver.com/941119___/224411364098",
             "postdate": "20260914"
           },
           {
-            "title": "[2026 최신] 전주 가볼만한곳 부모님과 걷기 좋은 명소 5곳 및 주차 정....",
-            "description": "부모님을 모시고 전주 여행을 계획 중이신가요? 많이 걷기 힘들까 봐 걱정되거나, 주차가 불편해... 전주 여행, 부모님과 함께라면 어디가 좋을까? 부모님과 함께하는 여행은 일반적인 데이트나 친구들과의...",
-            "link": "https://blog.naver.com/nstartkkh/224410922977",
+            "title": "[여수 돌산 카페] '모이핀(MOIFIN)'섬 전체가 카페? 아시아 최대 규모 ....",
+            "description": "내내 여행자들의 사랑을 듬뿍 받는 대표적인 힐링 여행지인데요! 이번 포스팅은 &quot;이거 실화냐?&quot;라는... [정보 요약] 인플루언서 계정: @juni._.space 주요 여행지/권역: 전라남도 여수시 돌산읍 평사리 무술목 일대...",
+            "link": "https://blog.naver.com/dnd-cindy/224411364207",
             "postdate": "20260914"
           },
           {
-            "title": "오사카, 교토, 나라 3일 패키지 여행으로 전통과 현대를 한 번에",
-            "description": "오사카와 교토, 나라를 잇는 3일 여행 상품을 정리해봤어요. 다양한... 가진 여행자에게 적합합니다. 주요 관광지 방문과 유니버셜 스튜디오 선택 관람이 가능한 점도 특징입니다. 한눈에 보는 여행 정보 항목...",
-            "link": "https://blog.naver.com/bilqxfwnkde/224410923333",
+            "title": "[선글라스] 프라다 심볼 선글라스 슬레이트(a.k.a. 카리나 선글라스)",
+            "description": "여행가기 전에 뭘 살까 또 뒤적거리다가 .. 역시 면세는 선글라스가 짱 가성비지 ~~~ 하구 옛날에 봤뒀던 선글라스를 사기로햇음 ㅎ 바로바로 카리나 선글라스 그치만 나는 카리나로 요 선글라스에 빠진게...",
+            "link": "https://blog.naver.com/firefist_from_junggu/224411364368",
             "postdate": "20260914"
           },
           {
-            "title": "거제 갈만한곳 거제도 볼거리 거제 오션빌리지 장승포 수변공원 시....",
-            "description": "거제 갈만한곳 거제도 볼거리 거제 오션빌리지 장승포 수변공원 시간 가을에 거제 여행을 계획하고 있다면 장승포항 쪽으로 가보셔도 좋겠어요~ 바다를 바라보며 로컬 마켓과 먹거리, 체험을 함께 즐길 수 있는...",
-            "link": "https://blog.naver.com/spxl1010/224410922659",
+            "title": "더 넓은 풍경을 담는 최고의 광각렌즈 추천",
+            "description": "있어 여행이나 일상 촬영에 딱 좋아요. 착용감도 편해서 너무 편리하더라고요. 1.상덕... 45X 49UV, 3개, 블랙 ￦ 21,600원 별점 : ⭐⭐⭐⭐⭐ 구매하러 가기 ▶ 광각렌즈는 일상 생활뿐만 아니라 여행...",
+            "link": "https://blog.naver.com/tmj5754np/224411363752",
             "postdate": "20260914"
           },
           {
-            "title": "연희동 일본 감성이 느껴지는 경양식 레스토랑 로얄싸롱. 평일 런치....",
-            "description": "아기 태어나면 한동안 외출하기 힘들 것 같아서, 외관부터 일본 레트로 감성이 가득해 여행 기분을 낼 수 있는 연희동 '로얄싸롱'에 다녀왔었다. 가게 앞에 한대에서 두대 정도 주차가 가능했지만 되도록이면...",
-            "link": "https://blog.naver.com/boatwe/224410922892",
+            "title": "친구 4명과 다낭 여행 마지막 날!! 숙소 치하우스(조식 포함) , 센트....",
+            "description": "베트남 여행 마지막 포스팅 시작해 볼게요~ 으챠챠 이불 정리하는 척 호이안 야시장에서 힘겹게 가격... 가장 좋았던 숙소에서 마지막 한 컷트~ 여행 마지막 날 다낭 숙소로 이동~~ 여행은 많이 걷는 것이라...",
+            "link": "https://blog.naver.com/suhyun9453/224411363491",
             "postdate": "20260914"
           },
           {
-            "title": "군산 독채펜션 섬섬옥서 후기｜가족·단체여행에 좋았던 촌캉스 숙....",
-            "description": "군산 여행을 준비하면서 이번에는 호텔보다는 여러 명이 함께... 여럿이 차량을 나눠 타고 오는 단체여행이라면 주차가 가능한지 은근히... 특히 가족여행이나 친구들끼리 오는 단체여행처럼 각자 짐도 많고...",
-            "link": "https://blog.naver.com/rabiel/224410922829",
+            "title": "여행 중 잃어버린 물건, 당황하지 않고 찾는 작은 요령",
+            "description": "여행 중 예상치 못한 물건 분실은 누구에게나 당황스러운 경험이 될 수... 또한, 분실 예방을 위해 여행 전 소지품 목록을 작성하고, 중요한 물건은 눈에 잘 띄는 곳에 보관하는 습관을 들이는 것이 좋습니다. 여행...",
+            "link": "https://blog.naver.com/cyi2100/224411363770",
             "postdate": "20260914"
           },
           {
-            "title": "푸꾸옥 골프 빈펄 CC 가성비 좋은 가골프 여행을 원하시는 분들께 반....",
-            "description": "푸꾸옥 골프 여행 알아보기 푸꾸옥 골프 빈펄 CC는 가성비 높은 골프 여행을 원하는 분들에게 최적의... 이 글에서는 본 제품의 주요 특징과 이점, 적합한 여행 스타일에 대해 살펴보겠습니다. 푸꾸옥의 매력...",
-            "link": "https://blog.naver.com/sickee30/224410923544",
+            "title": "마르세유 호텔 생 쥐스트의 빌라 (300m², 침실 5개, 프라이빗 욕실 6개....",
+            "description": "요즘 여행 계획 세우실 때 숙소 선택이 참 중요하죠? 특히... 453,804원으로 경제적인 선택을 하고 싶은 여행객에게... 넓은 공간과 다양한 활동이 가능해 가족이나 단체 여행에...",
+            "link": "https://blog.naver.com/zyfrmb7tr9/224411364205",
             "postdate": "20260914"
           },
           {
-            "title": "일본여행 어디로 갈까?오사카·후쿠오카·오키나와 여행 꿀팁 총정....",
-            "description": "한국인이 직접 여행한다고 생각하고 딱 필요한 것만 정리했습니다 ✈️ 일본여행 계획하면서 이런... 오키나와가 좋을까?&quot; 세 곳 모두 일본이지만 여행 스타일은 완전히 다릅니다. 먹방 + 쇼핑 + 관광 → 오사카...",
-            "link": "https://blog.naver.com/freesilver83/224410922591",
+            "title": "신혼여행 리조트 추천｜신상 리조트가 무조건 좋을까? 신축 VS 오래....",
+            "description": "신혼여행 리조트, 새 리조트가 무조건 더 좋을까? 신상 리조트 VS 오래된 유명 리조트 제대로 비교하기 신혼여행 리조트를 알아보다 보면... 하지만 신혼여행 리조트는 단순히 ‘새로 지어졌는가’만으로...",
+            "link": "https://blog.naver.com/joyhoneymoon_/224411364277",
             "postdate": "20260914"
           },
           {
-            "title": "1시간이면 가능! 서울 근교 당일치기 단풍 드라이브 추천 10곳",
-            "description": "다녀오는 여행이라면 서울 근교에도 갈 만한 곳이 많습니다.... 하루 종일 여행하기보다는 반나절 정도 가볍게 다녀오는 코스로도... 단풍과 은행나무를 함께 보고 싶은 가을 여행지를 찾는다면 후보에...",
-            "link": "https://blog.naver.com/nextpage365/224410923220",
+            "title": "[함안 여행용품 세트 제작·인쇄] 출장·여행에 유용한 실용적인 판....",
+            "description": "함안에서 여행용품 세트 제작·인쇄를 알아보고 계신가요? 회사 행사나 직원... 보면 여행이나 출장에 활용할 수 있는 제품도 많이 비교하게 되는데요. 이번 제품은 담요, 목베개, 슬리퍼가 함께 구성된 여행 3종...",
+            "link": "https://blog.naver.com/yonghogift/224411363888",
             "postdate": "20260914"
           },
           {
-            "title": "육아휴직 절반 지나고 남겨보는 어린이집 등원룩 &amp; 유아식 기록",
-            "description": "지난 6월 휴직에 들어간 이후 돌아보면 휴직 시작과 동시에 아이의 첫 고열로 곤욕을 치렀고, 어찌저찌 가족 여행을 다녀왔으나 아이의 첫 입원을 겪는 등 정신없는 날들을 보냈구나 싶다. 또 8월 중순...",
-            "link": "https://blog.naver.com/421881/224410922716",
+            "title": "마르세유 호텔 2 Suites au Vieux-Port Marseille- Clim Netflix Wifi 고를 때 살펴....",
+            "description": "마르세유 여행을 계획하면서 숙소를 고르기란 쉽지 않아요. 마르세유 호텔 2... 가격도 326,098원으로 가성비가 뛰어나 많은 여행자들에게 사랑받고 있어요. 2위 — La...",
+            "link": "https://blog.naver.com/chj9udztfheiiogq/224411363953",
             "postdate": "20260914"
           },
           {
-            "title": "거제펜션 준비물, 주방 사진으로 줄이는 4가지",
-            "description": "여행을 준비할 때 짐이 가장 빨리 늘어나는 곳은 의외로 주방입니다. 혹시 없을까 싶어 냄비와 식기, 조리도구를 하나씩 챙기다 보면 여행... 이 두 가지가 보이면 여행 중 식사 계획을 훨씬 단순하게 짤 수...",
-            "link": "https://blog.naver.com/stay_revesoyu_geoje/224410922811",
+            "title": "408.미서부여행9",
+            "description": "모뉴먼트 밸리",
+            "link": "https://blog.naver.com/gonduda/224411363579",
             "postdate": "20260914"
           },
           {
-            "title": "미서부 10일 정통일주 패키지, 3대 도시와 6대 캐년 여행",
-            "description": "10일 여행 상품을 정리해봤어요. 3대 도시와 유명 캐년, 그리고 라스베이거스 시티투어가 포함된 일정입니다. &lt; &gt; 미서부 핵심 여행지 알찬... 일주 여행이에요. 일정 중에는 라스베이거스 시티투어와...",
-            "link": "https://blog.naver.com/iiboryvutz/224410922552",
+            "title": "&quot;팁도 옵션도 없이, 공항라운지까지 챙기는 품격 여행&quot; 모두투어 시....",
+            "description": "&quot;팁도 옵션도 없이, 공항라운지까지 챙기는 품격 여행&quot; 모두투어... &quot; 패키지여행, 현지에서 팁과 옵션 비용이 추가로 붙어서... 그대로 여행을 즐길 수 있었어요. 현지에서 예상치 못한 지출이 생기지...",
+            "link": "https://blog.naver.com/change-theworld/224411363774",
             "postdate": "20260914"
           },
           {
-            "title": "새벽 5시, 주말 부산 친정 나들이를 다녀와서",
-            "description": "내가 자란 곳, 친정이 있는 부산이라 그런지 부산으로 향하는 길은 다른 여행과는 조금 다른 기분이 든다. 차를 타고 가는 길에 바라본 하늘. 장거리 여행중 휴게소는 빠지면 안되는 코스. 해가 떠오르는 시간의...",
-            "link": "https://blog.naver.com/lee-cho0733/224410922733",
+            "title": "2026 서울 근교 가을 축제 당일치기 추천｜포천·가평 3곳",
+            "description": "주말마다 멀리 떠나는 여행은 은근히 체력 부담이 되더라고요.... 가족여행으로도 부담이 적어요. 특히 가을이 깊어지는 10월에는... 빡빡한 여행 코스보다 호숫가를 걸으며 천천히 쉬고 싶은 날에는 이런 서울...",
+            "link": "https://blog.naver.com/lurang_daily/224411363022",
             "postdate": "20260914"
           }
         ],
-        "lastBuildDate": "Mon, 14 Sep 2026 10:34:34 +0900",
+        "lastBuildDate": "Mon, 14 Sep 2026 16:21:57 +0900",
         "start": 1,
         "display": 100
       },
@@ -2342,43 +2172,43 @@
       },
       "result_sample": [
         {
-          "title": "온라인최저가 353만원대 1차 예약 공식 애플 아이폰 18 프로 장점 단....",
+          "title": "다이도 가든 호텔 교토 고를 때 살펴볼 예약 전 확인 사항",
           "postdate": "20260914"
         },
         {
-          "title": "비오는 오사카 교토 나라 여행하기",
+          "title": "해운대 가볼만한곳 전통시장 야시장 부산 시장, 안 가면 섭섭한 필....",
           "postdate": "20260914"
         },
         {
-          "title": "횡성한우축제 한우먹고 국순당 막걸리 만들기 체험까지",
+          "title": "올 가을 필수! 골프항공커버 추천템 모음",
           "postdate": "20260914"
         },
         {
-          "title": "나트랑과 달랏 5일 패키지 여행, 자연과 문화 모두 만끽하기",
+          "title": "영종도 근처 일본을 맛보자 ‘하나레 야끼니꾸’",
           "postdate": "20260914"
         },
         {
-          "title": "추자도의 모든것_SP편_올가을 추자도 여행, 최대 10만 원 지원받고 떠....",
+          "title": "[#12 후쿠오카 여행] 하카타역 짐 보관/일본 다이소/일본 돈키호테 쇼....",
           "postdate": "20260914"
         },
         {
-          "title": "[여수 중앙동] 여수여행 이순신광장 먹거리 디저트 맛집 여수당 쑥....",
+          "title": "그라나다 호텔 노이 가는법 공개 평점 정보 정리",
           "postdate": "20260914"
         },
         {
-          "title": "기장여행 조식맛집 골든리지 마티에 오시리아 존맛 후기",
+          "title": "[내돈내산] 몽골여행 도시락 이심 사용 후기",
           "postdate": "20260914"
         },
         {
-          "title": "[부모님 백두산 패키지여행 준비] 중국 유심 추천 및 하나은행 100위....",
+          "title": "밀양 리더스CC 골프여행 후기｜3월, 5월에 이어 오늘 또 다녀왔어요 ....",
           "postdate": "20260914"
         },
         {
-          "title": "[3주 유럽여행⑬] 이탈리아 피렌체｜토스카나 투어, 피렌체 근교로 ....",
+          "title": "여행과 일상 모두를 담은 스마트한 선택",
           "postdate": "20260914"
         },
         {
-          "title": "카론 비치 카론 플레이스 가는법, 숙소 정보 살펴보기",
+          "title": "[동남아] 필리핀 보홀 갈릭 레몬 Garlic 'n lemon bistro 보홀맛집",
           "postdate": "20260914"
         }
       ]

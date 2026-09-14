@@ -342,6 +342,42 @@ test('Given the head trend group measured only one or two days, when analyzed, t
   assert.equal(record.status, 'candidate');
 });
 
+test('Given the head series is nonzero only as a rounding artifact beside a dominant generic term, when analyzed, then no_search_interest blocks promotion', () => {
+  // DataLab ratios are relative to the strongest keyword in the batch: a head
+  // peaking at 0.01 while a related generic term peaks at 100 is a measured
+  // absence of demand for the head, not niche interest.
+  const negligible = {
+    startDate: '2026-08-15',
+    endDate: '2026-09-13',
+    timeUnit: 'date',
+    results: [
+      {
+        title: '엑셀 자동화',
+        keywords: ['엑셀 자동화', '엑셀'],
+        data: Array.from({ length: 12 }, (_, i) => ({
+          period: `2026-09-${String(i + 1).padStart(2, '0')}`,
+          ratio: 0.01,
+        })),
+      },
+      {
+        title: '엑셀',
+        keywords: ['엑셀 자동화', '엑셀'],
+        data: Array.from({ length: 30 }, (_, i) => ({
+          period: `2026-08-${String((i % 31) + 1).padStart(2, '0')}`,
+          ratio: 100,
+        })),
+      },
+    ],
+  };
+  const record = analyzeCandidate(
+    makeCandidate(),
+    [makeBlogEnvelope(), makeTrendEnvelope({ response: negligible })],
+    { now: fixedClock },
+  );
+  assert.deepEqual(record.risk_flags, ['no_search_interest']);
+  assert.equal(record.status, 'candidate');
+});
+
 test('Given a usable trend response that measures no head keyword group, when analyzed, then malformed_response blocks promotion', () => {
   // Demand must be measured through a group that actually covers the head
   // keyword. A response listing only unrelated groups answers a different

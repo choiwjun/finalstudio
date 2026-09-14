@@ -17,6 +17,14 @@ import {
   topicCandidatesFromStats,
 } from "./lib/auto-discovery.mjs";
 import {
+  extractTopicsWithModel,
+  triageTopicsWithModel,
+} from "./lib/model-extraction.mjs";
+import {
+  MODEL_REVIEW_DEADLINE_MS,
+  runModelJsonCodex,
+} from "./lib/model-review.mjs";
+import {
   assertContainedPath,
   assertSafeOutputDir,
 } from "./lib/output-boundary.mjs";
@@ -54,8 +62,14 @@ export function parseArgs(argv = []) {
     fixture: undefined,
     maxCandidates: DEFAULT_MAX_CANDIDATES,
     dryRun: false,
+    extractor: undefined,
   };
-  const takesValue = new Set(["--out-dir", "--fixture", "--max-candidates"]);
+  const takesValue = new Set([
+    "--out-dir",
+    "--fixture",
+    "--max-candidates",
+    "--extractor",
+  ]);
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index];
     if (flag === "--dry-run") {
@@ -71,7 +85,15 @@ export function parseArgs(argv = []) {
     if (flag === "--fixture") result.fixture = resolve(value);
     if (flag === "--max-candidates")
       result.maxCandidates = parsePositiveInteger(value, flag, 20);
+    if (flag === "--extractor") {
+      if (!["model", "ngram"].includes(value))
+        fail("--extractor must be model or ngram");
+      result.extractor = value;
+    }
   }
+  // Fixture runs must stay hermetic — no model calls. Real runs default to the
+  // model extractor; ngram remains available as an explicit fallback.
+  result.extractor = result.extractor ?? (result.fixture ? "ngram" : "model");
   return result;
 }
 
@@ -94,8 +116,9 @@ function providerFor(args) {
     : createNaverApiHubProvider({ env: providerEnv });
 }
 
-async function discoverFromNaver(args) {
+async function discoverFromNaver(args, { runModel = runModelJsonCodex } = {}) {
   const provider = providerFor(args);
+  const deadline = Date.now() + MODEL_REVIEW_DEADLINE_MS;
   const groups = [];
   const manifestGroups = [];
   for (const categoryQuery of AUTO_CATEGORY_QUERIES) {
@@ -112,29 +135,71 @@ async function discoverFromNaver(args) {
       );
     }
     const discoveryResponseSha256 = hashDiscoveryResponse(response);
-    // One phrase-stat scan feeds both topic ranking and per-topic related
-    // keywords: related terms are phrases that co-occur with the topic inside
-    // the same NAVER results, not sibling head topics.
-    const stats = collectPhraseStats(categoryQuery.query, response);
-    const topics = topicCandidatesFromStats(stats, {
-      ...categoryQuery,
-      limit: args.maxCandidates,
-    });
-    const headKeys = new Set(
-      topics.map((topic) => normalizeKeywordKey(topic.topic)),
-    );
-    const relatedTopics = topics.map((topic) => ({
-      ...topic,
-      related_keywords: relatedPhrasesForTopic(stats, topic.topic, {
-        excludeKeys: headKeys,
-        limit: 5,
-      }),
-      discovery_response_sha256: discoveryResponseSha256,
-    }));
-    if (topics.length === 0)
-      fail(
-        `NAVER returned no usable topic candidates for ${categoryQuery.category}`,
+    let relatedTopics;
+    let extraction;
+    if (args.extractor === "model") {
+      // The model proposes topics and may only narrow them in triage; code
+      // enforces verbatim-in-corpus on every term and keeps the final metric
+      // gates as the sole promotion path.
+      const extracted = await extractTopicsWithModel({
+        category: categoryQuery.category,
+        query: categoryQuery.query,
+        items: response.items,
+        maxTopics: args.maxCandidates,
+        runModel,
+        cwd: REPOSITORY_ROOT,
+        deadline,
+      });
+      const triaged = await triageTopicsWithModel({
+        category: categoryQuery.category,
+        topics: extracted.topics,
+        runModel,
+        cwd: REPOSITORY_ROOT,
+        deadline,
+      });
+      relatedTopics = triaged.kept.map((topic) => ({
+        topic: topic.topic,
+        search_intent: topic.intent || undefined,
+        content_angle: topic.angle,
+        related_keywords: topic.related_keywords,
+        extraction_rationale: topic.rationale,
+        discovery_response_sha256: discoveryResponseSha256,
+      }));
+      extraction = {
+        extractor: "model",
+        model: extracted.provenance.model,
+        extraction_input_sha256: extracted.provenance.input_sha256,
+        extraction_raw_sha256: extracted.provenance.raw_sha256,
+        over_cap_dropped: extracted.overCap,
+        triage_rejected: triaged.rejected,
+        triage_merged: triaged.merged,
+      };
+    } else {
+      // One phrase-stat scan feeds both topic ranking and per-topic related
+      // keywords: related terms are phrases that co-occur with the topic inside
+      // the same NAVER results, not sibling head topics.
+      const stats = collectPhraseStats(categoryQuery.query, response);
+      const topics = topicCandidatesFromStats(stats, {
+        ...categoryQuery,
+        limit: args.maxCandidates,
+      });
+      const headKeys = new Set(
+        topics.map((topic) => normalizeKeywordKey(topic.topic)),
       );
+      relatedTopics = topics.map((topic) => ({
+        ...topic,
+        related_keywords: relatedPhrasesForTopic(stats, topic.topic, {
+          excludeKeys: headKeys,
+          limit: 5,
+        }),
+        discovery_response_sha256: discoveryResponseSha256,
+      }));
+      extraction = { extractor: "ngram" };
+      if (topics.length === 0)
+        fail(
+          `NAVER returned no usable topic candidates for ${categoryQuery.category}`,
+        );
+    }
     groups.push({ category: categoryQuery.category, topics: relatedTopics });
     manifestGroups.push({
       category: categoryQuery.category,
@@ -144,6 +209,7 @@ async function discoverFromNaver(args) {
         : response.items.length,
       candidates: relatedTopics,
       discovery_response_sha256: discoveryResponseSha256,
+      extraction,
       response,
       source: {
         provider: "naver-api-hub",
@@ -175,7 +241,15 @@ export async function main(
   }
 
   const discovered = await discoverFromNaver(args);
-  const seedDocument = buildAutomaticSeedDocument(discovered.groups);
+  // A model extractor may legitimately find no valid topics in a category;
+  // empty groups are kept in the manifest for review but cannot seed evidence
+  // collection.
+  const seedGroups = discovered.groups.filter(
+    (group) => group.topics.length > 0,
+  );
+  if (seedGroups.length === 0)
+    fail("no usable topic candidates from any category");
+  const seedDocument = buildAutomaticSeedDocument(seedGroups);
   const seedPath = await assertContainedPath(
     resolve(args.outDir, "automatic-seeds.json"),
     args.outDir,
@@ -190,6 +264,7 @@ export async function main(
     schema_version: 1,
     generated_at: generatedAt,
     selection: "automatic-from-naver-blog-results",
+    extractor: args.extractor,
     ranking_note:
       "discovery_score is an internal extraction rank, not search volume, popularity, traffic, or revenue",
     categories: discovered.manifestGroups,
@@ -228,7 +303,7 @@ if (
 ) {
   main().catch((error) => {
     console.error(
-      `automatic topic discovery failed (${error?.code ?? "AUTO_DISCOVER_CLI"})`,
+      `automatic topic discovery failed (${error?.code ?? "AUTO_DISCOVER_CLI"}): ${error?.message ?? error}`,
     );
     process.exitCode = 1;
   });

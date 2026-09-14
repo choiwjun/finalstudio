@@ -28,6 +28,7 @@ import { execFileSync, spawn } from "node:child_process";
 import { join, resolve } from "node:path";
 import { parseFrontmatter } from "../lib/content-contract.mjs";
 import { buildWriterEnvironment } from "./writer-env.mjs";
+import { geminiCall } from "./backends.mjs";
 
 const ROOT = process.cwd();
 const IMAGES_DIR = join(ROOT, "public", "images");
@@ -221,10 +222,34 @@ if (ENGINE === "manual") {
   process.exit(0);
 }
 
+/* ── 모드 3b: Gemini OAuth — gemini-cli가 PNG를 직접 저장 ── */
+if (ENGINE === "gemini") {
+  console.log("[image] gemini-cli OAuth로 생성 중...");
+  try {
+    await geminiCall({
+      prompt: [
+        "The complete article and image request are supplied via stdin.",
+        `Create the requested editorial image and save exactly one real PNG file to ${JSON.stringify(targetPath)}.`,
+        "Do not modify any other file. Reply with the saved path only.",
+      ].join("\n"),
+      stdinText: imagePrompt,
+      cwd: ROOT,
+      yolo: true,
+    });
+  } catch (error) {
+    fail(error instanceof Error ? error.message : "gemini 이미지 생성 실패");
+  }
+  if (!existsSync(targetPath))
+    fail(`gemini가 이미지를 저장하지 않았습니다: ${targetPath}`);
+  console.log(`[image] 저장 완료: ${targetPath}`);
+  setImageFrontmatter();
+  process.exit(0);
+}
+
 /* ── 모드 3: Codex OAuth + $imagegen ─────────────────────── */
 if (ENGINE !== "codex")
   fail(
-    "이미지 엔진은 codex 또는 manual만 지원합니다. API 키 방식은 사용하지 않습니다.",
+    "이미지 엔진은 codex, gemini 또는 manual만 지원합니다. API 키 방식은 사용하지 않습니다.",
   );
 if (!CODEX_COMMAND)
   fail(

@@ -20,7 +20,7 @@ import { snapshotImageNotes } from "./lib/image-quality.mjs";
 import {
   checkDeadline,
   withinDeadline,
-  runImageCodex,
+  runImageDefault,
   runBriefCodex,
   runVisualJudgeCodex,
 } from "./lib/image-runtime.mjs";
@@ -248,7 +248,7 @@ export async function regenOneBundle(options) {
     root,
     entry,
     subCount = 2,
-    runImage = runImageCodex,
+    runImage = runImageDefault,
     runBrief = runBriefCodex,
     runVisualJudge = runVisualJudgeCodex,
     rasterize = defaultRasterize,

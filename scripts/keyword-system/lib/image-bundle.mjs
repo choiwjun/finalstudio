@@ -32,7 +32,7 @@ import {
   IMAGE_DEADLINE_MS,
   checkDeadline,
   withinDeadline,
-  runImageCodex,
+  runImageDefault,
   runJudgeCodex,
 } from "./image-runtime.mjs";
 import {
@@ -359,7 +359,7 @@ export async function generateImageBundle(options) {
           await verifyDirectoryPath(paths.outputRoot, directory);
           const output = await withinDeadline(
             (signal) =>
-              (options.runImage ?? runImageCodex)({
+              (options.runImage ?? runImageDefault)({
                 role: image.role,
                 prompt: buildImagePrompts({ plan: prepared.plan })[image.role],
                 path: join(paths.outputRoot, name),

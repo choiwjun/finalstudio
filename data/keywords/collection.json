@@ -1,335 +1,313 @@
 {
   "schema_version": 1,
-  "run_id": "20260914T013434Z-5718da8c",
-  "collected_at": "2026-09-14T01:34:34.295Z",
+  "run_id": "20260914T072307Z-b42e21dd",
+  "collected_at": "2026-09-14T07:23:07.953Z",
   "candidates": [
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "크루져 Cruiser"
+        "head_keyword": "국제유가 100달러 돌파"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-economy-business-크루져-Cruiser.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-economy-business-국제유가-100달러-돌파.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-economy-business-크루져-Cruiser.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-economy-business-국제유가-100달러-돌파.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "전하 블로그"
+        "head_keyword": "내 집 마련"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-economy-business-전하-블로그.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-economy-business-내-집-마련.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-economy-business-전하-블로그.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-economy-business-내-집-마련.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "블로그 쥔장 크루져"
+        "head_keyword": "관세 리스크"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-economy-business-블로그-쥔장-크루져.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-economy-business-관세-리스크.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-economy-business-블로그-쥔장-크루져.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-economy-business-관세-리스크.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "economy-business",
-        "head_keyword": "블로그 쥔장"
+        "head_keyword": "소상공인 1인 창업 정부지원금"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-economy-business-블로그-쥔장.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-economy-business-소상공인-1인-창업-정부지원금.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-economy-business-블로그-쥔장.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
-        }
-      ]
-    },
-    {
-      "candidate": {
-        "category": "economy-business",
-        "head_keyword": "쥔장 크루져 Cruiser"
-      },
-      "evidence": [
-        {
-          "source": "naver-api-hub-blog",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-economy-business-쥔장-크루져-Cruiser.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
-        },
-        {
-          "source": "naver-api-hub-trend",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-economy-business-쥔장-크루져-Cruiser.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-economy-business-소상공인-1인-창업-정부지원금.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "개발 속도"
+        "head_keyword": "무료 생성형 AI 도구"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-ai-개발-속도.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-ai-무료-생성형-AI-도구.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-ai-개발-속도.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-ai-무료-생성형-AI-도구.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "다리오 아모데"
+        "head_keyword": "AI 속도조절론"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-ai-다리오-아모데.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-ai-AI-속도조절론.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-ai-다리오-아모데.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-ai-AI-속도조절론.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "앤트로픽 오픈AI"
+        "head_keyword": "피지컬 AI"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-ai-앤트로픽-오픈AI.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-ai-피지컬-AI.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-ai-앤트로픽-오픈AI.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-ai-피지컬-AI.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "다리오 아모데 CEO"
+        "head_keyword": "AI 데이터센터"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-ai-다리오-아모데-CEO.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-ai-AI-데이터센터.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-ai-다리오-아모데-CEO.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-ai-AI-데이터센터.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "아모데 CEO"
+        "head_keyword": "인공지능 윤리"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-ai-아모데-CEO.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-ai-인공지능-윤리.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-ai-아모데-CEO.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-ai-인공지능-윤리.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "항목 내용 여행사"
+        "head_keyword": "교토 당일치기 코스 추천"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-travel-항목-내용-여행사.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-travel-교토-당일치기-코스-추천.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-travel-항목-내용-여행사.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-travel-교토-당일치기-코스-추천.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "항목 내용"
+        "head_keyword": "후지산 요시다 루트"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-travel-항목-내용.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-travel-후지산-요시다-루트.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-travel-항목-내용.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-travel-후지산-요시다-루트.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "내용 여행사"
+        "head_keyword": "상하이 여행 준비물 추천"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-travel-내용-여행사.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-travel-상하이-여행-준비물-추천.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-travel-내용-여행사.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-travel-상하이-여행-준비물-추천.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "5일 패키지"
+        "head_keyword": "코타키나발루 반딧불투어"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-travel-5일-패키지.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-travel-코타키나발루-반딧불투어.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-travel-5일-패키지.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-travel-코타키나발루-반딧불투어.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "3박 5일"
+        "head_keyword": "신혼여행 리조트"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-blog-travel-3박-5일.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-blog-travel-신혼여행-리조트.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T013434Z-5718da8c/naver-api-hub-trend-travel-3박-5일.json",
-          "run_id": "20260914T013434Z-5718da8c",
-          "collected_at": "2026-09-14T01:34:34.295Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T072307Z-b42e21dd/naver-api-hub-trend-travel-신혼여행-리조트.json",
+          "run_id": "20260914T072307Z-b42e21dd",
+          "collected_at": "2026-09-14T07:23:07.953Z"
         }
       ]
     }

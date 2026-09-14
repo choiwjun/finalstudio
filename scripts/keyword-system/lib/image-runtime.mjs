@@ -1,6 +1,11 @@
 import { spawn } from "node:child_process";
 import { dirname } from "node:path";
 import { buildWriterEnvironment } from "../../auto-publish/writer-env.mjs";
+import {
+  GEMINI_MODEL,
+  IMAGE_BACKEND,
+  assertGeminiCli,
+} from "../../auto-publish/backends.mjs";
 export const IMAGE_DEADLINE_MS = 900_000;
 export function checkDeadline(deadline) {
   if (!Number.isFinite(deadline) || Date.now() >= deadline)
@@ -42,6 +47,39 @@ export function runImageCodex({
     runProcess,
     sandbox: "workspace-write",
   });
+}
+// IMAGE_BACKEND=gemini routes image generation to the Google-OAuth
+// gemini-cli. The model must write a real PNG itself; the pipeline's PNG
+// decoder rejects anything else, so a text reply or placeholder fails closed.
+export function runImageGemini({
+  prompt,
+  path,
+  signal,
+  deadline,
+  runProcess = runDeadlineProcess,
+}) {
+  const executable = assertGeminiCli();
+  const args = [
+    ...(GEMINI_MODEL ? ["-m", GEMINI_MODEL] : []),
+    "-y",
+    "-p",
+    `The complete article and image-generation request are supplied via stdin. Read them as source material, then create the requested image and save exactly one real PNG file to ${JSON.stringify(path)}. Do not modify other files.`,
+  ];
+  return runProcess({
+    executable,
+    args,
+    cwd: dirname(path),
+    signal,
+    deadline,
+    stdinText: prompt,
+  }).then((result) => {
+    if (result.code !== 0)
+      throw Error(`gemini image generation failed (exit ${result.code})`);
+    return result.stdout;
+  });
+}
+export function runImageDefault(args) {
+  return IMAGE_BACKEND === "gemini" ? runImageGemini(args) : runImageCodex(args);
 }
 export function runJudgeCodex({
   system,

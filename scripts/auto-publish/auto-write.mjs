@@ -46,6 +46,7 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { separateGeneratedReport } from "../lib/generated-report.mjs";
 import { analyzePost, extractMarkers } from "../check-writing.mjs";
 import { buildWriterEnvironment } from "./writer-env.mjs";
+import { WRITER_BACKEND, geminiCall } from "./backends.mjs";
 
 const ROOT = process.cwd();
 const PROMPTS_DIR = join(ROOT, ".planning", "prompts");
@@ -412,6 +413,17 @@ const callCodex = async (system, user, { rawArtifact } = {}) => {
   return stripFences(out.trim());
 };
 
+// WRITER_BACKEND=gemini routes drafting to the Google-OAuth gemini-cli; the
+// codex path stays the default and unchanged.
+const callWriter = async (system, user, { rawArtifact } = {}) => {
+  if (WRITER_BACKEND === "gemini") {
+    const out = await geminiCall({ prompt: user, stdinText: system, cwd: ROOT });
+    if (rawArtifact) writeFileSync(join(runDir, rawArtifact), out, "utf8");
+    return stripFences(out.trim());
+  }
+  return callCodex(system, user, { rawArtifact });
+};
+
 const convert = (inputFile, topicTag, angle, fileSlug, draftDate) => {
   const cmdArgs = [
     join(ROOT, "scripts", "auto-publish", "convert-post.mjs"),
@@ -516,8 +528,12 @@ if (!(await codexLoggedIn())) {
     "codex가 로그인되어 있지 않습니다. `codex login` 실행 후 브라우저에서 ChatGPT 계정으로 로그인하세요.",
   );
 }
-const callModel = callCodex;
-console.log("[auto-write] 엔진: codex — ChatGPT OAuth 세션으로 실행");
+// Writing goes through the selected WRITER_BACKEND; judging stays on codex so
+// a gemini draft is still reviewed by an independent model.
+const callModel = callWriter;
+console.log(
+  `[auto-write] writer backend: ${WRITER_BACKEND}${WRITER_BACKEND === "gemini" ? " — Google OAuth gemini-cli (judge는 codex 유지)" : " — ChatGPT OAuth 세션으로 실행"}`,
+);
 
 /* ── 게이트 상수와 작성자 입력 ───────────────────────────── */
 const JUDGE_THRESHOLD = 90;

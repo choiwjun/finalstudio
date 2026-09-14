@@ -391,8 +391,15 @@ export function analyzeCandidate(candidate, evidence, options = {}) {
   // blip — an ephemeral news spike, not the sustained demand a blog post
   // needs. Three points is the minimum that still counts as interest.
   const MIN_HEAD_DATA_POINTS = 3;
+  // DataLab ratios are relative to the strongest keyword in the request batch,
+  // so a generic related term can leave the head's own series at ~0.01 — a
+  // value nonzero only as a rounding artifact. Below 0.1% of the cluster peak
+  // the head's series is indistinguishable from zero and cannot evidence
+  // demand for the head keyword.
+  const MIN_HEAD_MAX_RATIO = 0.1;
   const isZeroGroup = (group) =>
-    group.data_count < MIN_HEAD_DATA_POINTS || group.max_ratio === 0;
+    group.data_count < MIN_HEAD_DATA_POINTS ||
+    group.max_ratio < MIN_HEAD_MAX_RATIO;
   const trendUsable = usable.filter((item) => item.source === 'naver-api-hub-trend');
   if (trendUsable.length > 0) {
     const trend = deriveTrendSignals(newestUsable(trendUsable).response);
