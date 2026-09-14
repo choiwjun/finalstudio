@@ -1,57 +1,13 @@
 [
   {
     "category": "ai",
-    "head_keyword": "2026년 9월",
-    "related_keywords": [
-      "다리오 아모데",
-      "앤트로픽 CEO",
-      "네이버 블로그",
-      "14일 경제뉴스",
-      "14일 경제뉴스 애프터마켓"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 2026년 9월",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "ready-to-write"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "9월 14일",
-    "related_keywords": [
-      "다리오 아모데",
-      "앤트로픽 CEO",
-      "핵심 기업",
-      "14일 경제뉴스",
-      "14일 경제뉴스 애프터마켓"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 9월 14일",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
-    "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "ready-to-write"
-  },
-  {
-    "category": "ai",
     "head_keyword": "개발 속도",
     "related_keywords": [
-      "속도 조절해야",
       "다리오 아모데",
       "앤트로픽 오픈AI xAI",
       "오픈AI xAI",
-      "https //www.nbnnews.co.kr/news/articleView.html"
+      "앤트로픽 CEO",
+      "올트먼 오픈AI"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 개발 속도",
@@ -59,7 +15,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [],
     "evidence_available": true,

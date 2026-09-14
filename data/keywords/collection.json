@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "run_id": "20260914T011556Z-0c97db22",
-  "collected_at": "2026-09-14T01:15:56.882Z",
+  "run_id": "20260914T012031Z-9407bda6",
+  "collected_at": "2026-09-14T01:20:31.869Z",
   "candidates": [
     {
       "candidate": {
@@ -12,16 +12,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-크루져-Cruiser.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-economy-business-크루져-Cruiser.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-크루져-Cruiser.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-economy-business-크루져-Cruiser.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -34,16 +34,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-전하-블로그.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-economy-business-전하-블로그.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-전하-블로그.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-economy-business-전하-블로그.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -56,16 +56,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-블로그-쥔장-크루져.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-economy-business-블로그-쥔장-크루져.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-블로그-쥔장-크루져.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-economy-business-블로그-쥔장-크루져.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -78,16 +78,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-블로그-쥔장.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-economy-business-블로그-쥔장.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-블로그-쥔장.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-economy-business-블로그-쥔장.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -100,16 +100,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-economy-business-쥔장-크루져-Cruiser.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-economy-business-쥔장-크루져-Cruiser.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-economy-business-쥔장-크루져-Cruiser.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-economy-business-쥔장-크루져-Cruiser.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -122,16 +122,16 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-개발-속도.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-ai-개발-속도.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-개발-속도.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-ai-개발-속도.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -144,60 +144,38 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-앤트로픽-오픈AI.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-ai-앤트로픽-오픈AI.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-앤트로픽-오픈AI.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-ai-앤트로픽-오픈AI.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "ai",
-        "head_keyword": "2026년 9월"
+        "head_keyword": "있습니다 특히"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-2026년-9월.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-ai-있습니다-특히.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-2026년-9월.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
-        }
-      ]
-    },
-    {
-      "candidate": {
-        "category": "ai",
-        "head_keyword": "9월 14일"
-      },
-      "evidence": [
-        {
-          "source": "naver-api-hub-blog",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-9월-14일.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
-        },
-        {
-          "source": "naver-api-hub-trend",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-9월-14일.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-ai-있습니다-특히.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -210,60 +188,38 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-ai-하루-다르게.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-ai-하루-다르게.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-ai-하루-다르게.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-ai-하루-다르게.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
     {
       "candidate": {
-        "category": "travel",
-        "head_keyword": "한눈 보는"
+        "category": "ai",
+        "head_keyword": "2026 최신"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-한눈-보는.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-ai-2026-최신.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-한눈-보는.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
-        }
-      ]
-    },
-    {
-      "candidate": {
-        "category": "travel",
-        "head_keyword": "항목 내용 여행사"
-      },
-      "evidence": [
-        {
-          "source": "naver-api-hub-blog",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-항목-내용-여행사.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
-        },
-        {
-          "source": "naver-api-hub-trend",
-          "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-항목-내용-여행사.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-ai-2026-최신.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
@@ -276,60 +232,104 @@
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-항목-내용.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-travel-항목-내용.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-항목-내용.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-travel-항목-내용.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "내용 여행사"
+        "head_keyword": "한눈 보는"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-내용-여행사.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-travel-한눈-보는.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-내용-여행사.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-travel-한눈-보는.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     },
     {
       "candidate": {
         "category": "travel",
-        "head_keyword": "상품 정리해봤어요"
+        "head_keyword": "계획하고 있다면"
       },
       "evidence": [
         {
           "source": "naver-api-hub-blog",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-blog-travel-상품-정리해봤어요.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-travel-계획하고-있다면.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         },
         {
           "source": "naver-api-hub-trend",
           "outcome": "success",
-          "path": "data/keywords/raw/2026/09/14/20260914T011556Z-0c97db22/naver-api-hub-trend-travel-상품-정리해봤어요.json",
-          "run_id": "20260914T011556Z-0c97db22",
-          "collected_at": "2026-09-14T01:15:56.882Z"
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-travel-계획하고-있다면.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
+        }
+      ]
+    },
+    {
+      "candidate": {
+        "category": "travel",
+        "head_keyword": "계획하면서 숙소"
+      },
+      "evidence": [
+        {
+          "source": "naver-api-hub-blog",
+          "outcome": "success",
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-travel-계획하면서-숙소.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
+        },
+        {
+          "source": "naver-api-hub-trend",
+          "outcome": "success",
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-travel-계획하면서-숙소.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
+        }
+      ]
+    },
+    {
+      "candidate": {
+        "category": "travel",
+        "head_keyword": "가장 먼저"
+      },
+      "evidence": [
+        {
+          "source": "naver-api-hub-blog",
+          "outcome": "success",
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-blog-travel-가장-먼저.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
+        },
+        {
+          "source": "naver-api-hub-trend",
+          "outcome": "success",
+          "path": "data/keywords/raw/2026/09/14/20260914T012031Z-9407bda6/naver-api-hub-trend-travel-가장-먼저.json",
+          "run_id": "20260914T012031Z-9407bda6",
+          "collected_at": "2026-09-14T01:20:31.869Z"
         }
       ]
     }

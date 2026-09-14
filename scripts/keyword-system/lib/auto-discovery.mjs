@@ -119,11 +119,27 @@ function splitTrailingParticle(token) {
 const DATE_TOKEN_PATTERN = /^(?:\d{4}년|\d{1,2}월|\d{1,2}일|\d{1,4}분기|\d{1,2}주차|\d+년도|\d+)$/;
 const URL_TOKEN_PATTERN = /^(?:https?|www)$|\/|[a-z0-9-]+\.(?:com|net|org|io|kr|co)/i;
 const FRAGMENT_ENDING_PATTERN =
-  /(?:해야|해서|하고|하면|하는|해왔|걸까|건가요|어요|아요|여요|에요|였어요|세요|네요|군요|이에요|예요|봤어요|봅니다|드립니다|려주|없이|려고|인데|지만|더라|거든|잖아|랍니다|까요|시죠)$/u;
+  /(?:해야|해서|하고|하면|하는|해왔|걸까|건가요|어요|아요|여요|에요|였어요|세요|네요|군요|이에요|예요|봤어요|봅니다|드립니다|려주|없이|려고|인데|지만|다면|있다면|면서|보는|있다|없다|먼저|더라|거든|잖아|랍니다|까요|시죠)$/u;
+
+// Auxiliary-verb tokens too short to lose their ending ("있습니다" → stem
+// "있" is below the minimum) survive the splitter whole; any window
+// containing one is still a sentence fragment.
+const AUX_VERB_TOKENS = new Set([
+  "있습니다",
+  "없습니다",
+  "합니다",
+  "됩니다",
+  "입니다",
+  "였습니다",
+  "했습니다",
+  "있어요",
+  "없어요",
+]);
 
 function isViablePhrase(window) {
   if (window.every((token) => DATE_TOKEN_PATTERN.test(token))) return false;
   if (window.some((token) => URL_TOKEN_PATTERN.test(token))) return false;
+  if (window.some((token) => AUX_VERB_TOKENS.has(token))) return false;
   if (FRAGMENT_ENDING_PATTERN.test(window[window.length - 1])) return false;
   return true;
 }

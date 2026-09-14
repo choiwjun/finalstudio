@@ -1,47 +1,27 @@
 [
   {
     "category": "ai",
-    "head_keyword": "2026년 9월",
+    "head_keyword": "2026 최신",
     "related_keywords": [
-      "다리오 아모데",
-      "앤트로픽 CEO",
-      "네이버 블로그",
-      "14일 경제뉴스",
-      "14일 경제뉴스 애프터마켓"
+      "빠르게 재편되고",
+      "빠르게 재편되고 있습니다",
+      "재편되고 있습니다",
+      "환경 빠르게",
+      "환경 빠르게 재편되고"
     ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 2026년 9월",
+    "search_intent": "최신 이슈",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 2026 최신",
     "source": [
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
-    "risk_flags": [],
-    "evidence_available": true,
-    "status": "ready-to-write"
-  },
-  {
-    "category": "ai",
-    "head_keyword": "9월 14일",
-    "related_keywords": [
-      "다리오 아모데",
-      "앤트로픽 CEO",
-      "핵심 기업",
-      "14일 경제뉴스",
-      "14일 경제뉴스 애프터마켓"
+    "risk_flags": [
+      "no_search_interest"
     ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 9월 14일",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
-    "freshness": "fresh",
-    "risk_flags": [],
     "evidence_available": true,
-    "status": "ready-to-write"
+    "status": "candidate"
   },
   {
     "category": "ai",
@@ -69,11 +49,11 @@
     "category": "ai",
     "head_keyword": "개발 속도",
     "related_keywords": [
-      "속도 조절해야",
       "다리오 아모데",
       "앤트로픽 오픈AI xAI",
       "오픈AI xAI",
-      "https //www.nbnnews.co.kr/news/articleView.html"
+      "앤트로픽 CEO",
+      "올트먼 오픈AI"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 개발 속도",
@@ -81,7 +61,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [],
     "evidence_available": true,
@@ -179,11 +159,11 @@
     "category": "ai",
     "head_keyword": "앤트로픽 오픈AI",
     "related_keywords": [
-      "개발 속도 조절해야",
-      "속도 조절해야",
       "오픈AI xAI",
-      "https //www.nbnnews.co.kr/news/articleView.html",
-      "다리오 아모데"
+      "다리오 아모데",
+      "올트먼 오픈AI",
+      "빅테크 수장들",
+      "기술 잠재적"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 앤트로픽 오픈AI",
@@ -191,7 +171,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -205,9 +185,9 @@
     "related_keywords": [
       "앤트로픽 CEO",
       "빅테크 수장들",
-      "괜찮 걸까",
       "발전해 괜찮",
-      "발전해 괜찮 걸까"
+      "빨리 발전해",
+      "빨리 발전해 괜찮"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 하루 다르게",
@@ -215,7 +195,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -283,7 +263,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -307,7 +287,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -353,7 +333,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -421,7 +401,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -445,7 +425,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
@@ -499,6 +479,30 @@
   },
   {
     "category": "travel",
+    "head_keyword": "계획하면서 숙소",
+    "related_keywords": [
+      "확인 사항",
+      "스타일 맞춰",
+      "같아요 대부",
+      "고르는게 은근히",
+      "고르는게 은근히 여행지에서"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 계획하면서 숙소",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T01:20:31.869Z",
+    "freshness": "fresh",
+    "risk_flags": [
+      "no_search_interest"
+    ],
+    "evidence_available": true,
+    "status": "candidate"
+  },
+  {
+    "category": "travel",
     "head_keyword": "내용 여행사",
     "related_keywords": [
       "도시 호놀룰루",
@@ -509,30 +513,6 @@
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 내용 여행사",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
-    "freshness": "fresh",
-    "risk_flags": [
-      "no_search_interest"
-    ],
-    "evidence_available": true,
-    "status": "candidate"
-  },
-  {
-    "category": "travel",
-    "head_keyword": "상품 정리해봤어요",
-    "related_keywords": [
-      "부담 없이",
-      "8일 패키지",
-      "서유럽 3국",
-      "아우르 10일",
-      "주요 도시"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 상품 정리해봤어요",
     "source": [
       "naver-api-hub-blog",
       "naver-api-hub-trend"
@@ -635,28 +615,6 @@
   },
   {
     "category": "travel",
-    "head_keyword": "오딧세이뜻 알려주",
-    "related_keywords": [
-      "가족 숙소",
-      "알려주 다양한 작품들",
-      "오딧세이뜻 알려주 다양한",
-      "알려주 다양한",
-      "NAVER 블로그"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 오딧세이뜻 알려주",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-11T12:32:05.171Z",
-    "freshness": "unknown",
-    "risk_flags": [],
-    "evidence_available": false,
-    "status": "researching"
-  },
-  {
-    "category": "travel",
     "head_keyword": "오딧세이뜻 알려주 다양한",
     "related_keywords": [
       "가족 숙소",
@@ -701,37 +659,13 @@
   },
   {
     "category": "travel",
-    "head_keyword": "한눈 보는",
-    "related_keywords": [
-      "상품 하와",
-      "하와 7일",
-      "내용 여행사 모두투어",
-      "도시 호놀룰루",
-      "도시 호놀룰루 성인"
-    ],
-    "search_intent": "개념",
-    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 한눈 보는",
-    "source": [
-      "naver-api-hub-blog",
-      "naver-api-hub-trend"
-    ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
-    "freshness": "fresh",
-    "risk_flags": [
-      "no_search_interest"
-    ],
-    "evidence_available": true,
-    "status": "candidate"
-  },
-  {
-    "category": "travel",
     "head_keyword": "항목 내용",
     "related_keywords": [
-      "내용 여행사 모두투어",
-      "도시 호놀룰루",
-      "도시 호놀룰루 성인",
-      "방문 도시",
-      "방문 도시 호놀룰루"
+      "내용 여행사",
+      "2박 3일",
+      "자연 도시",
+      "터키 일주",
+      "3일 온천"
     ],
     "search_intent": "개념",
     "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 항목 내용",
@@ -739,7 +673,7 @@
       "naver-api-hub-blog",
       "naver-api-hub-trend"
     ],
-    "collected_at": "2026-09-14T01:15:56.882Z",
+    "collected_at": "2026-09-14T01:20:31.869Z",
     "freshness": "fresh",
     "risk_flags": [
       "no_search_interest"
