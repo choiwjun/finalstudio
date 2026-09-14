@@ -18,10 +18,7 @@ assert.equal(
   "5330af8de2aa5c4ff010c7dda0b61781b0a27a2ac33a5b006100c3f04eaf30e6",
 );
 const notes = await readFile(
-  new URL(
-    "../../out/keyword-briefs/economy-business-100달러-돌파.md",
-    import.meta.url,
-  ),
+  new URL("./test-fixtures/oil-100-breakout-notes.md", import.meta.url),
   "utf8",
 );
 const tail = oil.slice(oil.indexOf("\n---\n\n윤문 리포트") + 1);

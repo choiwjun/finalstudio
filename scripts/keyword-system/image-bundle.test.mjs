@@ -434,10 +434,7 @@ test("oil report archive is reversible, judged final bytes exclude metadata, fai
     "utf8",
   );
   const notes = await readFile(
-    new URL(
-      "../../out/keyword-briefs/economy-business-100달러-돌파.md",
-      import.meta.url,
-    ),
+    new URL("./test-fixtures/oil-100-breakout-notes.md", import.meta.url),
     "utf8",
   );
   await writeFile(options.postPath, oil);
