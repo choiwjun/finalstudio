@@ -32,7 +32,10 @@ export function runImageCodex({
   runProcess = runDeadlineProcess,
 }) {
   return runCodex({
-    prompt: `$imagegen\n${prompt}\nSave exactly one PNG to ${JSON.stringify(path)}. Do not modify other files. Native image tool only; stop on first failure.`,
+    // Keep the argv prompt short. The complete article is supplied through
+    // stdin so long posts cannot hit the POSIX argument-size limit.
+    prompt: `$imagegen\nThe complete article and image-generation request are supplied via stdin. Read them as source material, then create the requested image. Save exactly one PNG to ${JSON.stringify(path)}. Do not modify other files. Native image tool only; stop on first failure.`,
+    stdinText: prompt,
     cwd: dirname(path),
     signal,
     deadline,

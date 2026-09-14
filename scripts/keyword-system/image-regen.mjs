@@ -15,7 +15,7 @@ import {
   readBoundedAt,
   MAX_IMAGE_BYTES,
 } from "./lib/image-storage.mjs";
-import { hashText, imageRoles, buildVisualImagePrompts } from "./lib/image-plan.mjs";
+import { hashText, imageRoles, buildImagePrompts } from "./lib/image-plan.mjs";
 import { snapshotImageNotes } from "./lib/image-quality.mjs";
 import {
   checkDeadline,
@@ -508,7 +508,10 @@ export async function regenOneBundle(options) {
             bundleResult = { bundle: verdict.bundle, observed: verdict.observed };
           }
         } else {
-        const basePrompts = buildVisualImagePrompts({ brief, roles });
+        // Generation receives the complete immutable article verbatim. The
+        // visual brief remains judge metadata; it must not replace the source
+        // article when the image prompt is sent to the image model.
+        const basePrompts = buildImagePrompts({ plan: journal.plan });
         for (let bundleAttempt = 0; bundleAttempt <= 1; bundleAttempt++) {
           const suffix = bundleAttempt === 0 ? "" : `-b${bundleAttempt}`;
           const prompts = { ...basePrompts };

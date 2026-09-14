@@ -13,7 +13,7 @@ import {
   parseVisualJudgeScores,
   parseVisualBundleScore,
 } from "./lib/visual-judge.mjs";
-import { buildVisualImagePrompts } from "./lib/image-plan.mjs";
+import { buildImagePrompts, planArticleImages } from "./lib/image-plan.mjs";
 import { regenOneBundle, parseImageRegenArgs } from "./image-regen.mjs";
 import { generateImageBundle } from "./lib/image-bundle.mjs";
 import { hashText } from "./lib/image-plan.mjs";
@@ -138,19 +138,18 @@ test("visual judge parsers enforce observed elements and thresholds", () => {
     assert.throws(() => parseVisualBundleScore(bad));
 });
 
-test("visual prompts carry article-specific elements and bans", () => {
-  const brief = parseVisualBrief(briefJson);
-  const prompts = buildVisualImagePrompts({
-    brief,
-    roles: ["main", "sub-1", "sub-2"],
-  });
+test("image prompts carry the complete article and direct core-content request", () => {
+  parseVisualBrief(briefJson);
+  const plan = planArticleImages(post, { slug: "article" });
+  const prompts = buildImagePrompts({ plan });
   for (const role of ["main", "sub-1", "sub-2"]) {
     const prompt = prompts[role];
-    assert.ok(prompt.includes(brief.imageRoles[role]));
-    assert.ok(prompt.includes("검색 결과 목록"));
-    assert.ok(prompt.includes("장식용 돋보기"));
-    assert.ok(prompt.includes("no letters, words, numbers"));
-    assert.ok(prompt.includes("80%"));
+    assert.ok(prompt.includes(post));
+    assert.ok(prompt.includes("블로그 포스팅 예정"));
+    assert.ok(prompt.includes("핵심내용과 연결관계"));
+    assert.ok(prompt.includes("<ARTICLE>"));
+    assert.ok(prompt.includes("</ARTICLE>"));
+    assert.ok(!prompt.includes("Visual metaphor"));
   }
   assert.notEqual(prompts.main, prompts["sub-1"]);
 });

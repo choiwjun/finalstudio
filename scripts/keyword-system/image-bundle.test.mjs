@@ -53,7 +53,11 @@ test("finished body grounds distinct main and 2/3 section scenes with immutable 
     assert.equal(new Set(plan.scenes.map((s) => s.excerpt)).size, subCount + 1);
     for (const scene of plan.scenes) {
       assert.ok(post.includes(scene.excerpt));
+      assert.ok(prompts[scene.role].includes(post));
       assert.ok(prompts[scene.role].includes(scene.excerpt));
+      assert.ok(prompts[scene.role].includes("블로그 포스팅 예정"));
+      assert.ok(prompts[scene.role].includes("핵심내용과 연결관계"));
+      assert.ok(!prompts[scene.role].includes("Visual metaphor"));
     }
     assert.ok(Object.isFrozen(plan.scenes[0]));
   }

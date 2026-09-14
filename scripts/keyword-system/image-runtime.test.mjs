@@ -134,6 +134,8 @@ test("native and judge adapters use isolated sandbox, same deadline and no fallb
   assert.ok(calls[0].args.includes("workspace-write"));
   assert.ok(calls[1].args.includes("read-only"));
   assert.ok(calls[0].args.at(-1).includes("Native image tool only"));
+  assert.equal(calls[0].stdinText, "source data");
+  assert.ok(!calls[0].args.at(-1).includes("source data"));
   await assert.rejects(
     runJudgeCodex({ deadline, runProcess: async () => ({ code: 1 }) }),
     /no retry/,
