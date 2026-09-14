@@ -11,7 +11,7 @@ const posts = import.meta.env.DEV
 
 <BaseLayout
   title="초안 미리보기 | WJ Blog"
-  description="개발 환경에서만 확인하는 WJ Blog 초안 미리보기"
+  description="관리자 전용 WJ Blog 초안 미리보기"
   noindex
   shell="admin"
 >
@@ -41,10 +41,108 @@ const posts = import.meta.env.DEV
       {posts.map((post) => <DraftPreview post={post} />)}
     </div>
   ) : (
-    <article class="article article--narrow admin-guard">
-      <p class="eyebrow">관리자 영역</p>
-      <h1>초안 미리보기는 로컬 개발 환경에서만 사용할 수 있습니다.</h1>
-      <p><a href="/">사이트로 돌아가기</a></p>
-    </article>
+    <main class="preview-admin" id="preview-admin">
+      <section id="preview-login-view" class="admin-login-screen" aria-labelledby="preview-login-title">
+        <div class="admin-login-mark" aria-hidden="true">WJ</div>
+        <p class="admin-kicker">WJ BLOG / PRIVATE DESK</p>
+        <h1 id="preview-login-title">초안 미리보기</h1>
+        <p class="admin-lede">발행 전 글을 확인하는 비공개 화면입니다. 관리자 비밀번호로 로그인하세요.</p>
+        <form id="preview-login-form" class="admin-login-card">
+          <label for="preview-password">관리자 비밀번호</label>
+          <input id="preview-password" name="password" type="password" minlength="10" autocomplete="current-password" required />
+          <button class="admin-primary-button" type="submit">미리보기 열기 <span aria-hidden="true">→</span></button>
+          <p id="preview-login-error" class="admin-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div id="preview-view" hidden>
+        <header class="admin-topbar">
+          <a class="admin-brand" href="/admin/" aria-label="관리 대시보드로 이동"><span class="admin-brand-mark" aria-hidden="true">WJ</span><span>초안 미리보기 <small>private desk</small></span></a>
+          <div class="admin-topbar-actions"><a class="admin-quiet-button" href="/admin/">대시보드</a><button id="preview-refresh" class="admin-quiet-button" type="button">새로고침</button><button id="preview-logout" class="admin-quiet-button" type="button">로그아웃</button></div>
+        </header>
+        <p id="preview-status" class="admin-status-message" role="status"></p>
+        <p id="preview-error" class="admin-error" role="alert" hidden></p>
+        <nav id="preview-toc" class="preview-toc" aria-label="초안 목록" hidden></nav>
+        <div id="preview-posts"></div>
+      </div>
+    </main>
   )}
+
+  {!import.meta.env.DEV && (
+    <script type="module">
+      import '../../scripts/preview-admin.ts';
+    </script>
+  )}
+
+  <style is:global>
+    #preview-admin {
+      --admin-ink: #142a2c;
+      --admin-muted: #687b7b;
+      --admin-line: #d6e0dc;
+      --admin-soft: #f4f8f5;
+      --admin-accent: #d9f36a;
+      --admin-accent-ink: #1b2a1d;
+      --admin-danger: #b94b4b;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 4vw, 3rem) 6rem;
+      color: var(--admin-ink);
+    }
+    #preview-admin *, #preview-admin *::before, #preview-admin *::after { box-sizing: border-box; }
+    #preview-admin button, #preview-admin input { font: inherit; }
+    #preview-admin button, #preview-admin a { cursor: pointer; }
+    #preview-admin button:focus-visible, #preview-admin a:focus-visible, #preview-admin input:focus-visible { outline: 3px solid #9bbd2f; outline-offset: 3px; }
+    #preview-admin h1, #preview-admin h2, #preview-admin h3, #preview-admin p { margin-top: 0; }
+    #preview-admin .admin-kicker { margin-bottom: .65rem; color: var(--admin-muted); font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    #preview-admin .admin-lede { max-width: 38rem; color: var(--admin-muted); font-size: 1rem; line-height: 1.7; }
+    #preview-admin .admin-login-screen { min-height: 70vh; display: grid; align-content: center; justify-items: start; max-width: 34rem; margin: 0 auto; }
+    #preview-admin .admin-login-mark, #preview-admin .admin-brand-mark { display: grid; place-items: center; background: var(--admin-ink); color: var(--admin-accent); font-weight: 900; letter-spacing: -.1em; }
+    #preview-admin .admin-login-mark { width: 4rem; height: 4rem; margin-bottom: 1.5rem; border-radius: 1.1rem; font-size: 1.2rem; }
+    #preview-admin .admin-login-screen h1 { margin-bottom: 1rem; font-size: clamp(2.2rem, 6vw, 4rem); }
+    #preview-admin .admin-login-card { width: 100%; margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--admin-line); border-radius: 1.25rem; background: #fff; box-shadow: 0 1rem 3rem rgba(20,42,44,.08); }
+    #preview-admin label { display: grid; gap: .5rem; color: var(--admin-ink); font-size: .85rem; font-weight: 750; }
+    #preview-admin .admin-login-card input { width: 100%; min-height: 2.9rem; border: 1px solid var(--admin-line); border-radius: .7rem; background: #fff; color: var(--admin-ink); padding: .7rem .8rem; margin: .6rem 0 1rem; }
+    #preview-admin .admin-primary-button, #preview-admin .admin-quiet-button { display: inline-flex; align-items: center; min-height: 2.75rem; border-radius: .7rem; padding: .65rem 1rem; font-weight: 800; text-decoration: none; transition: transform .15s ease, background .15s ease, border-color .15s ease; }
+    #preview-admin .admin-primary-button { border: 1px solid var(--admin-accent-ink); background: var(--admin-accent); color: var(--admin-accent-ink); }
+    #preview-admin .admin-primary-button:hover { transform: translateY(-1px); background: #cbe75a; }
+    #preview-admin .admin-quiet-button { border: 1px solid var(--admin-line); background: #fff; color: var(--admin-ink); }
+    #preview-admin .admin-quiet-button:hover { border-color: var(--admin-ink); background: var(--admin-soft); }
+    #preview-admin .admin-topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--admin-line); }
+    #preview-admin .admin-brand { display: inline-flex; align-items: center; gap: .7rem; color: var(--admin-ink); font-weight: 850; text-decoration: none; }
+    #preview-admin .admin-brand small { display: block; margin-top: .15rem; color: var(--admin-muted); font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    #preview-admin .admin-brand-mark { width: 2rem; height: 2rem; border-radius: .55rem; font-size: .65rem; }
+    #preview-admin .admin-topbar-actions { display: flex; align-items: center; gap: .55rem; }
+    #preview-admin .admin-status-message { min-height: 1.5rem; margin: 1rem 0 0; color: #397448; font-size: .82rem; font-weight: 750; }
+    #preview-admin .admin-error { margin: .75rem 0 0; color: var(--admin-danger); font-size: .82rem; font-weight: 750; }
+    #preview-admin .preview-toc { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 2rem; }
+    #preview-admin .preview-toc a { display: inline-block; padding: .45rem .8rem; border: 1px solid var(--admin-line); border-radius: 999px; background: #fff; color: var(--admin-ink); font-size: .82rem; font-weight: 750; text-decoration: none; }
+    #preview-admin .preview-toc a:hover { border-color: var(--admin-ink); background: var(--admin-soft); }
+    #preview-admin .preview-post { margin-bottom: 2.5rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--admin-line); border-radius: 1rem; background: #fff; }
+    #preview-admin .preview-post-header { padding-bottom: 1rem; border-bottom: 1px solid var(--admin-line); margin-bottom: 1.25rem; }
+    #preview-admin .preview-post-header h2 { margin-bottom: .4rem; font-size: 1.6rem; letter-spacing: -.03em; }
+    #preview-admin .preview-post-meta { display: flex; flex-wrap: wrap; gap: .4rem .9rem; color: var(--admin-muted); font-size: .78rem; }
+    #preview-admin .admin-status-pill { display: inline-flex; border-radius: 999px; padding: .2rem .55rem; font-size: .72rem; font-weight: 800; }
+    #preview-admin .admin-status-pill--draft { background: #eef2f0; color: #536563; }
+    #preview-admin .admin-status-pill--scheduled { background: #fff2cf; color: #8b6515; }
+    #preview-admin .admin-status-pill--published { background: #e1f3df; color: #397448; }
+    #preview-admin .preview-body { font-size: .95rem; line-height: 1.8; }
+    #preview-admin .preview-body h1, #preview-admin .preview-body h2, #preview-admin .preview-body h3, #preview-admin .preview-body h4 { margin: 1.6rem 0 .7rem; line-height: 1.3; letter-spacing: -.02em; }
+    #preview-admin .preview-body p, #preview-admin .preview-body ul, #preview-admin .preview-body ol, #preview-admin .preview-body blockquote, #preview-admin .preview-body pre, #preview-admin .admin-markdown-table-wrap { margin: 0 0 1rem; }
+    #preview-admin .preview-body ul, #preview-admin .preview-body ol { padding-left: 1.35rem; }
+    #preview-admin .preview-body blockquote { padding-left: .9rem; border-left: 3px solid var(--admin-line); color: var(--admin-muted); }
+    #preview-admin .preview-body a { color: #2f6db3; text-decoration: underline; }
+    #preview-admin .preview-body img { display: block; max-width: 100%; margin: .75rem 0; border-radius: .65rem; }
+    #preview-admin .preview-body code { padding: .12rem .3rem; border-radius: .3rem; background: var(--admin-soft); font: .85em ui-monospace, SFMono-Regular, Consolas, monospace; }
+    #preview-admin .preview-body pre { padding: .85rem; overflow: auto; border-radius: .65rem; background: var(--admin-soft); }
+    #preview-admin .preview-body pre code { padding: 0; background: transparent; }
+    #preview-admin .admin-markdown-table-wrap { overflow-x: auto; }
+    #preview-admin .preview-body table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: .82rem; }
+    #preview-admin .preview-body th, #preview-admin .preview-body td { padding: .5rem; border: 1px solid var(--admin-line); text-align: left; vertical-align: top; }
+    #preview-admin .preview-body th { background: var(--admin-soft); }
+    #preview-admin .preview-body hr { margin: 1.5rem 0; border: 0; border-top: 1px solid var(--admin-line); }
+    #preview-admin .preview-empty { padding: 3rem; color: var(--admin-muted); text-align: center; }
+    @media (max-width: 600px) {
+      #preview-admin .admin-topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </BaseLayout>

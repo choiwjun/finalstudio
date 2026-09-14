@@ -222,6 +222,15 @@ function renderPosts() {
     time.textContent = formatDate(post.updatedAt);
     updated.append(time);
     const actions = createCell("admin-row-actions");
+    if (post.status !== "published") {
+      const preview = document.createElement("a");
+      preview.className = "admin-text-button";
+      preview.href = `/admin/preview#post-${post.slug}`;
+      preview.target = "_blank";
+      preview.rel = "noreferrer";
+      preview.textContent = "미리보기";
+      actions.append(preview);
+    }
     const edit = document.createElement("button");
     edit.className = "admin-text-button";
     edit.type = "button";
