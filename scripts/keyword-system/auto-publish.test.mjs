@@ -43,7 +43,9 @@ test("requires category and keyword together for one-click generation", () => {
 });
 
 test("dry-run selects exactly the requested ready candidate", async (t) => {
-  const briefDir = await mkdtemp(join("out", "wj-test-briefs-"));
+  const outDir = join(process.cwd(), "out");
+  await mkdir(outDir, { recursive: true });
+  const briefDir = await mkdtemp(join(outDir, "wj-test-briefs-"));
   t.after(() => rm(briefDir, { recursive: true, force: true }));
   await writeFile(
     join(briefDir, "ai-AI-데이터센터.json"),
