@@ -80,6 +80,9 @@ jobs:
           AUTO_MAX_PASSES: "3"
         run: node scripts/keyword-system/auto-publish.mjs --category "$CATEGORY" --keyword "$KEYWORD"
       - name: 품질 게이트
+        env:
+          CATEGORY: ${{ inputs.category }}
+          KEYWORD: ${{ inputs.keyword }}
         run: |
           npm run check:content
           mapfile -t drafts < <(git status --porcelain=v1 --untracked-files=all | sed -n 's/^.. //p' | grep -E '^src/content/posts/[^/]+\.md$' || true)
@@ -87,8 +90,21 @@ jobs:
             echo "생성된 Markdown 초안을 찾을 수 없습니다."
             exit 1
           fi
+          # The in-pipeline judge sources numeric claims against the keyword
+          # brief (notes). The standalone check needs the same evidence or it
+          # flags brief-sourced figures (일정 차수, 상대 지표) as unsourced.
+          # Rendered brief: out/keyword-briefs/<category>-<keyword>.md
+          KW_SLUG=$(echo "$KEYWORD" | tr ' ' '-')
+          NOTES="out/keyword-briefs/${CATEGORY}-${KW_SLUG}.md"
+          NOTES_ARG=""
+          if [ -f "$NOTES" ]; then
+            NOTES_ARG="--notes $NOTES"
+            echo "근거 파일 사용: $NOTES"
+          else
+            echo "::warning::근거 브리프를 찾지 못해 notes 없이 검사합니다: $NOTES"
+          fi
           for draft in "${drafts[@]}"; do
-            node scripts/check-writing.mjs "$draft"
+            node scripts/check-writing.mjs "$draft" $NOTES_ARG
           done
           npm run build
           npm run check:build
