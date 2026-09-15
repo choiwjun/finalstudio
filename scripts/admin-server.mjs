@@ -15,6 +15,7 @@ import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { spawn, execFile, execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { ALLOWED_STATUS, parseFrontmatter, validatePost } from './lib/content-contract.mjs';
 
 const ROOT = process.cwd();
@@ -112,6 +113,31 @@ const safeFile = (file) =>
   file.endsWith('.md') &&
   !file.startsWith('.');
 
+const BRIEFS = join(ROOT, 'out', 'keyword-briefs');
+const KEYWORD_DATA = join(ROOT, 'data', 'keywords');
+
+const listBriefs = () => {
+  if (!existsSync(BRIEFS)) return [];
+  return readdirSync(BRIEFS)
+    .filter((f) => f.endsWith('.json') && f !== 'index.json')
+    .map((file) => {
+      try {
+        const parsed = JSON.parse(readFileSync(join(BRIEFS, file), 'utf8'));
+        const text = readFileSync(join(BRIEFS, file), 'utf8');
+        return {
+          file,
+          category: parsed.category,
+          headKeyword: parsed.head_keyword,
+          intent: parsed.search_intent,
+          sha256: createHash('sha256').update(text).digest('hex'),
+        };
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+};
+
 const listPosts = () => readdirSync(POSTS).filter((f) => f.endsWith('.md')).map((file) => {
   const fm = parseFrontmatter(readFileSync(join(POSTS, file), 'utf8'));
   const get = fm?.get ?? (() => undefined);
@@ -200,6 +226,88 @@ const server = createServer(async (req, res) => {
       renameSync(join(POSTS, file), target);
       void resyncDev();
       return send(res, 200, { ok: true, movedTo: target });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/briefs') {
+      return send(res, 200, { briefs: listBriefs() });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/keywords') {
+      try {
+        const records = JSON.parse(readFileSync(join(KEYWORD_DATA, 'records.json'), 'utf8'));
+        return send(res, 200, {
+          records: records.map((r) => ({
+            category: r.category,
+            headKeyword: r.head_keyword,
+            status: r.status,
+            collectedAt: r.collected_at,
+          })),
+        });
+      } catch {
+        return send(res, 200, { records: [] });
+      }
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/keywords/discover') {
+      const output = await new Promise((done) => {
+        execFile(
+          'node',
+          [join(ROOT, 'scripts', 'keyword-system', 'auto-discover.mjs')],
+          { cwd: ROOT, timeout: 600_000 },
+          (err, stdout, stderr) => done({ ok: !err, output: `${stdout}${stderr}`.trim() }),
+        );
+      });
+      return send(res, output.ok ? 200 : 500, output);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/keywords/analyze') {
+      const output = await new Promise((done) => {
+        execFile(
+          'node',
+          [join(ROOT, 'scripts', 'keyword-system', 'analyze.mjs')],
+          { cwd: ROOT, timeout: 300_000 },
+          (err, stdout, stderr) => done({ ok: !err, output: `${stdout}${stderr}`.trim() }),
+        );
+      });
+      return send(res, output.ok ? 200 : 500, output);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/keywords/briefs') {
+      const output = await new Promise((done) => {
+        execFile(
+          'node',
+          [join(ROOT, 'scripts', 'keyword-system', 'brief.mjs')],
+          { cwd: ROOT, timeout: 120_000 },
+          (err, stdout, stderr) => done({ ok: !err, output: `${stdout}${stderr}`.trim() }),
+        );
+      });
+      return send(res, output.ok ? 200 : 500, output);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/draft') {
+      const body = await readBody(req);
+      const { brief, angle, format, slug, reviewer, reason, noImages } = body;
+      if (typeof brief !== 'string' || !brief.endsWith('.json') || /[/\\]/.test(brief))
+        return send(res, 400, { error: 'brief는 out/keyword-briefs 안의 .json 파일명이어야 합니다.' });
+      if (!existsSync(join(BRIEFS, brief))) return send(res, 404, { error: '브리프 파일을 찾을 수 없습니다.' });
+      const args = [
+        join(ROOT, 'scripts', 'keyword-system', 'draft.mjs'),
+        '--brief', join(BRIEFS, brief),
+        '--angle', String(angle ?? ''),
+        '--format', String(format ?? 'how-to'),
+        '--reviewer', String(reviewer ?? 'admin-dashboard'),
+        '--reason', String(reason ?? '관리 대시보드에서 승인'),
+        '--brief-sha256', String(body.briefSha256 ?? ''),
+      ];
+      if (slug) args.push('--slug', String(slug));
+      if (noImages) args.push('--no-images');
+      const output = await new Promise((done) => {
+        execFile('node', args, { cwd: ROOT, timeout: 900_000 }, (err, stdout, stderr) =>
+          done({ ok: !err, output: `${stdout}${stderr}`.trim() }),
+        );
+      });
+      if (output.ok) void resyncDev();
+      return send(res, output.ok ? 200 : 500, output);
     }
 
     if (req.method === 'POST' && url.pathname === '/api/check') {

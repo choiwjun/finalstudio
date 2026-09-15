@@ -25,6 +25,28 @@
   },
   {
     "category": "ai",
+    "head_keyword": "AI 데이터센터",
+    "related_keywords": [
+      "데이터센터 전력",
+      "국가 AI 컴퓨팅센터",
+      "부유식 데이터센터 FDC",
+      "AI 인프라",
+      "광통신"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 AI 데이터센터",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T07:23:07.953Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "ready-to-write"
+  },
+  {
+    "category": "ai",
     "head_keyword": "AI 속도조절론",
     "related_keywords": [
       "AI 위험성",
@@ -241,6 +263,28 @@
   },
   {
     "category": "ai",
+    "head_keyword": "인공지능 윤리",
+    "related_keywords": [
+      "AI 윤리",
+      "알고리즘편향",
+      "설명가능AI",
+      "데이터프라이버시",
+      "AI책임성"
+    ],
+    "search_intent": "문제 해결",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 인공지능 윤리",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T07:23:07.953Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "ready-to-write"
+  },
+  {
+    "category": "ai",
     "head_keyword": "전환 AX",
     "related_keywords": [
       "11일 울산전시컨벤션센터",
@@ -290,6 +334,28 @@
   },
   {
     "category": "ai",
+    "head_keyword": "피지컬 AI",
+    "related_keywords": [
+      "멀티모달 로봇 AI",
+      "로봇 파운데이션 모델",
+      "분산형 로봇 지능",
+      "촉각센서 기반 제어",
+      "인공지능 로봇개발"
+    ],
+    "search_intent": "개념",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 피지컬 AI",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T07:23:07.953Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "ready-to-write"
+  },
+  {
+    "category": "ai",
     "head_keyword": "하루 다르게",
     "related_keywords": [
       "앤트로픽 CEO",
@@ -335,6 +401,28 @@
     ],
     "evidence_available": true,
     "status": "candidate"
+  },
+  {
+    "category": "economy-business",
+    "head_keyword": "국제유가 100달러 돌파",
+    "related_keywords": [
+      "원달러 환율",
+      "호르무즈 해협",
+      "중동 전쟁 확전",
+      "고유가 공포",
+      "국내 산업계"
+    ],
+    "search_intent": "최신 이슈",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 국제유가 100달러 돌파",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T07:23:07.953Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "ready-to-write"
   },
   {
     "category": "economy-business",
@@ -719,6 +807,28 @@
     ],
     "evidence_available": true,
     "status": "candidate"
+  },
+  {
+    "category": "travel",
+    "head_keyword": "코타키나발루 반딧불투어",
+    "related_keywords": [
+      "뚜아이 원숭이",
+      "선셋",
+      "일정",
+      "시간",
+      "NAVER 블로그"
+    ],
+    "search_intent": "방법",
+    "content_angle": "NAVER 블로그 검색 결과에서 자동 발견된 발행 주제 후보 코타키나발루 반딧불투어",
+    "source": [
+      "naver-api-hub-blog",
+      "naver-api-hub-trend"
+    ],
+    "collected_at": "2026-09-14T07:23:07.953Z",
+    "freshness": "fresh",
+    "risk_flags": [],
+    "evidence_available": true,
+    "status": "ready-to-write"
   },
   {
     "category": "travel",

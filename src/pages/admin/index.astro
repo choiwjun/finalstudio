@@ -138,6 +138,19 @@ const reviewSignals = (post: (typeof posts)[number]) => {
       </div>
       <p id="check-result" class="dashboard-footnote" hidden></p>
 
+      <div class="keyword-pipeline" id="keyword-pipeline">
+        <div class="keyword-pipeline-header">
+          <h3>키워드 → 초안 파이프라인</h3>
+          <div class="keyword-pipeline-actions">
+            <button id="kw-discover" class="btn btn--ghost" type="button" disabled>키워드 발굴 (NAVER)</button>
+            <button id="kw-analyze" class="btn btn--ghost" type="button" disabled>재분석</button>
+            <button id="kw-briefs" class="btn btn--ghost" type="button" disabled>브리프 생성</button>
+          </div>
+        </div>
+        <p id="kw-pipeline-status" class="dashboard-footnote" aria-live="polite"></p>
+        <div id="kw-brief-list" class="keyword-brief-list" hidden></div>
+      </div>
+
       {posts.length ? (
         <div class="dashboard-table-wrap">
           <table class="dashboard-table">

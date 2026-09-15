@@ -49,7 +49,7 @@ const setStatusUi = () => {
       : '편집·삭제·상태 변경·새 글 작성은 npm run admin 실행 후 사용할 수 있습니다.';
   }
   document
-    .querySelectorAll('.row-actions button, #new-post, #run-check')
+    .querySelectorAll('.row-actions button, #new-post, #run-check, #kw-discover, #kw-analyze, #kw-briefs')
     .forEach((btn) => btn.toggleAttribute('disabled', !adminOnline.value));
 };
 
@@ -61,6 +61,7 @@ const ping = async () => {
     adminOnline.value = false;
   }
   setStatusUi();
+  if (adminOnline.value) void loadBriefs();
 };
 ping();
 setInterval(ping, 10_000);
@@ -253,6 +254,96 @@ const deletePost = async (file) => {
   }
 };
 
+/* 키워드 → 초안 파이프라인 */
+const kwStatus = (msg) => {
+  const el = document.querySelector('#kw-pipeline-status');
+  if (el) el.textContent = msg;
+};
+
+const kwButtons = ['#kw-discover', '#kw-analyze', '#kw-briefs'];
+const setKwBusy = (busy) => {
+  kwButtons.forEach((sel) => {
+    const btn = document.querySelector(sel);
+    if (btn) btn.toggleAttribute('disabled', busy || !adminOnline.value);
+  });
+};
+
+const runKwAction = async (endpoint, label) => {
+  setKwBusy(true);
+  kwStatus(`${label} 실행 중… (수 분 걸릴 수 있습니다)`);
+  try {
+    const res = await fetch(`${ADMIN_API}${endpoint}`, { method: 'POST' });
+    const data = await res.json();
+    kwStatus(`${label} ${res.ok ? '완료' : '실패'}\n${data.output ?? data.error ?? ''}`);
+    if (endpoint === '/api/keywords/briefs' && res.ok) void loadBriefs();
+  } catch (err) {
+    kwStatus(`${label} 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`);
+  } finally {
+    setKwBusy(false);
+  }
+};
+
+const loadBriefs = async () => {
+  const list = document.querySelector('#kw-brief-list');
+  if (!list) return;
+  try {
+    const res = await fetch(`${ADMIN_API}/api/briefs`);
+    const data = await res.json();
+    const briefs = data.briefs ?? [];
+    list.innerHTML = '';
+    if (!briefs.length) { list.setAttribute('hidden', ''); return; }
+    list.removeAttribute('hidden');
+    for (const b of briefs) {
+      const item = document.createElement('div');
+      item.className = 'keyword-brief-item';
+      const info = document.createElement('div');
+      const title = document.createElement('strong');
+      title.textContent = `${b.headKeyword ?? b.file}`;
+      const meta = document.createElement('small');
+      meta.textContent = `${b.category ?? ''} · ${b.intent ?? ''}`;
+      info.append(title, meta);
+      const btn = document.createElement('button');
+      btn.className = 'row-btn';
+      btn.type = 'button';
+      btn.textContent = '초안 생성';
+      btn.addEventListener('click', () => runDraft(b));
+      item.append(info, btn);
+      list.append(item);
+    }
+  } catch { /* 서버 미연결 시 무시 */ }
+};
+
+const runDraft = async (brief) => {
+  const angle = window.prompt(
+    `「${brief.headKeyword}」 초안을 생성합니다.\n\n이 글의 각도(angle)를 입력하세요 — 독자에게 줄 하나의 판단 기준:\n(예: "상품 비교보다 일정표 읽는 법을 알려준다")`,
+  );
+  if (angle === null) return;
+  if (angle.trim() === '') { window.alert('각도를 입력해야 초안을 생성할 수 있습니다.'); return; }
+  setKwBusy(true);
+  kwStatus(`「${brief.headKeyword}」 초안 생성 중… (작성+윤문+심사+이미지, 수 분 소요)`);
+  try {
+    const res = await fetch(`${ADMIN_API}/api/draft`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        brief: brief.file,
+        angle: angle.trim(),
+        format: 'how-to',
+        briefSha256: brief.sha256,
+        reviewer: 'admin-dashboard',
+        reason: '관리 대시보드에서 승인',
+      }),
+    });
+    const data = await res.json();
+    kwStatus(`초안 생성 ${res.ok ? '완료 — 페이지를 새로고침하면 글 목록에 표시됩니다' : '실패'}\n${data.output ?? data.error ?? ''}`);
+    if (res.ok) reloadAfterSync();
+  } catch (err) {
+    kwStatus(`초안 생성 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`);
+  } finally {
+    setKwBusy(false);
+  }
+};
+
 /* 콘텐츠 검사 */
 const runCheck = async () => {
   const result = document.querySelector('#check-result');
@@ -288,6 +379,9 @@ document.addEventListener('click', (event) => {
   }
   if (target.closest('#new-post')) openEdit(null);
   if (target.closest('#run-check')) runCheck();
+  if (target.closest('#kw-discover')) runKwAction('/api/keywords/discover', '키워드 발굴');
+  if (target.closest('#kw-analyze')) runKwAction('/api/keywords/analyze', '재분석');
+  if (target.closest('#kw-briefs')) runKwAction('/api/keywords/briefs', '브리프 생성');
   if (target.closest('#edit-save')) saveEdit();
   if (target.closest('#status-apply')) applyStatus();
   if (target.closest('[data-modal-close]')) {
