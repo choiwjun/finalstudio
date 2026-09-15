@@ -91,6 +91,9 @@ const extractProse = (body) => {
     if (/^```/.test(line.trim())) { inFence = !inFence; continue; }
     if (inFence) continue;
     if (/^\s*\|/.test(line)) continue;
+    // 이미지 임베드(![alt](path))는 산문이 아니라 미디어 — 반복 검사에서 제외.
+    // (같은 slug prefix를 쓰는 서브 이미지들이 유사 구절로 오인되는 것을 막는다)
+    if (/^\s*!\[[^\]]*\]\([^)]+\)/.test(line)) continue;
     // 링크 목록 항목은 어떤 섹션에서든 참조 목록 — 산문 반복 검사에서 제외
     if (/^\s*[-*]\s*\[[^\]]*\]\(https?:\/\//.test(line)) continue;
     if (/^#{1,6}\s/.test(line.trim())) {
