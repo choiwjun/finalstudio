@@ -10,6 +10,7 @@ const currentDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(currentDir, "../..");
 const postsDir = join(projectRoot, "src/content/posts");
 const recordsPath = join(projectRoot, "data/keywords/records.json");
+const tombstonesPath = join(projectRoot, "data/deleted-posts.json");
 
 function parseDocument(text, fileName) {
   const match = text.match(/^---\n([\s\S]*?)\n---/);
@@ -146,7 +147,7 @@ const postUpsert = `
     updated_at = now()
 `;
 
-export function buildSyncQueries(keywordRows, postRows, sql) {
+export function buildSyncQueries(keywordRows, postRows, sql, tombstones = []) {
   return [
     ...keywordRows.map((row) =>
       sql.query(keywordUpsert, [
@@ -158,6 +159,11 @@ export function buildSyncQueries(keywordRows, postRows, sql) {
         row.payload,
       ]),
     ),
+    // keyword_records는 워커에 쓰기 경로가 없는 순수 repo 미러라
+    // 저장소에서 사라진 레코드는 그대로 비운다.
+    sql.query("DELETE FROM keyword_records WHERE NOT (record_key = ANY($1::text[]))", [
+      keywordRows.map((row) => row.recordKey),
+    ]),
     ...postRows.map((row) =>
       sql.query(postUpsert, [
         row.slug,
@@ -174,30 +180,59 @@ export function buildSyncQueries(keywordRows, postRows, sql) {
         row.payload,
       ]),
     ),
+    // posts 테이블은 관리자 화면이 직접 쓰는 행을 포함할 수 있어서
+    // 명시된 tombstone slug만 지운다. 저장소에 다시 생긴 slug는 repo 우선.
+    ...tombstones
+      .filter((slug) => !postRows.some((row) => row.slug === slug))
+      .map((slug) =>
+        sql.query("DELETE FROM posts WHERE slug = $1", [slug]),
+      ),
   ];
 }
 
+async function readTombstones() {
+  let value;
+  try {
+    value = JSON.parse(await readFile(tombstonesPath, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+  if (value === null || typeof value !== "object" || !Array.isArray(value.deleted))
+    throw new Error("data/deleted-posts.json must contain a deleted array");
+  return value.deleted.map((entry) => {
+    if (
+      !entry ||
+      typeof entry.slug !== "string" ||
+      !/^[a-z0-9][a-z0-9-]{0,100}$/u.test(entry.slug)
+    )
+      throw new Error("invalid tombstone slug in data/deleted-posts.json");
+    return entry.slug;
+  });
+}
+
 export async function collectSyncRows() {
-  const [keywordRows, postRows] = await Promise.all([
+  const [keywordRows, postRows, tombstones] = await Promise.all([
     readKeywords(),
     readPosts(),
+    readTombstones(),
   ]);
-  return { keywordRows, postRows };
+  return { keywordRows, postRows, tombstones };
 }
 
 async function main() {
-  const { keywordRows, postRows } = await collectSyncRows();
+  const { keywordRows, postRows, tombstones } = await collectSyncRows();
   if (process.argv.includes("--dry-run")) {
     process.stdout.write(
-      `Validated ${keywordRows.length} keyword records and ${postRows.length} posts\n`,
+      `Validated ${keywordRows.length} keyword records, ${postRows.length} posts, ${tombstones.length} tombstones\n`,
     );
     return;
   }
   const sql = connectDatabase();
-  const queries = buildSyncQueries(keywordRows, postRows, sql);
+  const queries = buildSyncQueries(keywordRows, postRows, sql, tombstones);
   if (queries.length > 0) await sql.transaction(queries);
   process.stdout.write(
-    `Synced ${keywordRows.length} keyword records and ${postRows.length} posts to Neon\n`,
+    `Synced ${keywordRows.length} keyword records and ${postRows.length} posts to Neon (${tombstones.length} tombstones applied)\n`,
   );
 }
 

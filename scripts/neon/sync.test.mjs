@@ -76,16 +76,45 @@ test("builds parameterized upsert queries for keywords and posts", () => {
     { query: (text, values) => ({ text, values }) },
   );
 
-  assert.equal(queries.length, 2);
+  assert.equal(queries.length, 3);
   assert.match(queries[0].text, /ON CONFLICT \(record_key\)/);
   assert.equal(queries[0].values[1], "ai");
-  assert.match(queries[1].text, /ON CONFLICT \(slug\)/);
+  assert.match(queries[1].text, /DELETE FROM keyword_records/);
+  assert.deepEqual(queries[1].values[0], ["key"]);
+  assert.match(queries[2].text, /ON CONFLICT \(slug\)/);
 });
 
-test("collects the checked-in keyword records and Markdown posts", async () => {
+test("tombstoned slugs produce post deletes only when absent from the repo", () => {
+  const sql = { query: (text, values) => ({ text, values }) };
+  const posts = [
+    {
+      slug: "kept",
+      title: "Title",
+      description: "Description",
+      pubDate: "2026-09-11",
+      publishAt: null,
+      status: "draft",
+      topic: "ai",
+      angle: "Angle",
+      author: "Author",
+      bodyMarkdown: "Body",
+      contentHash: "hash",
+      payload: "{}",
+    },
+  ];
+
+  const queries = buildSyncQueries([], posts, sql, ["gone", "kept"]);
+  const deletes = queries.filter((query) =>
+    query.text.includes("DELETE FROM posts"),
+  );
+  assert.equal(deletes.length, 1);
+  assert.deepEqual(deletes[0].values, ["gone"]);
+});
+
+test("collects the checked-in keyword records, Markdown posts, and tombstones", async () => {
   const rows = await collectSyncRows();
 
   assert.ok(rows.keywordRows.length > 0);
-  assert.ok(rows.postRows.length >= 1);
   assert.ok(rows.postRows.every((row) => row.slug.length > 0));
+  assert.ok(Array.isArray(rows.tombstones));
 });

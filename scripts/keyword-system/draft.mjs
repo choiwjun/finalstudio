@@ -34,6 +34,8 @@ import {
   requireReviewedBriefHash,
 } from "./lib/draft-bridge.mjs";
 import { normalizeKeywordBrief, renderKeywordBrief } from "./lib/briefs.mjs";
+import { generateImageBundle } from "./lib/image-bundle.mjs";
+import { hashText } from "./lib/image-plan.mjs";
 import { buildWriterEnvironment } from "../auto-publish/writer-env.mjs";
 
 export { buildWriterEnvironment } from "../auto-publish/writer-env.mjs";
@@ -81,6 +83,7 @@ export function parseDraftArgs(
     angle: undefined,
     slug: undefined,
     fromFinal: undefined,
+    noImages: false,
     briefSha256: undefined,
     automationPolicy: undefined,
     automationPolicySha256: undefined,
@@ -105,6 +108,10 @@ export function parseDraftArgs(
     const argument = argv[index];
     if (argument === "--approve") {
       result.approved = true;
+      continue;
+    }
+    if (argument === "--no-images") {
+      result.noImages = true;
       continue;
     }
     const key = valueOptions.get(argument);
@@ -324,7 +331,11 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
   requireReviewedBriefHash(args.briefSha256, briefHash);
   const brief = normalizeKeywordBrief(briefValue);
   const markdownPath = `${briefPath.slice(0, -5)}.md`;
-  await readTextAt(briefRoot, markdownPath, "brief Markdown");
+  const briefMarkdownText = await readTextAt(
+    briefRoot,
+    markdownPath,
+    "brief Markdown",
+  );
   const ready = await readReadyToWriteExport({
     path: readyPath,
     recordsPath,
@@ -466,6 +477,31 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     process.stdout.write(
       `created draft ${reference} for ${brief.head_keyword}; publication remains human-approved\n`,
     );
+    if (!args.noImages) {
+      // 초안 설치와 같은 실행에서 이미지 번들까지 만들어 미리보기가
+      // 글+이미지를 함께 보여주도록 한다. 이미지 실패는 초안을 되돌리지 않는다.
+      const generateImages =
+        dependencies.generateImages ?? generateImageBundle;
+      try {
+        await generateImages({
+          root,
+          postPath: draftPath,
+          slug: basename(fileName, ".md"),
+          expectedHash: hashText(draftText),
+          notesPath: relative(root, markdownPath).replaceAll("\\", "/"),
+          notesSha256: hashText(briefMarkdownText),
+          format: args.format,
+          subCount: 2,
+          runImage: dependencies.runImage,
+          runJudge: dependencies.runJudge,
+        });
+        process.stdout.write(`installed image bundle for ${reference}\n`);
+      } catch (imageError) {
+        process.stderr.write(
+          `image bundle skipped for ${reference}: ${imageError instanceof Error ? imageError.message : String(imageError)}\n`,
+        );
+      }
+    }
     return result;
   } catch (error) {
     if (createdDraftPath) {

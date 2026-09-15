@@ -11,6 +11,7 @@ type AdminPost = {
   author: string;
   bodyMarkdown: string;
   updatedAt: string;
+  metadata?: { image?: string };
 };
 
 type ApiBody<T> = { ok: boolean; error?: string; data?: T };
@@ -76,6 +77,14 @@ function formatDate(value: string) {
   return Number.isNaN(date.valueOf()) ? "-" : date.toLocaleDateString("ko-KR");
 }
 
+function safeImageUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  const candidate = value.trim();
+  return candidate.startsWith("/") && !candidate.startsWith("//")
+    ? candidate
+    : null;
+}
+
 function renderPosts(posts: AdminPost[]) {
   if (!previewPosts || !previewToc) return;
   const drafts = posts.filter((post) => post.status !== "published");
@@ -104,7 +113,10 @@ function renderPosts(posts: AdminPost[]) {
       <span>${post.author}</span>
     </div>
   </header>
-  <div class="preview-body">${renderMarkdownPreview(post.bodyMarkdown)}</div>
+  <div class="preview-body">${(() => {
+    const hero = safeImageUrl(post.metadata?.image);
+    return `${hero ? `<img class="preview-hero" src="${hero.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" alt="" loading="lazy">` : ""}${renderMarkdownPreview(post.bodyMarkdown)}`;
+  })()}</div>
 </article>`,
     )
     .join("");

@@ -134,6 +134,7 @@ test("draft bridge requires approval and records the writer handoff after draft 
     /related_keywords/iu,
   );
 
+  const imageCalls = [];
   const result = await draftMain(
     [
       "--brief",
@@ -166,6 +167,10 @@ test("draft bridge requires approval and records the writer handoff after draft 
           stderr: "",
         };
       },
+      generateImages: async (options) => {
+        imageCalls.push(options);
+        return { installed: true };
+      },
     },
   );
 
@@ -175,6 +180,15 @@ test("draft bridge requires approval and records the writer handoff after draft 
     draft: "src/content/posts/selected.md",
     status: "written",
   });
+  assert.equal(imageCalls.length, 1);
+  assert.equal(imageCalls[0].slug, "selected");
+  assert.equal(imageCalls[0].format, "how-to");
+  assert.equal(
+    imageCalls[0].expectedHash,
+    createHash("sha256").update("---\nstatus: draft\n---\n").digest("hex"),
+  );
+  assert.equal(imageCalls[0].notesSha256.length, 64);
+  assert.match(imageCalls[0].notesPath, /^out\/keyword-briefs\//u);
   assert.equal(JSON.parse(await readFile(readyPath, "utf8")).length, 0);
   assert.equal(
     JSON.parse(await readFile(recordsPath, "utf8"))[0].status,
@@ -213,6 +227,7 @@ test("draft bridge requires approval and records the writer handoff after draft 
       "사람이 승인한 글의 범위와 독자 문제",
       "--brief-sha256",
       briefSha256,
+      "--no-images",
     ],
     {
       repositoryRoot: root,
@@ -306,6 +321,7 @@ test("automation policy can authorize the bridge without per-keyword human field
       "근거와 확인 범위를 중심으로 정리합니다.",
       "--brief-sha256",
       briefSha256,
+      "--no-images",
     ],
     {
       repositoryRoot: root,
@@ -326,4 +342,76 @@ test("automation policy can authorize the bridge without per-keyword human field
   const decisionText = await readFile(decisionsPath, "utf8");
   assert.match(decisionText, /automation-policy/iu);
   assert.match(decisionText, new RegExp(`policy_sha256=${policySha256}`, "u"));
+});
+
+test("image bundle failure warns but keeps the installed draft", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "wj-draft-images-"));
+  const keywordDir = join(root, "data/keywords");
+  const briefDir = join(root, "out/keyword-briefs");
+  const postsDir = join(root, "src/content/posts");
+  await mkdir(keywordDir, { recursive: true });
+  await mkdir(briefDir, { recursive: true });
+  await mkdir(postsDir, { recursive: true });
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const record = makeValidRecord({
+    category: "ai",
+    head_keyword: "선정 키워드",
+    status: "ready-to-write",
+  });
+  const recordsPath = join(keywordDir, "records.json");
+  const readyPath = join(keywordDir, "ready-to-write.json");
+  const decisionsPath = join(keywordDir, "decisions.jsonl");
+  await writeFile(recordsPath, `${JSON.stringify([record])}\n`);
+  await writeFile(decisionsPath, "");
+  await writeReadyToWriteExport([record], { path: readyPath, recordsPath });
+  const briefText = `${JSON.stringify(makeBrief(), null, 2)}\n`;
+  const briefPath = join(briefDir, "ai-selected.json");
+  const briefSha256 = createHash("sha256").update(briefText).digest("hex");
+  await writeFile(briefPath, briefText);
+  await writeFile(
+    join(briefDir, "ai-selected.md"),
+    "# 선정 키워드\n\n사람 검토 필요\n",
+  );
+
+  const result = await draftMain(
+    [
+      "--brief",
+      briefPath,
+      "--records",
+      recordsPath,
+      "--ready",
+      readyPath,
+      "--decisions",
+      decisionsPath,
+      "--approve",
+      "--reviewer",
+      "운영자",
+      "--reason",
+      "검토함",
+      "--angle",
+      "사람이 승인한 글의 범위와 독자 문제",
+      "--brief-sha256",
+      briefSha256,
+    ],
+    {
+      repositoryRoot: root,
+      runWriter: async ({ args }) => {
+        const stagingDir = args[args.indexOf("--out") + 1];
+        const stagedPath = join(stagingDir, "kept.md");
+        await writeFile(stagedPath, "---\nstatus: draft\n---\n");
+        return {
+          code: 0,
+          stdout: `[convert-post] 저장 완료: ${stagedPath}\n`,
+          stderr: "",
+        };
+      },
+      generateImages: async () => {
+        throw new Error("image backend unavailable");
+      },
+    },
+  );
+
+  assert.equal(result.status, "written");
+  assert.match(await readFile(join(postsDir, "kept.md"), "utf8"), /status: draft/u);
 });

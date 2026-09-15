@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "deleted": [
+    { "slug": "ai-ethics-check-guide", "deleted_at": "2026-09-15" },
+    { "slug": "kotakinabalu-firefly-tour", "deleted_at": "2026-09-15" },
+    { "slug": "oil-100-dollar-check", "deleted_at": "2026-09-15" },
+    { "slug": "post-2026-09-14", "deleted_at": "2026-09-15" },
+    { "slug": "post-2026-09-14-2", "deleted_at": "2026-09-15" },
+    { "slug": "travel-3nights-5days-package", "deleted_at": "2026-09-15" }
+  ]
+}
