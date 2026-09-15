@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import sharp from "sharp";
-import { parseAutoPublishArgs, preparePublishedPost } from "./auto-publish.mjs";
+import { main, parseAutoPublishArgs, preparePublishedPost } from "./auto-publish.mjs";
 
 test("auto-publish defaults to all ready candidates and separates dry-run from publish", () => {
   const args = parseAutoPublishArgs(["--publish"]);
@@ -16,6 +16,43 @@ test("auto-publish defaults to all ready candidates and separates dry-run from p
     () => parseAutoPublishArgs(["--dry-run", "--publish"]),
     /cannot be combined/iu,
   );
+});
+
+test("accepts an exact category and keyword selection for dashboard generation", () => {
+  const args = parseAutoPublishArgs([
+    "--category",
+    "ai",
+    "--keyword",
+    "AI 데이터센터",
+  ]);
+
+  assert.equal(args.category, "ai");
+  assert.equal(args.headKeyword, "AI 데이터센터");
+  assert.equal(args.publish, false);
+});
+
+test("requires category and keyword together for one-click generation", () => {
+  assert.throws(
+    () => parseAutoPublishArgs(["--category", "ai"]),
+    /--category requires --keyword/iu,
+  );
+  assert.throws(
+    () => parseAutoPublishArgs(["--keyword", "AI"]),
+    /--keyword requires --category/iu,
+  );
+});
+
+test("dry-run selects exactly the requested ready candidate", async () => {
+  const result = await main([
+    "--dry-run",
+    "--category",
+    "ai",
+    "--keyword",
+    "AI 데이터센터",
+  ]);
+  assert.equal(result.manifest.candidates.length, 1);
+  assert.equal(result.manifest.candidates[0].category, "ai");
+  assert.equal(result.manifest.candidates[0].head_keyword, "AI 데이터센터");
 });
 
 test("blocks publication when the image bundle is incomplete", async (t) => {

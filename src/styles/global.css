@@ -640,6 +640,12 @@ main {
 .keyword-pipeline-header h3 { margin: 0; font-size: var(--text-card-title); }
 .keyword-pipeline-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .keyword-pipeline-actions .btn { min-height: 2.6rem; font-size: var(--text-sm); }
+.keyword-auto-form { margin-top: var(--space-4); padding: var(--space-4); border: 1px solid var(--site-line); border-radius: var(--radius-md); background: var(--site-bg); }
+.keyword-auto-form h4 { margin: 0 0 var(--space-3); }
+.keyword-auto-fields { display: grid; grid-template-columns: auto minmax(10rem, 1fr) auto minmax(14rem, 1.4fr) auto; align-items: center; gap: var(--space-2); }
+.keyword-auto-fields label { font-weight: 700; font-size: var(--text-sm); }
+.keyword-auto-fields select { min-height: 2.6rem; }
+@media (max-width: 760px) { .keyword-auto-fields { grid-template-columns: 1fr; } }
 .keyword-brief-list {
   margin-top: var(--space-3);
   display: grid;

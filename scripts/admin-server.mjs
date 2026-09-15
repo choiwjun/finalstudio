@@ -14,6 +14,7 @@
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawn, execFile, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { ALLOWED_STATUS, parseFrontmatter, validatePost } from './lib/content-contract.mjs';
@@ -154,7 +155,19 @@ const listPosts = () => readdirSync(POSTS).filter((f) => f.endsWith('.md')).map(
   };
 });
 
-const server = createServer(async (req, res) => {
+const defaultRunCommand = (script, args, timeout) => new Promise((done) => {
+  execFile('node', [join(ROOT, 'scripts', 'keyword-system', script), ...args], {
+    cwd: ROOT,
+    timeout,
+    maxBuffer: 2_000_000,
+  }, (err, stdout, stderr) => done({
+    ok: !err,
+    output: `${stdout}${stderr}`.trim(),
+  }));
+});
+
+export function createAdminServer({ runCommand = defaultRunCommand, onResync = resyncDev } = {}) {
+  return createServer(async (req, res) => {
   if (!cors(req, res)) return;
   const url = new URL(req.url ?? '/', 'http://127.0.0.1');
   const file = url.searchParams.get('file') ?? '';
@@ -248,6 +261,34 @@ const server = createServer(async (req, res) => {
       }
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/auto-publish') {
+      const body = await readBody(req);
+      const category = typeof body.category === 'string' ? body.category.trim() : '';
+      const keyword = typeof body.keyword === 'string' ? body.keyword.trim() : '';
+      if (!['ai', 'travel', 'economy-business'].includes(category))
+        return send(res, 400, { error: '유효한 카테고리를 선택하세요.' });
+      if (!keyword || keyword.length > 300 || /[\u0000-\u001f\u007f]/u.test(keyword))
+        return send(res, 400, { error: '유효한 키워드를 선택하세요.' });
+
+      // 선택한 키워드의 최신 브리프를 먼저 만들고, 정확히 한 건만
+      // 자동 작성(본문·윤문·심사·이미지)한다. --publish는 의도적으로 제외한다.
+      const brief = await runCommand('brief.mjs', [
+        '--category', category,
+        '--keyword', keyword,
+      ], 120_000);
+      if (!brief.ok) return send(res, 500, { ok: false, stage: 'brief', output: brief.output });
+      const generated = await runCommand('auto-publish.mjs', [
+        '--category', category,
+        '--keyword', keyword,
+      ], 900_000);
+      if (generated.ok) void onResync();
+      return send(res, generated.ok ? 200 : 500, {
+        ok: generated.ok,
+        stage: 'draft',
+        output: `${brief.output}\n${generated.output}`.trim(),
+      });
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/keywords/discover') {
       const output = await new Promise((done) => {
         execFile(
@@ -323,12 +364,15 @@ const server = createServer(async (req, res) => {
   } catch (err) {
     return send(res, 400, { error: err?.message ?? '요청 처리 실패' });
   }
-});
+  });
+}
 
-if (SUPERVISE_DEV) spawnDev();
-
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`[admin] 관리 서버 실행: http://127.0.0.1:${PORT} (localhost 전용)`);
-  console.log('[admin] 대시보드(http://localhost:4321/admin/)에서 편집·삭제·상태 변경을 사용할 수 있습니다.');
-  console.log(`[admin] 삭제된 글은 ${resolve(TRASH)} 로 이동됩니다.`);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  if (SUPERVISE_DEV) spawnDev();
+  const server = createAdminServer();
+  server.listen(PORT, '127.0.0.1', () => {
+    console.log(`[admin] 관리 서버 실행: http://127.0.0.1:${PORT} (localhost 전용)`);
+    console.log('[admin] 대시보드(http://localhost:4321/admin/)에서 편집·삭제·상태 변경을 사용할 수 있습니다.');
+    console.log(`[admin] 삭제된 글은 ${resolve(TRASH)} 로 이동됩니다.`);
+  });
+}

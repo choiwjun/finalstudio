@@ -62,6 +62,8 @@ export function parseAutoPublishArgs(argv = []) {
     dryRun: false,
     publish: false,
     limitPerCategory: Number.MAX_SAFE_INTEGER,
+    category: undefined,
+    headKeyword: undefined,
     policyPath: DEFAULT_POLICY,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -76,6 +78,17 @@ export function parseAutoPublishArgs(argv = []) {
     }
     if (flag === "--all") {
       result.limitPerCategory = Number.MAX_SAFE_INTEGER;
+      continue;
+    }
+    if (flag === "--category" || flag === "--keyword") {
+      const value = argv[index + 1];
+      if (typeof value !== "string" || value === "" || value.startsWith("--"))
+        fail(`${flag} requires a value`);
+      if (flag === "--category" && !["ai", "travel", "economy-business"].includes(value))
+        fail("--category must be ai, travel, or economy-business");
+      if (flag === "--category") result.category = value;
+      else result.headKeyword = value;
+      index += 1;
       continue;
     }
     if (flag === "--limit-per-category" || flag === "--policy") {
@@ -101,6 +114,10 @@ export function parseAutoPublishArgs(argv = []) {
   }
   if (result.dryRun && result.publish)
     fail("--dry-run and --publish cannot be combined");
+  if (result.headKeyword !== undefined && result.category === undefined)
+    fail("--keyword requires --category");
+  if (result.category !== undefined && result.headKeyword === undefined)
+    fail("--category requires --keyword");
   return result;
 }
 
@@ -555,6 +572,10 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     resolve(DATA_DIR, "automatic-discovery.json"),
     "automatic discovery",
   );
+  if (args.headKeyword !== undefined && args.category === undefined)
+    fail("--keyword requires --category");
+  if (args.category !== undefined && args.headKeyword === undefined)
+    fail("--category requires --keyword for one-click generation");
   const plan = await buildPersonaBatchPlan({
     readyRecords: records,
     discovery,
@@ -562,6 +583,8 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     briefDir: BRIEF_DIR,
     persona,
     limitPerCategory: args.limitPerCategory,
+    category: args.category,
+    headKeyword: args.headKeyword,
   });
   const automationPlan = plan.map((entry) =>
     Object.freeze({

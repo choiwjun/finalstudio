@@ -94,6 +94,15 @@ test("does not select candidates outside the configured category set", () => {
   );
 });
 
+test("selects exactly the chosen category and keyword for a one-click article", () => {
+  const selected = selectPersonaBatchCandidates(records, discovery, {
+    category: "ai",
+    headKeyword: "AI 두 번째",
+  });
+
+  assert.deepEqual(selected, [records[0]]);
+});
+
 test("parses a dry-run batch without requiring per-keyword approval fields", () => {
   const parsed = parsePersonaBatchArgs(["--dry-run", "--all"]);
 

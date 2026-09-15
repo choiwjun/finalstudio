@@ -29,8 +29,18 @@ function discoveryRank(discovery) {
 export function selectPersonaBatchCandidates(
   records,
   discovery,
-  { limitPerCategory = Number.MAX_SAFE_INTEGER } = {},
+  {
+    limitPerCategory = Number.MAX_SAFE_INTEGER,
+    category,
+    headKeyword,
+  } = {},
 ) {
+  if (headKeyword !== undefined && category === undefined) {
+    throw new TypeError("keyword selection requires a category");
+  }
+  if (category !== undefined && !CATEGORY_ORDER.includes(category)) {
+    throw new TypeError("unsupported category selection");
+  }
   if (!Array.isArray(records)) return [];
   const limit =
     Number.isInteger(limitPerCategory) && limitPerCategory > 0
@@ -41,9 +51,12 @@ export function selectPersonaBatchCandidates(
     (record) =>
       record?.status === "ready-to-write" &&
       CATEGORY_ORDER.includes(record.category) &&
-      clean(record.head_keyword) !== "",
+      clean(record.head_keyword) !== "" &&
+      (category === undefined || record.category === category) &&
+      (headKeyword === undefined || record.head_keyword === headKeyword),
   );
-  return CATEGORY_ORDER.flatMap((category) =>
+  const categories = category === undefined ? CATEGORY_ORDER : [category];
+  return categories.flatMap((category) =>
     ready
       .filter((record) => record.category === category)
       .toSorted((left, right) => {

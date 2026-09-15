@@ -61,7 +61,7 @@ const ping = async () => {
     adminOnline.value = false;
   }
   setStatusUi();
-  if (adminOnline.value) void loadBriefs();
+  if (adminOnline.value) { void loadBriefs(); void loadAutoKeywords(); }
 };
 ping();
 setInterval(ping, 10_000);
@@ -260,7 +260,11 @@ const kwStatus = (msg) => {
   if (el) el.textContent = msg;
 };
 
-const kwButtons = ['#kw-discover', '#kw-analyze', '#kw-briefs'];
+const kwButtons = ['#kw-discover', '#kw-analyze', '#kw-briefs', '#kw-auto-category', '#kw-auto-keyword', '#kw-auto-run'];
+const kwCategory = document.querySelector('#kw-auto-category');
+const kwKeyword = document.querySelector('#kw-auto-keyword');
+const kwAutoRun = document.querySelector('#kw-auto-run');
+let readyKeywords = [];
 const setKwBusy = (busy) => {
   kwButtons.forEach((sel) => {
     const btn = document.querySelector(sel);
@@ -280,6 +284,57 @@ const runKwAction = async (endpoint, label) => {
     kwStatus(`${label} 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`);
   } finally {
     setKwBusy(false);
+  }
+};
+
+const loadAutoKeywords = async () => {
+  if (!kwKeyword) return;
+  try {
+    const res = await fetch(`${ADMIN_API}/api/keywords`);
+    const data = await res.json();
+    readyKeywords = (data.records ?? []).filter((record) => record.status === 'ready-to-write');
+    updateAutoKeywords();
+  } catch { /* 서버 미연결 시 무시 */ }
+};
+
+const updateAutoKeywords = () => {
+  if (!(kwCategory instanceof HTMLSelectElement) || !(kwKeyword instanceof HTMLSelectElement)) return;
+  const category = kwCategory.value;
+  const matches = readyKeywords.filter((record) => record.category === category);
+  kwKeyword.innerHTML = '';
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = category ? (matches.length ? '키워드를 선택하세요' : '준비된 키워드가 없습니다') : '카테고리를 먼저 선택하세요';
+  kwKeyword.append(placeholder);
+  for (const record of matches) {
+    const option = document.createElement('option');
+    option.value = record.headKeyword;
+    option.textContent = record.headKeyword;
+    kwKeyword.append(option);
+  }
+  kwKeyword.toggleAttribute('disabled', !category || !matches.length);
+  if (kwAutoRun instanceof HTMLButtonElement) kwAutoRun.disabled = !category || !kwKeyword.value || !adminOnline.value;
+};
+kwCategory?.addEventListener('change', updateAutoKeywords);
+kwKeyword?.addEventListener('change', updateAutoKeywords);
+
+const runAutoDraft = async () => {
+  if (!(kwCategory instanceof HTMLSelectElement) || !(kwKeyword instanceof HTMLSelectElement) || !kwCategory.value || !kwKeyword.value) return;
+  setKwBusy(true);
+  kwStatus(`「${kwKeyword.value}」 자동 작성 중… (작성+윤문+심사+이미지, 수 분 소요)`);
+  try {
+    const res = await fetch(`${ADMIN_API}/api/auto-publish`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: kwCategory.value, keyword: kwKeyword.value }),
+    });
+    const data = await res.json();
+    kwStatus(`자동 글 작성 ${res.ok ? '완료 — 초안으로 저장됨' : '실패'}\n${data.output ?? data.error ?? ''}`);
+    if (res.ok) reloadAfterSync();
+  } catch (err) {
+    kwStatus(`자동 글 작성 실패: ${err instanceof Error ? err.message : '알 수 없는 오류'}`);
+  } finally {
+    setKwBusy(false);
+    updateAutoKeywords();
   }
 };
 
@@ -382,7 +437,10 @@ document.addEventListener('click', (event) => {
   if (target.closest('#kw-discover')) runKwAction('/api/keywords/discover', '키워드 발굴');
   if (target.closest('#kw-analyze')) runKwAction('/api/keywords/analyze', '재분석');
   if (target.closest('#kw-briefs')) runKwAction('/api/keywords/briefs', '브리프 생성');
+  if (target.closest('#kw-auto-run')) runAutoDraft();
   if (target.closest('#edit-save')) saveEdit();
+  if (target.closest('#kw-auto-category')) updateAutoKeywords();
+  if (target.closest('#kw-auto-keyword')) updateAutoKeywords();
   if (target.closest('#status-apply')) applyStatus();
   if (target.closest('[data-modal-close]')) {
     closeModal(target.closest('.admin-modal'));

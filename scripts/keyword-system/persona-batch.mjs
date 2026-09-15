@@ -67,6 +67,8 @@ export function parsePersonaBatchArgs(
     reviewer: undefined,
     reason: undefined,
     angle: undefined,
+    category: undefined,
+    headKeyword: undefined,
   };
   const supplied = new Set();
   for (let index = 0; index < argv.length; index += 1) {
@@ -91,6 +93,8 @@ export function parsePersonaBatchArgs(
       ["--reviewer", "reviewer"],
       ["--reason", "reason"],
       ["--angle", "angle"],
+      ["--category", "category"],
+      ["--keyword", "headKeyword"],
     ]);
     if (textFlags.has(flag)) {
       result[textFlags.get(flag)] = value;
@@ -214,9 +218,13 @@ export async function buildPersonaBatchPlan({
   persona,
   batchApproval,
   limitPerCategory = Number.MAX_SAFE_INTEGER,
+  category,
+  headKeyword,
 }) {
   const selected = selectPersonaBatchCandidates(readyRecords, discovery, {
     limitPerCategory,
+    category,
+    headKeyword,
   });
   const plan = [];
   for (const record of selected) {
@@ -381,6 +389,8 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
         }
       : undefined,
     limitPerCategory: args.limitPerCategory,
+    category: args.category,
+    headKeyword: args.headKeyword,
   });
   const manifestPath = join(batchDir, "latest.json");
   const manifest = {

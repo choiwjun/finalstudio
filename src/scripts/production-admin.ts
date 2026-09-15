@@ -27,7 +27,17 @@ type AdminKeyword = {
   collectedAt: string;
 };
 
-type ApiBody<T> = { ok: boolean; error?: string; data?: T };
+type ApiBody<T> = {
+  ok: boolean;
+  error?: string;
+  data?: T;
+  status?: string;
+  requestId?: string;
+  conclusion?: string | null;
+  url?: string;
+  stages?: Array<{ name: string; status: string; conclusion: string | null }>;
+  failureReason?: string;
+};
 
 const loginView = document.querySelector<HTMLElement>("#admin-login-view");
 const dashboardView = document.querySelector<HTMLElement>(
@@ -63,6 +73,11 @@ const editorPreview = document.querySelector<HTMLElement>(
 );
 const deleteButton =
   document.querySelector<HTMLButtonElement>("#admin-delete-post");
+const autoDraftForm = document.querySelector<HTMLFormElement>("#admin-auto-draft-form");
+const autoCategory = document.querySelector<HTMLSelectElement>("#admin-auto-category");
+const autoKeyword = document.querySelector<HTMLSelectElement>("#admin-auto-keyword");
+const autoDraftButton = document.querySelector<HTMLButtonElement>("#admin-auto-draft");
+const autoDraftStatus = document.querySelector<HTMLElement>("#admin-auto-draft-status");
 
 let state = Object.freeze({
   posts: [] as AdminPost[],
@@ -130,6 +145,13 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
       invalid_credentials: "비밀번호가 맞지 않습니다.",
       database_unavailable: "데이터베이스에 연결하지 못했습니다.",
       origin_not_allowed: "허용되지 않은 요청입니다.",
+      automation_not_configured: "자동 작성 연동이 설정되지 않았습니다.",
+      automation_configuration_invalid: "자동 작성 연동 설정이 올바르지 않습니다.",
+      automation_dispatch_failed: "자동 작성 작업을 시작하지 못했습니다.",
+      keyword_not_ready: "선택한 키워드는 작성 준비가 되지 않았습니다.",
+      invalid_keyword_selection: "카테고리와 준비된 키워드를 다시 선택하세요.",
+      automation_status_unavailable: "자동 작성 진행 상태를 조회하지 못했습니다.",
+      invalid_request_id: "자동 작성 요청 ID가 올바르지 않습니다.",
     };
     throw new Error(
       errors[body.error ?? ""] ?? body.error ?? "요청을 처리하지 못했습니다.",
@@ -257,7 +279,27 @@ function renderPosts() {
   renderMetrics();
 }
 
+function renderAutoKeywords() {
+  if (!autoCategory || !autoKeyword) return;
+  const selected = autoCategory.value;
+  const matches = state.keywords.filter((keyword) => keyword.category === selected && keyword.status === "ready-to-write");
+  autoKeyword.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = selected ? (matches.length ? "키워드를 선택하세요" : "준비된 키워드가 없습니다") : "카테고리를 먼저 선택하세요";
+  autoKeyword.append(placeholder);
+  for (const keyword of matches) {
+    const option = document.createElement("option");
+    option.value = keyword.headKeyword;
+    option.textContent = keyword.headKeyword;
+    autoKeyword.append(option);
+  }
+  autoKeyword.disabled = !selected || matches.length === 0;
+  if (autoDraftButton) autoDraftButton.disabled = !autoKeyword.value;
+}
+
 function renderKeywords() {
+  renderAutoKeywords();
   if (!keywordRows) return;
   const rows = state.keywords.map((keyword) => {
     const row = document.createElement("tr");
@@ -352,6 +394,7 @@ async function loadDashboard() {
     posts: postsResponse.data ?? [],
     keywords: keywordsResponse.data ?? [],
   });
+  renderAutoKeywords();
   renderPosts();
   renderKeywords();
   message(
@@ -433,6 +476,47 @@ field<HTMLTextAreaElement>("admin-body")?.addEventListener(
   "input",
   updatePreview,
 );
+autoCategory?.addEventListener("change", renderAutoKeywords);
+autoKeyword?.addEventListener("change", renderAutoKeywords);
+autoDraftForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!autoCategory?.value || !autoKeyword?.value) return;
+  if (autoDraftButton) autoDraftButton.disabled = true;
+  message(autoDraftStatus, `「${autoKeyword.value}」 자동 작성 중… 작성·윤문·심사·이미지 생성이 진행됩니다.`);
+  try {
+    const result = await api<{ status: string }>("/api/admin/auto-draft", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: autoCategory.value, keyword: autoKeyword.value }),
+    });
+    message(autoDraftStatus, `자동 작성 작업을 시작했습니다 (${result.status}). 완료 후 초안 목록을 새로고침하세요.`);
+    if (result.requestId) void pollAutoDraft(result.requestId);
+  } catch (error) {
+    message(autoDraftStatus, error instanceof Error ? error.message : "자동 작성 요청에 실패했습니다.");
+  } finally {
+    renderAutoKeywords();
+  }
+});
+
+async function pollAutoDraft(requestId: string) {
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    await new Promise((resolve) => window.setTimeout(resolve, 10_000));
+    try {
+      const result = await api<ApiBody<never>>(`/api/admin/auto-draft/status?request_id=${encodeURIComponent(requestId)}`);
+      const stageText = result.stages?.map((stage) => `${stage.name}: ${stage.conclusion ?? stage.status}`).join(" · ");
+      if (result.status === "completed") {
+        message(autoDraftStatus, result.conclusion === "success" ? `자동 작성 완료 — 초안으로 저장되었습니다. ${stageText ?? ""}` : `자동 작성 실패 — ${result.failureReason ?? "품질 게이트를 확인하세요."} ${stageText ?? ""}`);
+        await loadDashboard();
+        return;
+      }
+      message(autoDraftStatus, `자동 작성 진행 중… ${stageText ?? "GitHub Actions 대기"}`);
+    } catch (error) {
+      message(autoDraftStatus, error instanceof Error ? `진행 상태 조회 실패: ${error.message}` : "진행 상태 조회 실패");
+      return;
+    }
+  }
+  message(autoDraftStatus, "자동 작성 상태 조회 시간이 초과되었습니다. Actions에서 실행 결과를 확인하세요.");
+}
 
 postForm?.addEventListener("submit", async (event) => {
   event.preventDefault();

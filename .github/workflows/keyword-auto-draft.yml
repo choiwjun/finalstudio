@@ -1,0 +1,93 @@
+name: Keyword Auto Draft
+
+# Worker가 dispatch한 단일 후보를 검수 전 draft로 생성한다. publish 플래그는 사용하지 않는다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "카테고리"
+        required: true
+        type: choice
+        options:
+          - economy-business
+          - ai
+          - travel
+      keyword:
+        description: "ready-to-write 대표 키워드"
+        required: true
+        type: string
+      request_id:
+        description: "관리자 요청 추적 ID"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+run-name: "Keyword draft ${{ inputs.request_id }} / ${{ inputs.category }} / ${{ inputs.keyword }}"
+
+concurrency:
+  group: keyword-auto-draft
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    # OAuth CLI 세션은 저장소에 넣을 수 없으므로, Codex/선택적 agy가
+    # 사전 로그인된 전용 self-hosted runner에서만 실행한다.
+    runs-on: [self-hosted, linux, x64, wjblog-ai]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: OAuth CLI 사전 검증
+        run: |
+          command -v codex
+          codex login status
+      - name: 요청 ID 검증
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+        run: |
+          node --input-type=module -e 'const id=process.env.REQUEST_ID ?? ""; if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) process.exit(1)'
+      - name: 브리프 생성
+        env:
+          CATEGORY: ${{ inputs.category }}
+          KEYWORD: ${{ inputs.keyword }}
+        run: node scripts/keyword-system/brief.mjs --category "$CATEGORY" --keyword "$KEYWORD"
+      - name: 본문·윤문·심사·이미지 생성
+        env:
+          CATEGORY: ${{ inputs.category }}
+          KEYWORD: ${{ inputs.keyword }}
+        run: node scripts/keyword-system/auto-publish.mjs --category "$CATEGORY" --keyword "$KEYWORD"
+      - name: 품질 게이트
+        run: |
+          npm run check:content
+          mapfile -t drafts < <(git status --porcelain=v1 --untracked-files=all | sed -n 's/^.. //p' | grep -E '^src/content/posts/[^/]+\.md$' || true)
+          if [ "${#drafts[@]}" -eq 0 ]; then
+            echo "생성된 Markdown 초안을 찾을 수 없습니다."
+            exit 1
+          fi
+          for draft in "${drafts[@]}"; do
+            node scripts/check-writing.mjs "$draft"
+          done
+          npm run build
+          npm run check:build
+      - name: 생성된 초안 저장
+        env:
+          CATEGORY: ${{ inputs.category }}
+          KEYWORD: ${{ inputs.keyword }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- src/content/posts public/images data/keywords/records.json data/keywords/ready-to-write.json data/keywords/decisions.jsonl
+          if git diff --cached --quiet; then
+            echo "생성된 변경사항이 없습니다."
+            exit 1
+          fi
+          git commit -m "chore: create draft for ${CATEGORY}/${KEYWORD}"
+          git push origin HEAD:main

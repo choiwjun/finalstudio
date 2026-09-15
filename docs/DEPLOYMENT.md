@@ -40,14 +40,28 @@ gh run list --workflow=scheduled-publish.yml --limit 1
 - secret 미등록 시 워크플로는 빌드 검증만 하고 notice로 종료 (실패 아님).
 - secret 등록 후에는 build/check 통과 시 `curl -X POST $DEPLOY_HOOK_URL`로 Pages 재배포를 트리거한다.
 
-## 2. 예약 발행 흐름
+## 2. 관리자 자동 작성 흐름
+
+운영 `/admin/`에서 카테고리와 `ready-to-write` 키워드를 선택하면 Worker가 GitHub Actions의 `keyword-auto-draft.yml`을 `workflow_dispatch`로 호출합니다. Worker에는 다음 값을 secret/환경 변수로 등록합니다.
+
+- `GITHUB_TOKEN`: 해당 저장소 workflow dispatch 권한을 가진 최소 권한 토큰. 브라우저에는 노출하지 않는다.
+- `GITHUB_REPOSITORY`: 선택 사항. 기본값 `choiwjun/finalstudio`, `owner/repository` 형식만 허용.
+- `GITHUB_WORKFLOW`: 선택 사항. 기본값 `keyword-auto-draft.yml`. 값은 workflow 파일명만 허용되며, 잘못된 repository/workflow 설정은 `automation_configuration_invalid`로 거부됩니다.
+
+Workflow는 브리프 생성 → 본문·윤문·독립 심사·이미지 생성 → 콘텐츠/빌드 검사를 모두 통과한 뒤 변경사항을 `draft`로 커밋합니다. 호출 시 `--publish`를 사용하지 않으므로 자동 공개하지 않습니다. GitHub Actions 저장소 설정에서 workflow 권한과 `contents: write`를 확인하세요. 이 작업은 `self-hosted` runner label `wjblog-ai`를 사용하도록 고정되어 있습니다.
+
+작성·윤문·심사·이미지 생성은 저장소가 사용하는 OAuth CLI(Codex 기본, 설정 시 Antigravity `agy`)가 실행 환경에 로그인되어 있어야 합니다. 장기 토큰이나 OAuth 세션을 저장소에 커밋하지 마세요. Workflow는 실행 전에 `command -v codex`와 `codex login status`를 확인하며, 인증이 없는 runner에서는 실패하고 글을 저장하지 않습니다. self-hosted runner는 저장소 전용으로 격리하고 작업 후 workspace와 OAuth 자격 증명을 보존·공유하지 않도록 운영하세요.
+
+상태는 `/api/admin/auto-draft/status?request_id=<UUID>`로 조회되며 관리자 화면에 실행 단계와 품질 게이트 실패 여부를 표시합니다. Workflow의 `run-name`은 `Keyword draft <UUID> / <category> / <keyword>` 형식이므로 이 요청 ID로 정확한 실행을 찾습니다.
+
+## 3. 예약 발행 흐름
 
 - 글 승인 시 사람이 `status: scheduled` + `publishAt`을 frontmatter에 기록한다.
 - `scheduled-publish.yml`이 15분마다 실행되어 저장소를 재빌드하고 Deploy Hook을 호출한다.
 - `check:content`/`check:build`가 `publishAt` 미도래 scheduled 글을 공개 산출물에서 제외하는지
   빌드 단계에서 검증한다 (실패 시 배포 요청까지 가지 않고 중단).
 
-## 3. 장애·복구 절차
+## 4. 장애·복구 절차
 
 ### 3-1. Pages 배포 실패 (빌드 오류)
 
@@ -78,10 +92,13 @@ gh run list --workflow=scheduled-publish.yml --limit 1
 - Pages 대시보드에서 hook 삭제 후 재생성 → `gh secret set DEPLOY_HOOK_URL`로 갱신.
 - 오래된 hook URL은 재생성 즉시 무효화된다.
 
-## 4. 미결 사항 (사람 입력 필요)
+## 5. 미결 사항 (사람 입력 필요)
 
 - [ ] 실제 공개 도메인 (`*.pages.dev` 기본 or 커스텀 도메인) 확정
 - [ ] `PUBLIC_SITE_URL` 값 확정 후 Pages env에 등록
 - [ ] Deploy Hook URL 발급 → `DEPLOY_HOOK_URL` secret 등록
+- [ ] `wjblog-ai` self-hosted runner를 저장소 전용으로 구성하고 Codex OAuth 인증을 안전하게 등록
+- [ ] 운영 Worker에 `GITHUB_TOKEN` secret 및 Actions 권한 설정
+- [ ] 자동 작성 workflow 수동 실행 후 draft·이미지·상태 조회 확인
 - [ ] 예약 발행 워크플로 수동 실행 후 실제 URL에서 전후 확인
 - [ ] Safari/iOS 브라우저 확인 (Playwright 환경에서 미검증)
