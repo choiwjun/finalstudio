@@ -735,6 +735,17 @@ let candidate = humanized;
 let finalText = humanized;
 let judgeScore = NaN;
 let judgeOutputText = "";
+// Track the highest-scoring candidate across correction passes. The
+// correction loop can regress (a pass that fixes one flaw can introduce
+// another), so the gate must evaluate the best draft seen, not the last.
+let bestCandidate = humanized;
+let bestCandidateScore = -1;
+let bestCandidateJudgeOutput = "";
+let bestCandidateAnalysis = analyzePost(candidate, {
+  format,
+  expectedMarkers,
+  notes: notesContent,
+});
 let analysis = analyzePost(candidate, {
   format,
   expectedMarkers,
@@ -767,6 +778,19 @@ while (passes < MAX_PASSES) {
   console.log(
     `  [독립 심사] ${Number.isNaN(judgeScore) ? "점수 파싱 실패" : `${judgeScore}점`} / 기계 실패 ${analysis.failures.length}건`,
   );
+  // Keep the best mechanically-passing candidate seen so far. A candidate
+  // that fails the mechanical check can never ship, so it is not eligible
+  // for best regardless of judge score.
+  if (
+    analysis.pass &&
+    !Number.isNaN(judgeScore) &&
+    judgeScore > bestCandidateScore
+  ) {
+    bestCandidate = candidate;
+    bestCandidateScore = judgeScore;
+    bestCandidateAnalysis = analysis;
+    bestCandidateJudgeOutput = judgeOutput;
+  }
   if (analysis.pass && judgeScore >= JUDGE_THRESHOLD) {
     finalText = candidate;
     break;
@@ -818,11 +842,14 @@ while (passes < MAX_PASSES) {
   }
 }
 
-const finalCheck = analyzePost(finalText, {
-  format,
-  expectedMarkers,
-  notes: notesContent,
-});
+// Gate on the best candidate seen across all passes, not the last one. A
+// later correction can score lower than an earlier draft; shipping the
+// last would discard a higher-scoring draft that already passed the
+// mechanical check.
+finalText = bestCandidate;
+judgeScore = bestCandidateScore;
+judgeOutputText = bestCandidateJudgeOutput;
+const finalCheck = bestCandidateAnalysis;
 writeFileSync(
   join(runDir, "05-writing-check-final.json"),
   JSON.stringify(finalCheck, null, 2),
@@ -830,7 +857,7 @@ writeFileSync(
 );
 if (!(finalCheck.pass && judgeScore >= JUDGE_THRESHOLD)) {
   fail(
-    `게이트 미통과 — 기계 실패 ${finalCheck.failures.length}건, 독립 심사 ${Number.isNaN(judgeScore) ? "점수 없음" : `${judgeScore}점`}. out/auto-publish/${runId}/ 리포트를 확인하세요.`,
+    `게이트 미통과 — 기계 실패 ${finalCheck.failures.length}건, 독립 심사 ${Number.isNaN(judgeScore) || judgeScore < 0 ? "점수 없음" : `${judgeScore}점`}. out/auto-publish/${runId}/ 리포트를 확인하세요.`,
   );
 }
 console.log(
