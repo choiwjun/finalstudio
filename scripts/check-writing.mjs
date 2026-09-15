@@ -16,13 +16,13 @@ const WARN = 'warn';
 
 /** 형식별 규칙. minChars는 생성 루프 기준이며 발행 게이트(1,500자)와 별개다. */
 export const FORMAT_RULES = {
-  'how-to': { minChars: 1200, require: ['numbered-list', 'table'], forbid: [] },
-  review: { minChars: 800, require: ['eval-criteria', 'cons'], forbid: [] },
-  essay: { minChars: 500, require: [], forbid: ['faq'] },
-  experience: { minChars: 500, require: [], forbid: [] },
-  'place-log': { minChars: 400, require: [], forbid: [] },
-  'book-memo': { minChars: 400, require: ['quote'], forbid: [] },
-  'photo-log': { minChars: 300, require: ['image'], forbid: [] },
+  'how-to': { minChars: 1200, maxChars: 2800, require: ['numbered-list', 'table'], forbid: [] },
+  review: { minChars: 800, maxChars: 2800, require: ['eval-criteria', 'cons'], forbid: [] },
+  essay: { minChars: 500, maxChars: 2200, require: [], forbid: ['faq'] },
+  experience: { minChars: 500, maxChars: 2200, require: [], forbid: [] },
+  'place-log': { minChars: 400, maxChars: 2200, require: [], forbid: [] },
+  'book-memo': { minChars: 400, maxChars: 2200, require: ['quote'], forbid: [] },
+  'photo-log': { minChars: 300, maxChars: 1800, require: ['image'], forbid: [] },
 };
 
 const MARKER_RE = /\[(직접 확인 필요|테스트 필요|스크린샷|출처 확인 필요)[^\]]*\]/g;
@@ -35,6 +35,35 @@ const FORBIDDEN_PHRASES = [
 const CONTEXT_DEPENDENT = [
   '위에서 말한', '위에서 설명한', '앞서 말한', '앞서 언급한', '아서 설명했듯', '앞서 본 것처럼',
 ];
+
+// 사람이 쓴 글처럼 보이게 하는 형식적 경험 신호 — 실제 테스트 없이 쓰면 AI 티.
+const FAKE_EXPERIENCE = [
+  '제가 쓰는 순서', '제가 쓰는 방법', '제가 해보니', '제가 해보니까',
+  '제가 직접', '제가 실제로', '제가 확인해', '제 경험상', '제가 겪은',
+];
+
+// 문장 정규화 — 비교 목적이므로 마크다운·공백·조사 변형을 제거한다.
+const normalizeSentence = (s) =>
+  s
+    .replace(/<!--.*?-->/g, ' ') // HTML 주석(자동 이미지 마커 포함)은 산문이 아님
+    .replace(/[\s*_\-`#\[\]()>|「」"'·~…]/g, '');
+
+// 한 문장 안에서 연속으로 겹치는 문자 n-gram 집합.
+const charNgrams = (s, n = 10) => {
+  const g = new Set();
+  for (let i = 0; i + n <= s.length; i++) g.add(s.slice(i, i + n));
+  return g;
+};
+
+// 두 문장의 n-gram 자카드 유사도 — 같은 예시·같은 구절의 재탕을 잡는다.
+const sentenceSimilarity = (a, b) => {
+  const ga = charNgrams(a);
+  const gb = charNgrams(b);
+  if (ga.size === 0 || gb.size === 0) return 0;
+  let inter = 0;
+  for (const g of ga) if (gb.has(g)) inter += 1;
+  return inter / (ga.size + gb.size - inter);
+};
 
 const STRUCTURE_REQUIRE = {
   faq: { label: 'FAQ 섹션', test: (t) => /(^|\n)#{2,3}[^\n]*(FAQ|자주 묻는|자주 하는 질문)/i.test(t) },
@@ -56,12 +85,21 @@ export const parseFrontmatter = (text) => {
 const extractProse = (body) => {
   const lines = [];
   let inFence = false;
+  let inSourceList = false;
   for (const raw of body.split('\n')) {
     const line = raw.trimEnd();
     if (/^```/.test(line.trim())) { inFence = !inFence; continue; }
     if (inFence) continue;
     if (/^\s*\|/.test(line)) continue;
-    if (/^#{1,6}\s/.test(line.trim())) continue;
+    // 링크 목록 항목은 어떤 섹션에서든 참조 목록 — 산문 반복 검사에서 제외
+    if (/^\s*[-*]\s*\[[^\]]*\]\(https?:\/\//.test(line)) continue;
+    if (/^#{1,6}\s/.test(line.trim())) {
+      // 출처·링크 모음 섹션은 본문 산문이 아니라 참조 목록 — 반복·밀도 검사에서 제외
+      inSourceList = /출처|참고|링크 모음|source/i.test(line);
+      continue;
+    }
+    if (inSourceList && /^\s*[-*]\s*\[.*\]\(https?:\/\//.test(line)) continue;
+    if (line.trim()) inSourceList = false;
     lines.push(line.replace(MARKER_RE, ' '));
   }
   return lines.join('\n');
@@ -220,6 +258,101 @@ export function analyzePost(md, options = {}) {
 
   for (const phrase of CONTEXT_DEPENDENT) {
     if (body.includes(phrase)) add(FAIL, 'context-dependent', `문맥 의존 표현: "${phrase}"`);
+  }
+
+  // ── AI 티: 같은 예시·문장 재탕, 종결 다양성, 가짜 경험 신호 ──
+  const normalizedSentences = sentences
+    .map(normalizeSentence)
+    .filter((s) => s.length >= 25);
+  let worstPair = null;
+  for (let i = 0; i < normalizedSentences.length; i++) {
+    for (let j = i + 1; j < normalizedSentences.length; j++) {
+      const sim = sentenceSimilarity(normalizedSentences[i], normalizedSentences[j]);
+      if (sim >= 0.18 && (!worstPair || sim > worstPair.sim)) {
+        worstPair = { sim, a: normalizedSentences[i], b: normalizedSentences[j] };
+      }
+    }
+  }
+  if (worstPair) {
+    add(
+      FAIL,
+      'repeated-passage',
+      `같은 구절·예시가 다른 문장에서 반복 (유사도 ${worstPair.sim.toFixed(2)}): "${worstPair.a.slice(0, 40)}…" ≈ "${worstPair.b.slice(0, 40)}…"`,
+    );
+  }
+
+  // 종결어미 다양성 — "~합니다/습니다/세요"만 기계적으로 반복하면 AI 티.
+  const endingCounts = {};
+  for (const s of sentences) {
+    const m = s.trim().match(/([가-힣]{2,4}(?:습니다|합니다|세요|해요|인데요|거든요|됩니다|입니다|까요|죠|네요|더라고요|습니다만|합니다만))[.!?]?$/u);
+    if (m) endingCounts[m[1]] = (endingCounts[m[1]] ?? 0) + 1;
+  }
+  const topEnding = Object.entries(endingCounts).sort((a, b) => b[1] - a[1])[0];
+  if (topEnding && topEnding[1] >= 4 && topEnding[1] > sentences.length * 0.3) {
+    add(
+      WARN,
+      'ending-monotony',
+      `종결어미 "${topEnding[0]}" ${topEnding[1]}회 — 문장 끝을 다양하게 섞으세요`,
+    );
+  }
+
+  for (const phrase of FAKE_EXPERIENCE) {
+    if (body.includes(phrase)) {
+      const severity = (options.notes ?? '').includes(phrase) ? WARN : FAIL;
+      add(
+        severity,
+        'fake-experience',
+        `형식적 경험 신호: "${phrase}" — 실제 테스트 없이 쓰면 AI 티. notes에 근거가 있을 때만 허용`,
+      );
+    }
+  }
+
+  // 정보 나열 억제 — 표·불릿이 본문을 지배하면 감사 문서처럼 읽힌다.
+  // 출처 링크 목록(참조 섹션)은 정보 나열이 아니라 참조 목록이므로 제외한다.
+  // 출처 열이 있는 표 행과 출처 링크 불릿은 참조 목록 — 정보 나열 밀도에서 제외
+  // 출처·참고 링크 목록과 출처 열을 가진 표 행은 참조 목록 — 밀도 계산에서 제외
+  const sourceListRows =
+    (body.match(/^\s*[-*]\s*\[[^\]]*\]\(https?:\/\/[^)]+\)[^\n|]*$/gm) ?? [])
+      .length +
+    (body.match(/^\|[^\n]*\[[^\]]*\]\(https?:\/\/[^)]+\)[^\n]*\|/gm) ?? [])
+      .length +
+    // 표 헤더·구분선 행은 내용 행이 아니므로 제외
+    (body.match(/^\|[\s\-|]+\|$/gm) ?? []).length +
+    (body.match(/^\|[^\n]*\|[^\n]*\|/gm) ?? []).filter((row) =>
+      /상황|방법|주의|항목|내용|기준|확인|후보|유형|특징|이유|비고|선택|조건|출처/.test(
+        row,
+      ),
+    ).length;
+  const visualRows = Math.max(
+    0,
+    (body.match(/^\|/gm) ?? []).length +
+      (body.match(/^\s*[-*+]\s/gm) ?? []).length +
+      (body.match(/^\s*\d+[.)]\s/gm) ?? []).length -
+      sourceListRows,
+  );
+  const listDensity = chars > 0 ? visualRows / (chars / 1000) : 0;
+  if (listDensity > 14) {
+    add(
+      FAIL,
+      'list-density',
+      `표·목록 과다 (1,000자당 ${listDensity.toFixed(1)}개) — 산문으로 풀어쓸 부분을 늘리세요`,
+    );
+  } else if (listDensity > 11) {
+    add(
+      WARN,
+      'list-density',
+      `표·목록이 많습니다 (1,000자당 ${listDensity.toFixed(1)}개) — 산문 비중을 높이세요`,
+    );
+  }
+
+  // how-to·review는 정보 나열로 길어지기 쉬우므로 상한을 둔다.
+  const maxChars = rules.maxChars;
+  if (maxChars && chars > maxChars) {
+    add(
+      WARN,
+      'max-chars',
+      `본문 ${chars}자 — ${format} 권장 상한 ${maxChars}자 초과. 범위를 좁히거나 문장을 줄이세요`,
+    );
   }
 
   for (const key of rules.require) {
