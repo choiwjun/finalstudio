@@ -92,17 +92,20 @@ test("single-line report tolerates the prompt's trailing self-check bullet list"
   assert.equal(result.article, "기사 본문입니다.\n\n");
   assert.equal(result.archive.text, tail);
   assert.equal(restoreGeneratedReport(result.article, result.archive), source);
-  // The spec allows a parenthetical note on the closing line.
-  const noted = source.replace(
-    "자체검증: 6항 중 6항 통과",
+  // The spec allows a parenthetical note or trailing punctuation on the
+  // closing line.
+  for (const closing of [
     "자체검증: 6항 중 6항 통과 (기존 검증 마커 없음)",
-  );
-  const notedResult = separateGeneratedReport(noted);
-  assert.equal(notedResult.article, "기사 본문입니다.\n\n");
-  assert.equal(
-    restoreGeneratedReport(notedResult.article, notedResult.archive),
-    noted,
-  );
+    "자체검증: 6항 중 6항 통과.",
+  ]) {
+    const noted = source.replace("자체검증: 6항 중 6항 통과", closing);
+    const notedResult = separateGeneratedReport(noted);
+    assert.equal(notedResult.article, "기사 본문입니다.\n\n");
+    assert.equal(
+      restoreGeneratedReport(notedResult.article, notedResult.archive),
+      noted,
+    );
+  }
   // Non-list trailing prose after the closing line is still reader content.
   assert.throws(
     () =>

@@ -39,14 +39,15 @@ export function separateGeneratedReport(source) {
   // line, a 변경률 field, a category/change list, and the fixed closing line —
   // nothing after it, or it is not process metadata and we fail closed.
   // The prompt's 자체검증 section enumerates a fixed 6-item checklist, so the
-  // model may echo it as a bullet list after the closing line, and the spec
-  // allows a parenthetical note ("(미통과 시 항목 명시)") on that line.
-  // Tolerate both while still requiring the report to end at end-of-source —
-  // anything else after the closing line is reader content and we fail closed.
+  // model may echo it as a bullet list after the closing line, and may append
+  // punctuation or a short note (e.g. a period or "(미통과 시 항목 명시)").
+  // Tolerate a single-line trailing note plus the checklist while still
+  // requiring the report to end at end-of-source — anything else after the
+  // closing line is reader content and we fail closed.
   const looseMatch = strictMatch
     ? null
     : text.match(
-        /^(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n[\s\S]*?변경률: 약?\s*(\d{1,3})%[\s\S]*?자체검증: 6항 중 6항 통과(?:\s*\([^\r\n()]*\))?(?:[ \t]*\r?\n[ \t]*-[ \t][^\r\n]*|[ \t]*\r?\n)*\s*$/u,
+        /^(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n[\s\S]*?변경률: 약?\s*(\d{1,3})%[\s\S]*?자체검증: 6항 중 6항 통과[^\r\n]{0,80}(?:[ \t]*\r?\n[ \t]*-[ \t][^\r\n]*|[ \t]*\r?\n)*\s*$/u,
       );
   if (strictMatch) {
     if (
