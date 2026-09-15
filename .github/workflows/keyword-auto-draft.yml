@@ -115,7 +115,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- src/content/posts public/images data/keywords/records.json data/keywords/ready-to-write.json data/keywords/decisions.jsonl
+          git add -- src/content/posts public/images data/keywords/records.json data/keywords/ready-to-write.json data/keywords/ready-to-write.json.commit.json data/keywords/decisions.jsonl
           if git diff --cached --quiet; then
             echo "생성된 변경사항이 없습니다."
             exit 1
