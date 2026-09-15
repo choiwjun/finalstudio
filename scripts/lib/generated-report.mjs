@@ -47,7 +47,7 @@ export function separateGeneratedReport(source) {
   const looseMatch = strictMatch
     ? null
     : text.match(
-        /^(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n[\s\S]*?변경률: 약?\s*(\d{1,3})%[\s\S]*?자체검증: 6항 중 6항 통과[^\r\n]{0,80}(?:[ \t]*\r?\n[ \t]*-[ \t][^\r\n]*|[ \t]*\r?\n)*\s*$/u,
+        /^(?:---\r?\n\r?\n윤문 리포트\r?\n\r?\n|(?:---\r?\n\r?\n)?--- 윤문 리포트 ---[ \t]*\r?\n)[\s\S]*?변경률: 약?\s*(\d{1,3})%[\s\S]*?자체검증: 6항 중 6항 통과[^\r\n]{0,80}(?:[ \t]*\r?\n[ \t]*-[ \t][^\r\n]*|[ \t]*\r?\n)*\s*$/u,
       );
   if (strictMatch) {
     if (

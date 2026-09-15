@@ -116,3 +116,15 @@ test("single-line report tolerates the prompt's trailing self-check bullet list"
     /report/,
   );
 });
+test("strict-boundary report with a 주요 변경 range still separates", () => {
+  // The model may write '주요 변경 3~5건:' (a range) under the strict
+  // '---\n\n윤문 리포트' boundary. The loose matcher must accept that boundary
+  // form too, not only the single-line '--- 윤문 리포트 ---' variant.
+  const tail =
+    "---\n\n윤문 리포트\n\n변경률: 12%\n\n카테고리별 수정: 문장 직결 5건\n\n주요 변경 3~5건:\n\n- \"전\" → \"후\"\n\n자체검증: 6항 중 6항 통과.\n";
+  const source = "기사 본문입니다.\n\n" + tail;
+  const result = separateGeneratedReport(source);
+  assert.equal(result.article, "기사 본문입니다.\n\n");
+  assert.equal(result.archive.text, tail);
+  assert.equal(restoreGeneratedReport(result.article, result.archive), source);
+});
