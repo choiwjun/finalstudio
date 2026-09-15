@@ -6,7 +6,13 @@ import {
   IMAGE_BACKEND,
   assertGeminiCli,
 } from "../../auto-publish/backends.mjs";
-export const IMAGE_DEADLINE_MS = 900_000;
+// One image bundle = up to `subCount`+1 sequential image model calls plus a
+// visual judge call. Each image subprocess is a full model invocation that
+// routinely takes 3-5min, so 3 images + a judge can exceed 15min on a slow
+// runner. 15min was too tight and killed bundles mid-generation; 30min keeps
+// a real bound without starving legitimate work. The workflow job timeout is
+// the outer bound on the whole auto-draft job.
+export const IMAGE_DEADLINE_MS = 1_800_000;
 export function checkDeadline(deadline) {
   if (!Number.isFinite(deadline) || Date.now() >= deadline)
     throw Error("image bundle shared deadline exceeded");
