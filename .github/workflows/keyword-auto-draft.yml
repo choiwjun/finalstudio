@@ -76,6 +76,8 @@ jobs:
         env:
           CATEGORY: ${{ inputs.category }}
           KEYWORD: ${{ inputs.keyword }}
+          # 독립 심사가 85~89점대에 머무는 경우가 있어 수정 루프를 한 번 더 돌린다.
+          AUTO_MAX_PASSES: "3"
         run: node scripts/keyword-system/auto-publish.mjs --category "$CATEGORY" --keyword "$KEYWORD"
       - name: 품질 게이트
         run: |
