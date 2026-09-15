@@ -54,6 +54,19 @@ jobs:
           REQUEST_ID: ${{ inputs.request_id }}
         run: |
           node --input-type=module -e 'const id=process.env.REQUEST_ID ?? ""; if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) process.exit(1)'
+      - name: 수집 근거 복원
+        # data/keywords/raw/*는 gitignore되어 checkout에 없다. 브리프는
+        # collection.json이 참조하는 수집 근거를 필요로 하므로 runner 로컬
+        # 캐시에서 worktree로 복원한다. 러너 호스트의
+        # ~/keyword-evidence-cache/raw를 갱신해야 최신 근거가 반영된다.
+        run: |
+          if [ -d "$HOME/keyword-evidence-cache/raw" ]; then
+            mkdir -p data/keywords/raw
+            cp -r "$HOME/keyword-evidence-cache/raw/." data/keywords/raw/
+            echo "restored $(find data/keywords/raw -name '*.json' | wc -l) evidence files"
+          else
+            echo "::warning::runner evidence cache not found at \$HOME/keyword-evidence-cache/raw"
+          fi
       - name: 브리프 생성
         env:
           CATEGORY: ${{ inputs.category }}

@@ -17,6 +17,16 @@ test("keyword auto-draft workflow fails fast without an authenticated Codex runn
   assert.match(workflow, /command -v codex/);
 });
 
+test("keyword auto-draft workflow restores gitignored collection evidence before brief", async () => {
+  const workflow = await readFile(workflowPath, "utf8");
+  const restoreIdx = workflow.indexOf("keyword-evidence-cache/raw");
+  const briefIdx = workflow.indexOf("scripts/keyword-system/brief.mjs");
+  assert.ok(restoreIdx !== -1, "evidence restore step missing");
+  assert.ok(briefIdx !== -1, "brief step missing");
+  assert.ok(restoreIdx < briefIdx, "evidence must be restored before brief runs");
+  assert.match(workflow, /data\/keywords\/raw/);
+});
+
 test("keyword auto-draft workflow pins third-party actions", async () => {
   const workflow = await readFile(workflowPath, "utf8");
   assert.doesNotMatch(workflow, /uses:\s*actions\/(?:checkout|setup-node)@v\d+/u);
