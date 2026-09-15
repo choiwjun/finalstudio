@@ -89,7 +89,13 @@ export function buildPostRow(slug, text) {
 }
 
 async function readPosts() {
-  const entries = await readdir(postsDir, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(postsDir, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
   const files = entries
     .filter((entry) => entry.isFile() && extname(entry.name) === ".md")
     .sort((a, b) => a.name.localeCompare(b.name));
