@@ -429,8 +429,10 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     const draftText = await readDraftFile(stagedPath);
     let fileName = basename(stagedPath);
     const postsRoot = resolve(root, "src/content/posts");
+    // 첫 초안 설치 시 posts/ 가 아직 없을 수 있다(모든 글이 tombstone 처리된
+    // fresh checkout). 검증된 디렉터리 FD로 각 경로 조각을 안전하게 만든다.
     const postsHandle = await openVerifiedDirectory(postsRoot, {
-      create: false,
+      create: true,
     });
     let draftPath;
     try {

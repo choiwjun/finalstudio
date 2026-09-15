@@ -526,7 +526,9 @@ async function runDraftProcess(draftArgs, { deadline, signal }) {
     signal,
   });
   if (result.code !== 0)
-    throw Error(`draft process failed (exit ${result.code}); no retries`);
+    throw Error(
+      `draft process failed (exit ${result.code}); no retries; stderr: ${String(result.stderr ?? "").slice(-800)}`,
+    );
   const matches = [
     ...result.stdout.matchAll(
       /^created draft (src\/content\/posts\/[a-z0-9-]+\.md) for /gm,
