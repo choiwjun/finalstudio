@@ -42,14 +42,52 @@ test("requires category and keyword together for one-click generation", () => {
   );
 });
 
-test("dry-run selects exactly the requested ready candidate", async () => {
-  const result = await main([
-    "--dry-run",
-    "--category",
-    "ai",
-    "--keyword",
-    "AI 데이터센터",
-  ]);
+test("dry-run selects exactly the requested ready candidate", async (t) => {
+  const briefDir = await mkdtemp(join("out", "wj-test-briefs-"));
+  t.after(() => rm(briefDir, { recursive: true, force: true }));
+  await writeFile(
+    join(briefDir, "ai-AI-데이터센터.json"),
+    JSON.stringify({
+      schema_version: 1,
+      category: "ai",
+      head_keyword: "AI 데이터센터",
+      related_keywords: ["데이터센터 전력", "국가 AI 컴퓨팅센터"],
+      search_intent: "개념",
+      content_angle: "테스트용 브리프",
+      collected_at: "2026-09-14T07:23:07.953Z",
+      freshness: "fresh",
+      source: ["naver-api-hub-blog", "naver-api-hub-trend"],
+      outline: ["개요"],
+      review_gate: "사람 검토 필요; 자동 작성·예약·발행 금지",
+      evidence: {
+        blog: [
+          {
+            title: "테스트 블로그",
+            description: "설명",
+            link: "https://blog.naver.com/test/1",
+            postdate: "20260914",
+            collected_at: "2026-09-14T07:23:07.953Z",
+          },
+        ],
+        trend: [
+          {
+            group_name: "AI 데이터센터",
+            keywords: ["AI 데이터센터"],
+            latest_period: "2026-09-13",
+            latest_ratio: 44.16666,
+            max_ratio: 100,
+            ratio_note: "상대 지표이며 절대 검색량이 아님",
+            collected_at: "2026-09-14T07:23:07.953Z",
+          },
+        ],
+      },
+    }),
+    "utf8",
+  );
+  const result = await main(
+    ["--dry-run", "--category", "ai", "--keyword", "AI 데이터센터"],
+    { briefDir },
+  );
   assert.equal(result.manifest.candidates.length, 1);
   assert.equal(result.manifest.candidates[0].category, "ai");
   assert.equal(result.manifest.candidates[0].head_keyword, "AI 데이터센터");

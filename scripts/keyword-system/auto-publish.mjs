@@ -580,7 +580,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
     readyRecords: records,
     discovery,
     repositoryRoot: ROOT,
-    briefDir: BRIEF_DIR,
+    briefDir: dependencies.briefDir ?? BRIEF_DIR,
     persona,
     limitPerCategory: args.limitPerCategory,
     category: args.category,
