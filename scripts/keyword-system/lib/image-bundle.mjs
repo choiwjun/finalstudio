@@ -387,6 +387,11 @@ export async function generateImageBundle(options) {
           runJudge: options.runJudge ?? runJudgeCodex,
           deadline,
           cwd: paths.outputRoot,
+          // The draft subprocess only writes a post after the independent
+          // judge scores it >=90; the post's existence is the approval
+          // signal. Passing the proven threshold lets the quality check
+          // reuse it instead of re-rolling the judge on identical prose.
+          approvedScore: options.approvedScore,
           recordRaw: (raw) =>
             writeStableTextAtDirectory(directory, "judge.md", raw),
         });

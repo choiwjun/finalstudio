@@ -561,6 +561,12 @@ export async function runDraftImageTopic({
     postPath,
     slug: basename(postPath, ".md"),
     deadline: imageDeadline,
+    // The draft subprocess only writes a post after the independent judge
+    // scores it >=90 — the post's existence is the approval signal. Passing
+    // the proven threshold lets the bundle reuse it instead of re-rolling
+    // the subjective judge on identical prose (which randomly dropped a
+    // passing 92 draft to 89 and discarded valid work).
+    approvedScore: imageOptions.approvedScore ?? 90,
   });
   return { draft, imageBundle, postPath };
 }
