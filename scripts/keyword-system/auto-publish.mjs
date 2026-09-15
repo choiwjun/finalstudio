@@ -540,20 +540,20 @@ async function runDraftProcess(draftArgs, { deadline, signal }) {
 export async function runDraftImageTopic({
   draftArgs,
   imageOptions,
-  deadline = Date.now() + IMAGE_DEADLINE_MS,
+  deadline,
   runDraft = runDraftProcess,
   runImages = generateImageBundle,
 }) {
+  // Each stage gets its own full deadline window. The draft stage runs
+  // multiple judge + correction passes and can consume 15min on its own;
+  // sharing one budget starved whichever stage ran second and killed the
+  // draft mid-correction-loop. The workflow job timeout bounds the total.
+  const draftDeadline = deadline ?? Date.now() + IMAGE_DEADLINE_MS;
   const draft = await withinDeadline(
-    (signal) => runDraft(draftArgs, { deadline, signal }),
-    deadline,
+    (signal) => runDraft(draftArgs, { deadline: draftDeadline, signal }),
+    draftDeadline,
   );
   const postPath = postPathFromResult(draft);
-  // Give image generation its own full deadline window. The draft stage
-  // can consume most of the shared budget (multiple judge + correction
-  // passes); images are a separate stage and should not inherit the
-  // draft's consumed time. The workflow job timeout still bounds the
-  // total.
   const imageDeadline = Date.now() + IMAGE_DEADLINE_MS;
   const imageBundle = await runImages({
     ...imageOptions,
