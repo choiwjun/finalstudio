@@ -832,6 +832,46 @@ while (passes < MAX_PASSES) {
       console.log(
         `  [수정 채택] 기계 실패 ${analysis.failures.length}건 → ${correctedAnalysis.failures.length}건`,
       );
+    } else if (
+      correctedAnalysis.pass &&
+      correctedText.trim() === candidate.trim()
+    ) {
+      // The review model returned a no-op (identical text): it sees no
+      // mechanical failures to fix and preserves the draft. That is a
+      // dead end — instead of giving up, regenerate a fresh draft with
+      // the judge's feedback so the next pass evaluates a genuinely
+      // different candidate.
+      console.log(
+        `  [수정 무변화] 검수 모델이 동일 본문을 반환 — 심사 지적을 반영한 새 초안을 생성합니다.`,
+      );
+      const regenInput = [
+        writerInput,
+        "\n--- 이전 초안에 대한 독립 심사자 지적 (이번 초안에서 반드시 해소할 것) ---",
+        judgeOutput,
+      ].join("\n");
+      const regen = await callModel(writerSystem, regenInput);
+      const regenText = normalizeGeneratedCandidate(
+        extractArticle(regen, candidate),
+        `03-regen-${passes}`,
+      );
+      const regenAnalysis = analyzePost(regenText, {
+        format,
+        expectedMarkers,
+        notes: notesContent,
+      });
+      if (regenAnalysis.pass && regenText.trim() !== candidate.trim()) {
+        candidate = regenText;
+        finalText = candidate;
+        console.log(
+          `  [재생성 채택] 새 초안으로 다음 판정을 진행합니다 (기계 실패 ${regenAnalysis.failures.length}건).`,
+        );
+      } else {
+        finalText = candidate;
+        console.log(
+          `  [재생성 기각] 기계 실패 ${regenAnalysis.failures.length}건 — 이전 본문을 유지하고 종료합니다.`,
+        );
+        break;
+      }
     } else {
       finalText = candidate;
       console.log(
