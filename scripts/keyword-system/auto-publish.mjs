@@ -12,7 +12,6 @@ import { detectContentRisks } from "../lib/content-risk.mjs";
 import { imageRoles as bundleRoles } from "./lib/image-plan.mjs";
 import {
   IMAGE_DEADLINE_MS,
-  checkDeadline,
   withinDeadline,
   runDeadlineProcess,
 } from "./lib/image-runtime.mjs";
@@ -549,14 +548,19 @@ export async function runDraftImageTopic({
     (signal) => runDraft(draftArgs, { deadline, signal }),
     deadline,
   );
-  checkDeadline(deadline);
   const postPath = postPathFromResult(draft);
+  // Give image generation its own full deadline window. The draft stage
+  // can consume most of the shared budget (multiple judge + correction
+  // passes); images are a separate stage and should not inherit the
+  // draft's consumed time. The workflow job timeout still bounds the
+  // total.
+  const imageDeadline = Date.now() + IMAGE_DEADLINE_MS;
   const imageBundle = await runImages({
     ...imageOptions,
     root: ROOT,
     postPath,
     slug: basename(postPath, ".md"),
-    deadline,
+    deadline: imageDeadline,
   });
   return { draft, imageBundle, postPath };
 }
