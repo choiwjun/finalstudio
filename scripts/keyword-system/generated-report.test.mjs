@@ -81,3 +81,24 @@ test("single-line --- 윤문 리포트 --- wrapper is separated only when the ta
     /report/,
   );
 });
+test("single-line report tolerates the prompt's trailing self-check bullet list", () => {
+  // The humanize prompt enumerates a fixed 6-item 자체검증 checklist; the model
+  // may echo it as bullets after the closing line. That tail is still process
+  // metadata and must be archived, not treated as reader prose.
+  const tail =
+    "--- 윤문 리포트 ---\n\n변경률: 약 7%\n\n카테고리별 수정: A 번역투 5건, E 리듬 4건\n\n주요 변경 1건:\n\n- \"전\" → \"후\"\n\n자체검증: 6항 중 6항 통과\n\n- 고유명사·수치·날짜·인용·툴 이름 보존\n- 검증 마커 보존\n- 번호 목록·표·FAQ·헤딩 구조 보존\n- 연결어미 뒤 쉼표 추가 없음\n- 변경률 30% 이하\n- 합니다체 유지\n";
+  const source = "기사 본문입니다.\n\n" + tail;
+  const result = separateGeneratedReport(source);
+  assert.equal(result.article, "기사 본문입니다.\n\n");
+  assert.equal(result.archive.text, tail);
+  assert.equal(restoreGeneratedReport(result.article, result.archive), source);
+  // Non-list trailing prose after the closing line is still reader content.
+  assert.throws(
+    () =>
+      separateGeneratedReport(
+        "기사 본문입니다.\n\n" +
+          tail.replace("합니다체 유지\n", "합니다체 유지\n\n이어지는 독자 본문\n"),
+      ),
+    /report/,
+  );
+});
